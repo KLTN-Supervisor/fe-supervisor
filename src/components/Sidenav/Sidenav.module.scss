@@ -1,0 +1,114 @@
+.sidenav {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+    background-color: #00558d;
+    height: 100%;
+    width: 240px;
+    border-right: white solid 1px;
+    transition: width 0.5s ease; /* Hiệu ứng chuyển đổi mượt mà */
+  }
+  .sidenav__title {
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .sidenav__title__button {
+      display: none;
+    }
+  }
+  
+  .sidenav__logo {
+    width: 120px;
+    margin: 25px;
+  }
+  
+  .sidenav__buttons {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sidenav__button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: white;
+    background: 0;
+    border: 0;
+    margin: 5px 0px 5px 10px;
+    padding: 10px 15px 10px 15px;
+    border-radius: 15px;
+    width: 90%;
+    position: relative;
+    // display: inline-block;
+    .unread{
+      display: flex;
+      justify-content: center; /* Căn giữa ngang */
+      align-items: center; /* Căn giữa dọc */
+      position: absolute;
+      width: 20px;
+      height: 19px;
+      align-items: center;
+      border-radius: 50%;
+      background-color: rgb(255, 8, 8);
+      font-size: 12px;
+      font-weight: 550;
+      bottom: 40px;
+      left: 10%;
+      transform: translate(-50%, 50%);
+    }
+  }
+  
+  .sidenav__button:hover {
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.128);
+    .sidenav__icon {
+      transform: scale(1.05);
+    }
+  }
+  
+  .sidenav__button > span {
+    font-size: 15px;
+    font-weight: 300;
+    margin-left: 20px;
+  }
+  
+  .sidenav__button_avatar {
+    width: 27px;
+    height: 27px;
+  }
+
+  @media (max-width: 1064px) {
+    .sidenav {
+      width: 80px;
+    }
+    .sidenav__title {
+      height: 120px;
+      display: flex;
+      align-items: center;
+      .sidenav__title__button {
+        display: block;
+      }
+      .sidenav__logo {
+        display: none;
+      }
+    }
+    .sidenav__button {
+      width: 71% !important;
+      margin: 5px 10px 5px 10px;
+    }
+    .sidenav__button .unread{
+      left: 20px;
+    }
+    .sidenav__button .span {
+      display: none;
+    }
+    .sidenav__more {
+      width: 80px;
+    }
+    .sidenav__buttonText{
+      display: none;
+    }
+  
+  }

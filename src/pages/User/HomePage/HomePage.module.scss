@@ -1,0 +1,66 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  .homepage {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+  }
+  
+  .homepage__navWraper {
+    position: relative;
+    width:240px;
+  }
+  
+  .homepage__timeline {
+    flex: 1;
+    width: calc(100vw - 240px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .appvide{
+      display: flex;
+      flex: 1;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .appcanvas{
+      position:fixed;
+      top: 100px;
+    }
+    
+    .myapp h1{
+      width: calc(100vw - 270px);
+      text-align: center;
+      background: #00558d;
+      color: white;
+      margin: 0;
+      padding: 15px;
+    }
+    .myapp{
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+  @media (max-width: 1064px){
+    .homepage {
+      .homepage__navWraper {
+        position: relative;
+        width: 80px;
+      }
+      .homepage__timeline {
+        width: calc(100vw - 80px);
+        .myapp h1{
+          width: calc(100vw - 110px);
+        }
+      }
+    }
+  }
