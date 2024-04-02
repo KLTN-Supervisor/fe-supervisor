@@ -8,74 +8,55 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import GroupsIcon from "@mui/icons-material/Groups";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
-import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
-import ChatIcon from "@mui/icons-material/Chat";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
-import DensityMediumOutlinedIcon from "@mui/icons-material/DensityMediumOutlined";
+import LogoutIcon from '@mui/icons-material/Logout';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
 import { useLocation, useNavigate } from "react-router-dom";
-import { StateContext } from "../../context/StateContext";
 import useLogout from "../../hooks/auth-hook/logout-hook";
 import NavBarLogo from "../../assets/logo-white.png";
-
+import NavBarIcon from "../../assets/NESTME-2.png";
 const cx = classNames.bind(styles);
-function Sidenav({ onScrollToTop }) {
+function Sidenav() {
     const locate = window.location.pathname;
     const { logout } = useLogout();
     const navigate = useNavigate();
-    const [open, setOpen] = useState("");
     return(
         <div style={{ display: "flex" }}>
-            <div className={cx("sidenav")} style={open ? { width: "80px" } : null}>
-                {open ? (
-                    <div
-                        style={{
-                        height: "120px",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        }}
-                    >
-                        <button
-                        className={cx("sidenav__button")}
-                        onClick={() => {
-                            navigate("/", { replace: true });
-                        }}
-                        style={
-                            open ? { width: "71%", margin: "5px 13px 8px 10px" } : null
-                        }
-                        >
-                        <InstagramIcon
-                            className={cx("sidenav__icon")}
-                            style={{ width: "27px", height: "27px" }}
-                        />
-                        </button>
-                    </div>
-                    ) : (
-                    <div className={cx("sidenav__title")}>
-                        <img
-                        style={{ cursor: "pointer" }}
-                        onClick={() => {
-                            navigate("/", { replace: true });
-                        }}
-                        className={cx("sidenav__logo")}
-                        src={NavBarLogo}
-                        alt="Instagram Logo"
-                        />
-                    </div>
-                    )}
-
-                    <div className={cx("sidenav__buttons")}>
+            <div className={cx("sidenav")} >
+                
+                <div
+                    className={cx("sidenav__logo__icon")}
+                >
+                    <img
+                    style={{ cursor: "pointer", width: "27px", height: "27px", borderRadius: "5px" }}
+                    onClick={() => {
+                        navigate("/", { replace: true });
+                    }}
+                    className={cx("sidenav__logo")}
+                    src={NavBarIcon}
+                    alt="NestMe Icon"
+                    />
+                </div>
+                
+                <div className={cx("sidenav__title")}>
+                    <img
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                        navigate("/", { replace: true });
+                    }}
+                    className={cx("sidenav__logo")}
+                    src={NavBarLogo}
+                    alt="NestMe Logo"
+                    />
+                </div>
+                
+                <div className={cx("sidenav__buttons")}>
                     <button
                         onClick={() => {
                         navigate("/", { replace: true });
                         }}
                         className={cx("sidenav__button")}
                         style={
-                        open
-                            ? { width: "71%", margin: "5px 10px 5px 10px" }
-                            : locate === "/"
+                            locate === "/"
                             ? { background: "rgba(255, 255, 255, 0.128)" }
                             : null
                         }
@@ -91,39 +72,37 @@ function Sidenav({ onScrollToTop }) {
                             style={{ width: "27px", height: "27px" }}
                         />
                         )}
-                        {open ? null : <span className={cx("span")}>Home</span>}
+                        <span className={cx("span")}>Trang chủ</span>
                     </button>
                     <button
                         className={cx("sidenav__button")}
                         onClick={() => {
-                            navigate("/search", { replace: true });
+                            navigate("/searchExamSchedule", { replace: true });
                             }}
-                        style={Object.assign(
-                        {},
-                        open ? { width: "71%", margin: "5px 10px 5px 10px" } : {},
-                        open === "Search" ? { background: "rgba(255, 255, 255, 0.128)" } : {}
-                        )}
+                            style={
+                                locate === "/searchExamSchedule"
+                                ? { background: "rgba(255, 255, 255, 0.128)" }
+                                : null
+                            }
                     >
                         <SearchIcon
                         className={cx("sidenav__icon")}
                         style={{ width: "27px", height: "27px", fontWeight: "900" }}
                         />
-                        {open ? null : <span className={cx("span")}>Search</span>}
+                        <span className={cx("span")}>Tra cứu phòng thi</span>
                     </button>
                     <button
                         onClick={() => {
-                        navigate("/group", { replace: true });
+                        navigate("/searchStudent", { replace: true });
                         }}
                         className={cx("sidenav__button")}
                         style={
-                        open
-                            ? { width: "71%", margin: "5px 10px 5px 10px" }
-                            : locate === "/group" || locate.startsWith("/g/")
+                            locate === "/searchStudent"
                             ? { background: "rgba(255, 255, 255, 0.128)" }
                             : null
                         }
                     >
-                        {locate === "/group" ? (
+                        {locate === "/searchStudent" ? (
                         <GroupsIcon
                             className={cx("sidenav__icon")}
                             style={{ width: "27px", height: "27px" }}
@@ -135,72 +114,19 @@ function Sidenav({ onScrollToTop }) {
                         />
                         )}
 
-                        {open ? null : <span className={cx("span")}>Groups</span>}
+                       <span className={cx("span")}>Tra cứu sinh viên</span>
                     </button>
-                    {/* <button
-                        className={cx("sidenav__button")}
-                        style={open ? { width: "71%", margin: "5px 10px 5px 10px" } : null}
-                    >
-                        <MovieOutlinedIcon
-                        className={cx("sidenav__icon")}
-                        style={{ width: "27px", height: "27px" }}
-                        />
-                        {open ? null : <span>Reels</span>}
-                    </button> */}
-                    <button
-                        className={cx("sidenav__button")}
-                        style={
-                        open
-                            ? { width: "71%", margin: "5px 10px 5px 10px" }
-                            : locate === "/chat"
-                            ? { background: "rgba(255, 255, 255, 0.128)" }
-                            : null
-                        }
-                    >
-                        {locate === "/chat" ? (
-                        <ChatIcon
+                    <div className={cx("sidenav__more")}>
+                        <button
+                            className={cx("sidenav__button")}
+                        >
+                            <LogoutIcon
                             className={cx("sidenav__icon")}
                             style={{ width: "27px", height: "27px" }}
-                        />
-                        ) : (
-                        <ChatOutlinedIcon
-                            className={cx("sidenav__icon")}
-                            style={{ width: "27px", height: "27px" }}
-                        />
-                        )}
-                        {open ? null : <span className={cx("span")}>Messages</span>}
-                    </button>
-                    <button
-                        className={cx("sidenav__button")}
-                        style={Object.assign(
-                        {},
-                        open ? { width: "71%", margin: "5px 10px 5px 10px" } : {},
-                        open === "Notification" ? { background: "rgba(255, 255, 255, 0.128)" } : {}
-                        )}
-                    >
-                        {open === "Notification" ? (
-                        <FavoriteIcon
-                            className={cx("sidenav__icon")}
-                            style={{ width: "27px", height: "27px" }}
-                        />
-                        ) : (
-                        <FavoriteBorderIcon
-                            className={cx("sidenav__icon")}
-                            style={{ width: "27px", height: "27px" }}
-                        />
-                        )}
-                        {open ? null : <span className={cx("span")}>Notifications</span>}
-                    </button>
-                    <button
-                        className={cx("sidenav__button")}
-                        style={open ? { width: "71%", margin: "5px 10px 5px 10px" } : null}
-                    >
-                        <AddBoxOutlinedIcon
-                        className={cx("sidenav__icon")}
-                        style={{ width: "27px", height: "27px" }}
-                        />
-                        {open ? null : <span className={cx("span")}>Create</span>}
-                    </button>
+                            />        
+                            <span className={cx("sidenav__buttonText span")}>Đăng xuất</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

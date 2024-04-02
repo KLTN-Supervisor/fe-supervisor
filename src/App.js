@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { Routes, Route } from "react-router-dom";
 
-import { publicRoutes } from "./routes";
+import { publicRoutes, adminRoutes } from "./routes";
 //import { DefaultLayout } from './Layout';
 import { ToastContainer } from "react-toastify";
 
@@ -34,6 +34,26 @@ function App() {
             />
           );
         })}
+        <Route 
+          // element={<RequireAuth admin={true} />}
+          >
+          {adminRoutes.map((route, index) => {
+            const Pages = route.components || [];
+
+            const Layout = route.layout || Fragment;
+            return (
+              <Route key={index} path={route.path} element={<Layout />}>
+                {Pages.map((comp, compIndex) => (
+                  <Route
+                    key={compIndex}
+                    path={comp.path}
+                    element={<comp.component />}
+                  />
+                ))}
+              </Route>
+            );
+          })}
+        </Route>
       </Routes>
       <ToastContainer
         position="top-right"

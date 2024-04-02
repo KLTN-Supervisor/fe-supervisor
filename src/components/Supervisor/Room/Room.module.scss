@@ -1,0 +1,38 @@
+.room{
+    border:rgba(0, 85, 141, 0.5) solid 1px;
+    color: rgb(0 36 147 / 83%);
+    border-radius: 10px;
+    width: 11.8%;
+    padding: 0.5%;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1.8%;
+}
+.room:hover{
+    background-color: rgba(208, 208, 208, 0.229);
+    cursor: pointer;
+}
+
+@media (max-width: 1164px){
+    .room {
+        width: 15%;
+    }
+  }
+@media (max-width: 780px){
+    .room {
+        width: 20%;
+    }
+}
+@media (max-width: 584px){
+    .room {
+        width: 28%;
+    }
+}
+@media (max-width: 400px){
+    .room {
+        width: 44%;
+    }
+}

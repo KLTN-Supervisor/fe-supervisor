@@ -54,7 +54,7 @@ function HomePage() {
         new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
 
       // DRAW YOU FACE IN WEBCAM
-      canvasRef.current.innerHtml = faceapi.createCanvasFromMedia(videoRef.current)
+      canvasRef.current.innerHtml = faceapi.createCanvas(videoRef.current)
       faceapi.matchDimensions(canvasRef.current,{
         width:940,
         height:650
@@ -69,8 +69,23 @@ function HomePage() {
       faceapi.draw.drawFaceLandmarks(canvasRef.current,resized)
       faceapi.draw.drawFaceExpressions(canvasRef.current,resized)
     };
-
     intervalRef.current = setInterval(runFaceDetection, 1000);
+    setTimeout(() => {
+      clearInterval(intervalRef.current);
+
+      const stream = videoRef.current.srcObject;
+      console.log(stream);
+      // Lấy danh sách các track trong stream
+      const tracks = stream.getTracks();
+
+      // Dừng tất cả các track trong stream
+      tracks.forEach(track => track.stop());
+
+      // Xóa đối tượng stream khỏi video element
+      videoRef.current.srcObject = null;
+
+    }, 1000000);
+    
   }
 
 
@@ -81,7 +96,7 @@ function HomePage() {
       </div>
       <div className={cx("homepage__timeline")}>
       <div className={cx("myapp")}>
-        <h1>Face Detection</h1>
+        <h1>Điểm danh</h1>
           <div className={cx("appvide")}>
             <video crossOrigin="anonymous" ref={videoRef} autoPlay style={{borderRadius: 10}}></video>
           </div>

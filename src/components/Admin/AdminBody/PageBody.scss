@@ -1,0 +1,58 @@
+.section {
+  margin: 24px 0;
+}
+
+.page-title {
+  color: #78bada;
+  margin-bottom: 16px;
+  text-transform: capitalize;
+}
+
+.page-subtitle {
+  color: #5c8498;
+  margin: 8px 0;
+  text-transform: uppercase;
+}
+
+.card-label {
+  text-transform: uppercase;
+  color: #5c8498;
+  text-align: center;
+  margin: 8px 0px;
+  @media (max-width: 600px) {
+    font-size: 0.8rem;
+  }
+}
+
+.card-title {
+  text-transform: capitalize;
+  color: #2b3e48;
+  text-align: center;
+  margin: 8px 0px;
+  @media (max-width: 600px) {
+    font-size: 1.8rem;
+  }
+}
+
+.ratio-btn {
+  font-size: 1rem !important;
+  font-weight: bold !important;
+}
+
+.display-card-graph {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100% !important;
+  height: 45% !important;
+}
+
+.card-content {
+  position: relative;
+}
+
+.display-user-graph {
+  width: 100%;
+  min-height: 300px;
+  height: auto;
+}

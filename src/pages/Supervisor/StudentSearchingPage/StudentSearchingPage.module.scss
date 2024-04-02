@@ -1,0 +1,143 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  .studentPage {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+  }
+  
+  .studentPage__navWraper {
+    position: relative;
+    width:240px;
+  }
+  
+  .studentPage__content {
+    flex: 1;
+    flex-direction: column;
+    background-color: (244, 245, 247);
+    display: flex;
+    width: calc(100vw - 240px);
+    justify-content: center;
+    align-items: center;
+  
+    .page_content{
+      width: 90%;
+      padding: 16px 16px 24px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+      box-shadow: rgba(255, 255, 255, 0.144) 0px 1px 2px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+      .page_content__header{
+          display: flex;
+          .search > input{
+            background-color: rgb(255, 255, 255);
+            flex: 1;
+            padding: 3px 16px 3px 16px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 85, 141, 0.5);
+            color: black;
+            font-size: 15px;
+            font-weight: 400;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+              Helvetica, Arial, sans-serif;
+          }.search > input:focus{
+            outline: none;
+          }
+          .search{
+            display: flex;
+            flex: 1;
+            .search__button {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+              color: black;
+              background-color: transparent;
+              border: 1px solid rgba(0, 85, 141, 0.5);
+              padding: 7px;
+              border-radius: 15px;
+              position: relative;
+              // display: inline-block;
+              .search__icon{
+                  color: #00558d;
+              }
+              .span{
+                  color: #00558d;
+                  font-size: 14px;
+                  font-weight: 500;
+              }
+            }
+              
+            .search__button:hover {
+              cursor: pointer;
+              background-color: rgba(4, 149, 246, 0.103);
+              border: 1px solid rgba(0, 28, 46, 0.5);
+              .sidenav__icon {
+                transform: scale(1.05);
+              }
+            }
+            .search__button > span {
+              font-size: 15px;
+              font-weight: 300;
+            }
+          }
+      }
+      .page_content__body{
+          margin-top: 20px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          .students{
+            display: flex;
+            // justify-content: center;
+            width: fit-content;
+            flex-wrap: wrap;
+          }
+      }
+    }
+}
+
+
+@media (max-width: 1064px){
+    .studentPage {
+      .studentPage__navWraper {
+        position: relative;
+        width: 80px;
+      }
+      .studentPage__content {
+        width: calc(100vw - 80px);
+        .page_content{
+          .page_content__header{
+            .search__button {
+              .span{
+                display: none;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @media (max-width: 527px){
+    .studentPage {
+      .studentPage__content {
+        .page_content{
+          .page_content__header{
+            flex-direction: column;
+            .form__select{
+              width: 90%;
+              margin-bottom: 10px;
+            }
+          }
+          .page_content__body{
+            .students{
+              justify-content: center;
+            }
+          }
+        }
+      }
+  
+    }
+  }

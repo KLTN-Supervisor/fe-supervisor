@@ -9,11 +9,21 @@
     border-right: white solid 1px;
     transition: width 0.5s ease; /* Hiệu ứng chuyển đổi mượt mà */
   }
+  .sidenav__logo__icon{
+    display: none;
+    // style={{
+    //   height: "120px",
+    //   display: "flex",
+    //   justifyContent: "center",
+    //   alignItems: "center",
+    //   }}
+  }
   .sidenav__title {
     height: 120px;
     display: flex;
     justify-content: center;
     align-items: center;
+    
     .sidenav__title__button {
       display: none;
     }
@@ -79,20 +89,54 @@
     height: 27px;
   }
 
+  .sidenav__more {
+    position: fixed;
+    bottom: 15px;
+    width: 240px;
+    //more
+    .sidenav__more-content {
+      border: #353535 solid 0.5px;
+      position: absolute;
+      z-index: 0;
+      width: 250px;
+      height: fit-content;
+      background: #262626;
+      border-radius: 10px;
+      .sidenav__more-element{
+        text-align: center;
+        padding: 14px 10px;
+        color: white;
+        font-weight: 500;
+        font-size: 15px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        cursor: pointer;
+      }
+      .sidenav__more-element:hover{
+        background: #4e4d4d;
+      }
+      .sidenav__more-element:first-child{
+        border-bottom:none;
+        border-radius: 10px 10px 0px 0px;
+      }
+      .sidenav__more-element:last-child{
+        border-bottom:none;
+        border-radius: 0px 0px 10px 10px;
+      }
+    }
+  }
+
   @media (max-width: 1064px) {
     .sidenav {
       width: 80px;
     }
-    .sidenav__title {
+    .sidenav__logo__icon{
       height: 120px;
-      display: flex;
+      display:flex;
+      justify-content: center;
       align-items: center;
-      .sidenav__title__button {
-        display: block;
-      }
-      .sidenav__logo {
-        display: none;
-      }
+    }
+    .sidenav__title {
+      display: none;
     }
     .sidenav__button {
       width: 71% !important;
@@ -106,6 +150,9 @@
     }
     .sidenav__more {
       width: 80px;
+      .sidenav__button >span {
+        display: none;
+      }
     }
     .sidenav__buttonText{
       display: none;
