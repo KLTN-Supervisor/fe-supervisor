@@ -11,14 +11,105 @@ import Select from "@mui/material/Select";
 import StudentCard from "../../../components/Supervisor/StudentCard";
 import Building from "../../../components/Supervisor/Building";
 import Floor from "../../../components/Supervisor/Floor";
+import examScheduleServices from "../../../services/examScheduleServices";
 import { useNavigate } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 function ExamSchedulePage() {
-  const [age, setAge] = useState("");
-  const handleChange = (event) => {
-    setAge(event.target.value);
+  const [building, setBuilding] = useState([]);
+  const [year, setYear] = useState([]);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const handleYearChange = (event) => {
+    setYear(event.target.value);
   };
+  const [term, setTerm] = useState([]);
+  const handleTermChange = (event) => {
+    setTerm(event.target.value);
+  };
+  const [date, setDate] = useState([]);
+  const handleDateChange = (event) => {
+    setDate(event.target.value);
+  };
+  useEffect(() => {
+    const getYears = async () => {
+      if (!studentsLoading) {
+        setStudentsLoading(true);
+        try {
+          const response = await examScheduleServices.getYears();
+          setYear(response);
+          setStudentsLoading(false);
+        } catch (err) {
+          setStudentsLoading(false);
+          console.log("get year error: ", err);
+        }
+      }
+    };
+    getYears();
+  },[])
+
+  useEffect(() => {
+    const getTerms = async () => {
+      if (!studentsLoading) {
+        setStudentsLoading(true);
+        try {
+          const response = await examScheduleServices.getTerms(year);
+          setTerm(response);
+          setStudentsLoading(false);
+        } catch (err) {
+          setStudentsLoading(false);
+          console.log("get year error: ", err);
+        }
+      }
+    };
+    getTerms();
+  },[year])
+
+  useEffect(() => {
+    const getDates = async () => {
+      if (!studentsLoading) {
+        setStudentsLoading(true);
+        try {
+          const response = await examScheduleServices.getDates(year, term);
+          
+          // Tạo một Set để lưu trữ các ngày không trùng nhau
+          const uniqueDatesSet = new Set();
+          
+          // Lặp qua mảng datetime và lấy ngày từ mỗi mục
+          response.forEach((datetime) => {
+            const date = datetime.toISOString().split('T')[0];
+            uniqueDatesSet.add(date);
+          });
+          
+          // Chuyển Set thành mảng
+          const uniqueDatesArray = Array.from(uniqueDatesSet);
+          setDate(uniqueDatesArray);
+          setStudentsLoading(false);
+        } catch (err) {
+          setStudentsLoading(false);
+          console.log("get year error: ", err);
+        }
+      }
+    };
+    getDates();
+  },[term])
+
+  useEffect(() => {
+    const getBuildings = async () => {
+      if (!studentsLoading) {
+        setStudentsLoading(true);
+        try {
+          const response = await examScheduleServices.getBuildings(date);
+          setBuilding(response);
+          setStudentsLoading(false);
+        } catch (err) {
+          setStudentsLoading(false);
+          console.log("get year error: ", err);
+        }
+      }
+    };
+    getBuildings();
+  },[date])
+
   return (
     <div className={cx("schedulePage")}>
       <div className={cx("schedulePage__navWraper")}>
@@ -40,8 +131,8 @@ function ExamSchedulePage() {
               }}
             >
               <Select
-                value={age}
-                onChange={handleChange}
+                value={year}
+                onChange={handleYearChange}
                 displayEmpty
                 disableUnderline
                 inputProps={{ "aria-label": "Without label" }}
@@ -50,9 +141,7 @@ function ExamSchedulePage() {
                 <MenuItem value="">
                   <em>Chọn năm</em>
                 </MenuItem>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                {year.map((y) => (<MenuItem value={y}>{y} - {y+1}</MenuItem>))}
               </Select>
             </FormControl>
             <FormControl
@@ -67,8 +156,8 @@ function ExamSchedulePage() {
               }}
             >
               <Select
-                value={age}
-                onChange={handleChange}
+                value={term}
+                onChange={handleTermChange}
                 displayEmpty
                 disableUnderline
                 inputProps={{ "aria-label": "Without label" }}
@@ -77,9 +166,7 @@ function ExamSchedulePage() {
                 <MenuItem value="">
                   <em>Chọn học kỳ</em>
                 </MenuItem>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                {term.map((t) => (<MenuItem value={t}>Học kỳ {t}</MenuItem>))}
               </Select>
             </FormControl>
             <FormControl
@@ -93,8 +180,8 @@ function ExamSchedulePage() {
               }}
             >
               <Select
-                value={age}
-                onChange={handleChange}
+                value={date}
+                onChange={handleDateChange}
                 displayEmpty
                 disableUnderline
                 inputProps={{ "aria-label": "Without label" }}
@@ -103,9 +190,7 @@ function ExamSchedulePage() {
                 <MenuItem value="">
                   <em>Chọn ngày thi</em>
                 </MenuItem>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
+                {date.map((t) => (<MenuItem value={t}>{t}</MenuItem>))}
               </Select>
             </FormControl>
           </div>
@@ -114,15 +199,9 @@ function ExamSchedulePage() {
           </div>
           <div className={cx("page_content__body")}>
             <div className={cx("students")}>
-              <Building />
-              <Building />
-              <Building />
-              <Building />
-              <Building />
-              <Building />
-              <Building />
-              <Building />
-              <Floor />
+              {building.map((b) => (
+                <Building key={b._id} building={b} date={date} />
+              ))}
             </div>
           </div>
         </div>

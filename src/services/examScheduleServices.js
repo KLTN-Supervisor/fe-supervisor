@@ -1,4 +1,3 @@
-import React from "react";
 import usePrivateHttpClient from "../hooks/http-hook/private-http-hook";
 
 const examScheduleServices = () => {
@@ -15,6 +14,7 @@ const examScheduleServices = () => {
       throw err;
     }
   };
+
   const getTerms = async (year) => {
     try {
       const response = await privateRequest(
@@ -51,7 +51,7 @@ const examScheduleServices = () => {
     }
   };
 
-  const getTimes = async (date) => {
+  const getTimes = async (date, building_id) => {
     try {
       const response = await privateRequest(
         `/examSchedule/getTime?date=${date}&&building_id=${building_id}`
@@ -87,7 +87,7 @@ const examScheduleServices = () => {
     }
   };
 
-  return { getYears, getTerms };
+  return { getYears, getTerms, getDate, getBuildings, getTimes, getRooms, getStudents };
 };
 
 export default examScheduleServices;

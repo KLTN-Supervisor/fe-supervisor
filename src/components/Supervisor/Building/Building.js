@@ -1,10 +1,15 @@
 import classNames from 'classnames/bind';
 import styles from "./Building.module.scss";
 import ApartmentIcon from '@mui/icons-material/Apartment';
+import { useNavigate } from 'react-router-dom';
 const cx = classNames.bind(styles);
-function Building() {
+function Building({building, date}) {
+    const navigate = useNavigate();
+    const handleNavigation = () => {
+        navigate('/schedule', { building: building, date: date });
+      };
     return(
-        <div className={cx("building")}>
+        <div className={cx("building")} onClick={handleNavigation}>
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center"}}>
                 <ApartmentIcon style={{width: "50px", height: "50px", color: "white"}}/>
             </div>
@@ -13,7 +18,7 @@ function Building() {
                 fontSize: "16px",
                 fontWeight: 500,
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,Helvetica, Arial, sans-serif'}}>
-                    Khu A</span>
+                    {building.building_name}</span>
         </div>
     )
 }
