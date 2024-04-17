@@ -11,7 +11,7 @@ import Select from "@mui/material/Select";
 import StudentCard from "../../../components/Supervisor/StudentCard";
 import Building from "../../../components/Supervisor/Building";
 import Floor from "../../../components/Supervisor/Floor";
-import examScheduleServices from "../../../services/examScheduleServices";
+import useExamScheduleServices from "../../../services/useExamScheduleServices";
 import { useNavigate } from "react-router-dom";
 
 const cx = classNames.bind(styles);
@@ -35,7 +35,7 @@ function ExamSchedulePage() {
       if (!studentsLoading) {
         setStudentsLoading(true);
         try {
-          const response = await examScheduleServices.getYears();
+          const response = await useExamScheduleServices.getYears();
           setYear(response);
           setStudentsLoading(false);
         } catch (err) {
@@ -52,7 +52,7 @@ function ExamSchedulePage() {
       if (!studentsLoading) {
         setStudentsLoading(true);
         try {
-          const response = await examScheduleServices.getTerms(year);
+          const response = await useExamScheduleServices.getTerms(year);
           setTerm(response);
           setStudentsLoading(false);
         } catch (err) {
@@ -69,7 +69,7 @@ function ExamSchedulePage() {
       if (!studentsLoading) {
         setStudentsLoading(true);
         try {
-          const response = await examScheduleServices.getDates(year, term);
+          const response = await useExamScheduleServices.getDates(year, term);
           
           // Tạo một Set để lưu trữ các ngày không trùng nhau
           const uniqueDatesSet = new Set();
@@ -98,7 +98,7 @@ function ExamSchedulePage() {
       if (!studentsLoading) {
         setStudentsLoading(true);
         try {
-          const response = await examScheduleServices.getBuildings(date);
+          const response = await useExamScheduleServices.getBuildings(date);
           setBuilding(response);
           setStudentsLoading(false);
         } catch (err) {

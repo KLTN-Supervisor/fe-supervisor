@@ -1,6 +1,6 @@
 import usePrivateHttpClient from "../hooks/http-hook/private-http-hook";
 
-const examScheduleServices = () => {
+const useExamScheduleServices = () => {
   const { privateRequest } = usePrivateHttpClient();
 
   const getYears = async () => {
@@ -90,4 +90,4 @@ const examScheduleServices = () => {
   return { getYears, getTerms, getDate, getBuildings, getTimes, getRooms, getStudents };
 };
 
-export default examScheduleServices;
+export default useExamScheduleServices;

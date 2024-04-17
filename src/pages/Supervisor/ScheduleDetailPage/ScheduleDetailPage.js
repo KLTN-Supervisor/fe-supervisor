@@ -11,7 +11,7 @@ import ListSubheader from '@mui/material/ListSubheader';
 import List from '@mui/material/List';
 import Floor from "../../../components/Supervisor/Floor";
 import { useLocation } from "react-router-dom";
-import examScheduleServices from "../../../services/examScheduleServices";
+import useExamScheduleServices from "../../../services/useExamScheduleServices";
 import LoadingCard from "../../../components/LoadingCard";
 
 const cx = classNames.bind(styles);
@@ -33,7 +33,7 @@ function ScheduleDetailPage() {
           if (!studentsLoading) {
             setStudentsLoading(true);
             try {
-              const response = await examScheduleServices.getTimes(date, building._id);
+              const response = await useExamScheduleServices.getTimes(date, building._id);
               setTime(response);
               setStudentsLoading(false);
             } catch (err) {
@@ -50,7 +50,7 @@ function ScheduleDetailPage() {
           if (!studentsLoading) {
             setStudentsLoading(true);
             try {
-              const response = await examScheduleServices.getRooms(date, building._id);
+              const response = await useExamScheduleServices.getRooms(date, building._id);
               const floors = [...new Set(response.map((room) => room.floor))];
               setFloor(floors);
               setStudents([]);
@@ -71,7 +71,7 @@ function ScheduleDetailPage() {
             if (!studentsLoading) {
               setStudentsLoading(true);
               try {
-                const response = await examScheduleServices.getStudents(date, Room);
+                const response = await useExamScheduleServices.getStudents(date, Room);
                 setStudents(response);
                 setRoom(response);
                 setStudentsLoading(false);
