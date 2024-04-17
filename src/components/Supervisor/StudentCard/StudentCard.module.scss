@@ -1,7 +1,7 @@
 .student {
   border: rgba(1, 76, 125, 0.5) solid 1px;
   border-radius: 10px;
-  width: 40%;
+  width: 20%;
   height: 300px;
   padding: 0.5%;
   display: flex;
@@ -49,6 +49,7 @@
   max-width: 900px;
   min-width: 300px;
   min-height: 400px;
+  max-height: 90%;
   overflow-y: auto;
   .modal-header {
     color: white;
@@ -90,7 +91,7 @@
       margin-top: 10px;
       .title {
         display: inline-block;
-        white-space: nowrap;
+        word-wrap: break-word;
         width: 30%;
         font-weight: 600;
         text-align: end;

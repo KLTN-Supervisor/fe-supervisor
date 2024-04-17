@@ -30,6 +30,7 @@ function Floor() {
                 </ListSubheader>
             }
         >
+            <>
             <ListItemButton onClick={handleClick}>
                 <ListItemIcon>
                 <MeetingRoomIcon />
@@ -48,6 +49,27 @@ function Floor() {
                     <Room/>
                 </div>
             </Collapse>
+            </>
+            <>
+            <ListItemButton onClick={handleClick}>
+                <ListItemIcon>
+                <MeetingRoomIcon />
+                </ListItemIcon>
+                <ListItemText primary="Tầng 2" />
+                {open ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+                <div className={cx("floor")}>
+                    <Room/>
+                    <Room/>
+                    <Room/>
+                    <Room/>
+                    <Room/>
+                    <Room/>
+                    <Room/>
+                </div>
+            </Collapse>
+            </>
         </List>
     )
 }

@@ -1,0 +1,52 @@
+.student {
+    border: rgba(1, 76, 125, 0.5) solid 1px;
+    border-radius: 10px;
+    width: 20%;
+    height: 250px;
+    padding: 0.5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 1.8%;
+    background: #949393;
+    background-size: 500px 30px;
+    background-image:			
+        linear-gradient(
+            90deg, 
+            rgba(#5c5b5b, 0.5), 
+            rgba(#5c5b5b, 1),
+            rgba(#5c5b5b, 2)
+        );
+    background-repeat: no-repeat; 
+    background-position: left 0px top -40px; 
+    animation: shine 1s ease infinite; 
+  }
+  @keyframes shine {
+    0% {
+      background-position: left 0 top -40px;
+    }
+    50% {
+      background-position: left 0 top 300px;
+    }
+    100% {
+      background-position: left 0 top -40px;
+    }
+  }
+
+  @media (max-width: 1164px) {
+    .student {
+      width: 28%;
+    }
+  }
+  @media (max-width: 720px) {
+    .student {
+      width: 45%;
+    }
+  }
+  @media (max-width: 527px) {
+    .student {
+      width: 200px;
+    }
+  }
+  

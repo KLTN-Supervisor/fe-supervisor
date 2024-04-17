@@ -15,6 +15,7 @@ html, body {
   }
   
   .studentPage__content {
+    
     flex: 1;
     flex-direction: column;
     background-color: (244, 245, 247);
@@ -86,12 +87,12 @@ html, body {
       .page_content__body{
           margin-top: 20px;
           display: flex;
-          justify-content: center;
+          // justify-content: center;
           align-items: center;
           .students{
             display: flex;
             // justify-content: center;
-            width: fit-content;
+            flex: 1;
             flex-wrap: wrap;
           }
       }
