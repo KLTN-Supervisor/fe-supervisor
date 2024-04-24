@@ -22,12 +22,14 @@ function Floor({room, handleRoomClick}) {
                 <ListItemIcon>
                 <MeetingRoomIcon />
                 </ListItemIcon>
-                <ListItemText primary={`Tầng ${room[0].floor}`} />
+                <ListItemText primary={`Tầng ${room[0]?.floor}`} />
                 {open ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
             <Collapse in={open} timeout="auto" unmountOnExit>
                 <div className={cx("floor")}>
-                    {room.map((r) => (<Room room={r} handleRoomClick={handleRoomClick}/>))}
+                {room.map((r) => (
+                    <Room key={r._id} room={r} handleRoomClick={() => handleRoomClick(r._id)} />
+                ))}
                 </div>
             </Collapse>
         </>

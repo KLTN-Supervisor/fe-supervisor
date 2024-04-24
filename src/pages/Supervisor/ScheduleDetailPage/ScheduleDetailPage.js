@@ -13,14 +13,22 @@ import Floor from "../../../components/Supervisor/Floor";
 import { useLocation } from "react-router-dom";
 import useExamScheduleServices from "../../../services/useExamScheduleServices";
 import LoadingCard from "../../../components/LoadingCard";
+import { formatHour } from "../../../untils/format-date";
+import {
+  Alert,
+  Snackbar,
+  CircularProgress
+} from "@mui/material";
 
 const cx = classNames.bind(styles);
 function ScheduleDetailPage() {
     const location = useLocation();
-    const building = location.building;
-    const date = location.date;
+    const { building, date } = location.state;
+    const { getTimes, getRooms, getStudents } = useExamScheduleServices();
+    const [loadMore, setLoadMore] = useState(false);
     const [studentsLoading, setStudentsLoading] = useState(false);
-    const [time, setTime] = useState([]);
+    const [times, setTimes] = useState([]);
+    const [time, setTime] = useState("");
     const [floor, setFloor] = useState([])
     const handleChange = (event) => {
         setTime(event.target.value);
@@ -28,13 +36,14 @@ function ScheduleDetailPage() {
     const [room, setRoom] = useState([]);
     const [students, setStudents] = useState([]);
 
+
     useEffect(() => {
-        const getTimes = async () => {
+        const getTimesExam = async () => {
           if (!studentsLoading) {
             setStudentsLoading(true);
             try {
-              const response = await useExamScheduleServices.getTimes(date, building._id);
-              setTime(response);
+              const response = await getTimes(date, building._id);
+              setTimes(response);
               setStudentsLoading(false);
             } catch (err) {
               setStudentsLoading(false);
@@ -42,15 +51,15 @@ function ScheduleDetailPage() {
             }
           }
         };
-        getTimes();
+        getTimesExam();
       },[])
 
       useEffect(() => {
-        const getRooms = async () => {
+        const getRoomsExam = async () => {
           if (!studentsLoading) {
             setStudentsLoading(true);
             try {
-              const response = await useExamScheduleServices.getRooms(date, building._id);
+              const response = await getRooms(time, building._id);
               const floors = [...new Set(response.map((room) => room.floor))];
               setFloor(floors);
               setStudents([]);
@@ -62,18 +71,17 @@ function ScheduleDetailPage() {
             }
           }
         };
-        getRooms();
+        getRoomsExam();
       },[time])
 
 
     const handleRoomClick = (Room) =>{
-        const getStudents = async () => {
+        const getStudentsExam = async () => {
             if (!studentsLoading) {
               setStudentsLoading(true);
               try {
-                const response = await useExamScheduleServices.getStudents(date, Room);
+                const response = await getStudents(time, Room);
                 setStudents(response);
-                setRoom(response);
                 setStudentsLoading(false);
               } catch (err) {
                 setStudentsLoading(false);
@@ -81,7 +89,7 @@ function ScheduleDetailPage() {
               }
             }
           };
-          getStudents();
+          getStudentsExam();
     }
     return (
         <div className={cx("schedulePage")}>
@@ -91,7 +99,7 @@ function ScheduleDetailPage() {
         <div className={cx("schedulePage__content")}>
             <div className={cx("page_content")}>
                 <div className={cx("title")}>
-                    <h6 className={cx("text")}>{building.building_name}</h6>
+                    <h6 className={cx("text")}>{building?.building_name}</h6>
                 </div>
                 <div className={cx("page_content__header")}>
                     <FormControl
@@ -116,7 +124,7 @@ function ScheduleDetailPage() {
                         <MenuItem value="">
                         <em>Chọn ca thi</em>
                         </MenuItem>
-                        {time.map((t) => (<MenuItem value={t}>{t}</MenuItem>))}
+                        {times.length > 0 && times.map((t) => (<MenuItem key={t} value={t}>{formatHour(t)}</MenuItem>))}
                     </Select>
                     </FormControl>
                 </div>
@@ -132,7 +140,7 @@ function ScheduleDetailPage() {
                                 </ListSubheader>
                             }
                         >
-                            {floor.map((f) => (<Floor room={room.filter((r) => r.floor === f)} handleRoomClick={handleRoomClick}/>))}
+                            {floor.map((f) => (<Floor key={f} room={room.filter((r) => r.floor === f)} handleRoomClick={handleRoomClick}/>))}
                         </List>
                         {studentsLoading ? <LoadingCard/> :
                             (students?.length > 0 ? 
@@ -143,7 +151,7 @@ function ScheduleDetailPage() {
                                 Helvetica, Arial, sans-serif`, color: "rgb(61 60 60)"}}>Không có dữ liệu
                             </div>)
                         }
-                        {!loadMore && (
+                        {loadMore && (
                             <div
                             style={{
                                 width: "100%",

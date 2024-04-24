@@ -6,7 +6,7 @@ const cx = classNames.bind(styles);
 function Building({building, date}) {
     const navigate = useNavigate();
     const handleNavigation = () => {
-        navigate('/schedule', { building: building, date: date });
+        navigate('/schedule', { state: { building, date } });
       };
     return(
         <div className={cx("building")} onClick={handleNavigation}>
