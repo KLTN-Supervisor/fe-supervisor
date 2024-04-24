@@ -3,6 +3,7 @@ import classNames from "classnames/bind";
 import dayjs from "dayjs";
 import React, { useState } from "react";
 import styles from "./StudentCard.module.scss";
+import { formatDate } from "../../../untils/format-date";
 const cx = classNames.bind(styles);
 function StudentCard({ student }) {
   const [age, setAge] = useState("");
@@ -115,7 +116,7 @@ function StudentCard({ student }) {
               </div>
               <div className={cx("info")}>
                 <div className={cx("title")}>Ngày sinh:</div>
-                <span className={cx("span")}>{student.date_of_birth}</span>
+                <span className={cx("span")}>{formatDate(student.date_of_birth)}</span>
               </div>
               <div className={cx("info")}>
                 <div className={cx("title")}>Nơi sinh:</div>

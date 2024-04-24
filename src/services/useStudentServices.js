@@ -15,8 +15,19 @@ const useStudentServices = () => {
       throw err;
     }
   };
+  const searchStudents = async (skip, search, type) => {
+    try {
+      const response = await privateRequest(
+        `/students/search?search=${search}&type=${type}&skip=${skip}`
+      );
 
-  return { getStudentsPaginated };
+      return response.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  return { getStudentsPaginated, searchStudents };
 };
 
 export default useStudentServices;

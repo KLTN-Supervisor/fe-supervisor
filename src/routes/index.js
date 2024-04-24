@@ -1,6 +1,7 @@
 import AuthPage from "../pages/AuthPage";
 import HomePage from "../pages/Supervisor/HomePage";
 import ExamSchedulePage from "../pages/Supervisor/ExamSchedulePage";
+import SchedulePage from "../pages/Supervisor/ScheduleDetailPage";
 import StudentSearchingPage from "../pages/Supervisor/StudentSearchingPage";
 import DashboardBody from "../components/Admin/AdminBody/Dashboard/Dashboard";
 import UsersManage from "../components/Admin/AdminBody/UsersManager/Users";
@@ -9,6 +10,7 @@ import AdminPage from "../pages/AdminPage"
 const publicRoutes = [
   { path: "/login", component: AuthPage },
   { path: "/searchExamSchedule", component: ExamSchedulePage },
+  { path: "/schedule", component: SchedulePage },
   { path: "/searchStudent", component: StudentSearchingPage },
   { path: "/", component: HomePage },
 ];
