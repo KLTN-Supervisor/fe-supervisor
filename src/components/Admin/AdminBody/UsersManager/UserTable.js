@@ -22,7 +22,7 @@ import UserTableItem from "./UserTableItem";
 const useUsers = (data, page, rowsPerPage) => {
   return useMemo(() => {
     return applyPagination(data, page, rowsPerPage);
-  }, [page, rowsPerPage]);
+  }, [data, page, rowsPerPage]);
 };
 
 const useUserIds = (users) => {
@@ -38,12 +38,12 @@ export const UserTable = (props) => {
     onPageChange = () => {},
     onRowsPerPageChange,
     page = 0,
-    rowsPerPage = 0,
+    rowsPerPage = -1,
     setUsersSelected,
     selected = [],
   } = props;
 
-  const users = useUsers(data, page, rowsPerPage);
+  const users = data;
   const usersIds = useUserIds(users);
   const usersSelection = useSelection(usersIds, setUsersSelected);
 
@@ -102,9 +102,9 @@ export const UserTable = (props) => {
         count={count}
         onPageChange={onPageChange}
         onRowsPerPageChange={onRowsPerPageChange}
-        page={page}
+        page={page - 1}
         rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[5, 10, 25]}
+        rowsPerPageOptions={[10, 15, 30]}
       />
     </Card>
   );

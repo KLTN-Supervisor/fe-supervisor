@@ -23,7 +23,7 @@ export const getAdminPosts = async (page, limit, sendRequest, search = "") => {
 export const getAdminUsers = async (page, limit, sendRequest, search = "") => {
   try {
     const response = await sendRequest(
-      `/admin/user?page=${page}&limit=${limit}&search=${search}`
+      `/admin/accounts?page=${page}&limit=${limit}&search=${search}`
     );
 
     return response?.data;
@@ -67,6 +67,20 @@ export const createUser = async (data, sendRequest) => {
     const response = await sendRequest(`/admin/users`, "post", data, {
       headers: { "Content-Type": "application/json" },
     });
+
+    return response?.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const uploadImportFile = async (formData, sendRequest) => {
+  try {
+    const response = await sendRequest(
+      `/admin/students/csv-import`,
+      "post",
+      formData
+    );
 
     return response?.data;
   } catch (err) {

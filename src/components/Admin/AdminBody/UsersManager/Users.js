@@ -1,6 +1,6 @@
-import { React, useCallback, useEffect, useState } from "react";
+import { React, useCallback, useEffect, useRef, useState } from "react";
 // import { subDays, subHours } from "date-fns";
-// import VerticalAlignBottomOutlinedIcon from "@mui/icons-material/VerticalAlignBottomOutlined";
+import VerticalAlignTopOutlinedIcon from "@mui/icons-material/VerticalAlignTopOutlined";
 import AddIcon from "@mui/icons-material/Add";
 import BlockIcon from "@mui/icons-material/Block";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
@@ -25,8 +25,10 @@ import {
   createUser,
   getAdminUsers,
   unBanUsers,
+  uploadImportFile,
 } from "../../../../services/adminServices";
 import usePrivateHttpClient from "../../../../hooks/http-hook/private-http-hook";
+import ImportInput from "../UploadFile/ImportInput";
 
 const cx = classNames.bind(styles);
 // const now = new Date();
@@ -36,8 +38,8 @@ const UsersManage = () => {
 
   const [visible, setVisible] = useState(false);
 
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const [search, setSearch] = useState("");
   const [data, setData] = useState([]);
@@ -52,6 +54,30 @@ const UsersManage = () => {
     admin: true,
   });
 
+  const [file, setFile] = useState();
+  const [fileIsValid, setFileIsValid] = useState();
+
+  const removeFile = () => {
+    setFile(null);
+    setFileIsValid(false);
+  };
+
+  const uploadFileHandler = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await uploadImportFile(
+        formData,
+        privateHttpRequest.privateRequest
+      );
+      if (response) {
+        removeFile();
+      }
+    } catch (err) {
+      console.log("upload file: ", err);
+    }
+  };
+
   const changeHandler = (e) => {
     setModalData((prev) => ({
       ...prev,
@@ -61,20 +87,20 @@ const UsersManage = () => {
 
   const getData = useCallback(async () => {
     const response = await getAdminUsers(
-      fetchPage,
-      500,
+      page,
+      rowsPerPage,
       privateHttpRequest.privateRequest,
       search
     );
     if (response) {
-      if (fetchPage === 1) setData(response.users);
-      else setData((prev) => [...prev, ...response.users]);
+      if (page === 1) setData(response.accounts);
+      else setData((prev) => [...prev, ...response.accounts]);
     }
-  }, [fetchPage, search]);
+  }, [page, rowsPerPage, search]);
 
   useEffect(() => {
     getData();
-  }, [fetchPage, search]);
+  }, [page, rowsPerPage, search]);
 
   // useEffect(() => {}, [data]);
 
@@ -167,23 +193,15 @@ const UsersManage = () => {
               spacing={4}
             >
               <Stack spacing={1}>
-                <Typography variant="h4">Users</Typography>
-                {/* <Stack
-                  alignItems="center"
-                  direction="row"
-                  spacing={1}
-                >
-                  <Button
-                    color="inherit"
-                    startIcon={(
-                      <SvgIcon fontSize="small">
-                        <VerticalAlignBottomOutlinedIcon />
-                      </SvgIcon>
-                    )}
-                  >
-                    Export
-                  </Button>
-                </Stack> */}
+                <Typography variant="h4">Students</Typography>
+                <ImportInput
+                  file={file}
+                  fileIsValid={fileIsValid}
+                  setFile={setFile}
+                  setFileIsValid={setFileIsValid}
+                  removeFile={removeFile}
+                  uploadHandler={uploadFileHandler}
+                />
               </Stack>
               <div>
                 {usersSelected.length > 0 && (
@@ -238,7 +256,7 @@ const UsersManage = () => {
               </div>
             </Stack>
             <UserSearch setSearch={setSearch} />
-            {data.length > 0 && !privateHttpRequest.isLoading && (
+            {!privateHttpRequest.isLoading && (
               <UserTable
                 count={data.length}
                 data={data}
