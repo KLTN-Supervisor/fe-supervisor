@@ -28,18 +28,15 @@ import {
 } from "@mui/material/colors";
 // import UserOverview from "./UserOverview";
 import usePrivateHttpClient from "../../../../hooks/http-hook/private-http-hook";
-import {
-  // getAdminPosts,
-  getAdminUsers,
-  getQuickOverview,
-  getTopAuthors,
-} from "../../../../services/adminServices";
+import useAdminServices from "../../../../services/useAdminServices";
 import ListComponent from "./ListComponent";
 
 const cx = classNames.bind(styles);
 
 const DashboardBody = () => {
   const privateHttpClient = usePrivateHttpClient();
+  const { getQuickOverview, getTopAuthors, getAdminUsers } = useAdminServices();
+
   const [displayData, setDisplayData] = useState([]);
   const [latestUsers, setLatestUsers] = useState([]);
   const [topAuthors, setTopAuthors] = useState([]);
@@ -47,7 +44,7 @@ const DashboardBody = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const data = await getQuickOverview(privateHttpClient.privateRequest);
+        const data = await getQuickOverview();
 
         if (data) setDisplayData(data);
       } catch (err) {
@@ -57,7 +54,7 @@ const DashboardBody = () => {
 
     const getTop5Authors = async () => {
       try {
-        const data = await getTopAuthors(privateHttpClient.privateRequest);
+        const data = await getTopAuthors();
 
         if (data) setTopAuthors(data.users);
       } catch (err) {
@@ -67,11 +64,7 @@ const DashboardBody = () => {
 
     const get5LatestUsers = async () => {
       try {
-        const data = await getAdminUsers(
-          1,
-          5,
-          privateHttpClient.privateRequest
-        );
+        const data = await getAdminUsers(1, 5);
 
         if (data) setLatestUsers(data.users);
       } catch (err) {

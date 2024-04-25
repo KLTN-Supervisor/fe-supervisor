@@ -21,7 +21,8 @@ function ExamSchedulePage() {
   const [year, setYear] = useState("");
   const [years, setYears] = useState([]);
   const [studentsLoading, setStudentsLoading] = useState(false);
-  const { getYears, getTerms, getDate, getBuildings } = useExamScheduleServices();
+  const { getYears, getTerms, getDate, getBuildings } =
+    useExamScheduleServices();
   const handleYearChange = (event) => {
     setYear(event.target.value);
   };
@@ -51,7 +52,7 @@ function ExamSchedulePage() {
       }
     };
     getYearExam();
-  },[])
+  }, []);
 
   useEffect(() => {
     const getTermsExam = async () => {
@@ -68,7 +69,7 @@ function ExamSchedulePage() {
       }
     };
     getTermsExam();
-  },[year])
+  }, [year]);
 
   useEffect(() => {
     const getDatesExam = async () => {
@@ -77,17 +78,17 @@ function ExamSchedulePage() {
         try {
           const response = await getDate(year, term);
           console.log(response);
-          
+
           // Tạo một Set để lưu trữ các ngày không trùng nhau
           const uniqueDatesSet = new Set();
-          
+
           // Lặp qua mảng datetime và lấy ngày từ mỗi mục
           response.forEach((datetime) => {
-            const date = new Date(datetime).toISOString().split('T')[0];
-            const dateFormat = formatDate(date)
+            const date = new Date(datetime).toISOString().split("T")[0];
+            const dateFormat = formatDate(date);
             uniqueDatesSet.add(dateFormat);
           });
-          
+
           // Chuyển Set thành mảng
           const uniqueDatesArray = Array.from(uniqueDatesSet);
           setDates(uniqueDatesArray);
@@ -99,7 +100,7 @@ function ExamSchedulePage() {
       }
     };
     getDatesExam();
-  },[term])
+  }, [term]);
 
   useEffect(() => {
     const getBuildingsExam = async () => {
@@ -116,7 +117,7 @@ function ExamSchedulePage() {
       }
     };
     getBuildingsExam();
-  },[date])
+  }, [date]);
 
   return (
     <div className={cx("schedulePage")}>
@@ -127,7 +128,7 @@ function ExamSchedulePage() {
         <h1>Tra cứu lịch thi</h1>
         <div className={cx("page_content")}>
           <div className={cx("page_content__header")}>
-          <FormControl
+            <FormControl
               variant="standard"
               className={cx("form__select")}
               sx={{
@@ -149,7 +150,12 @@ function ExamSchedulePage() {
                 <MenuItem value="">
                   <em>Chọn năm</em>
                 </MenuItem>
-                {years?.length > 0 && years.map((y) => ( <MenuItem value={y}>{y} - {y+1}</MenuItem>))}
+                {years?.length > 0 &&
+                  years.map((y) => (
+                    <MenuItem key={y} value={y}>
+                      {y} - {y + 1}
+                    </MenuItem>
+                  ))}
               </Select>
             </FormControl>
             <FormControl
@@ -174,7 +180,12 @@ function ExamSchedulePage() {
                 <MenuItem value="">
                   <em>Chọn học kỳ</em>
                 </MenuItem>
-                {terms?.length > 0 && terms.map((t) => (<MenuItem value={t}>Học kỳ {t}</MenuItem>))}
+                {terms?.length > 0 &&
+                  terms.map((t) => (
+                    <MenuItem key={t} value={t}>
+                      Học kỳ {t}
+                    </MenuItem>
+                  ))}
               </Select>
             </FormControl>
             <FormControl
@@ -198,7 +209,12 @@ function ExamSchedulePage() {
                 <MenuItem value="">
                   <em>Chọn ngày thi</em>
                 </MenuItem>
-                {dates?.length > 0 && dates.map((t) => (<MenuItem value={t}>{t}</MenuItem>))}
+                {dates?.length > 0 &&
+                  dates.map((t) => (
+                    <MenuItem key={t} value={t}>
+                      {t}
+                    </MenuItem>
+                  ))}
               </Select>
             </FormControl>
           </div>
@@ -207,11 +223,24 @@ function ExamSchedulePage() {
           </div>
           <div className={cx("page_content__body")}>
             <div className={cx("students")}>
-              {building?.length > 0 ? building.map((b) => (
-                <Building key={b._id} building={b} date={date} />
-              )) : <div style={{width: "100%", textAlign: "center", fontWeight: 600,
-              fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                Helvetica, Arial, sans-serif`, color: "rgb(61 60 60)"}}>Không có dữ liệu</div>}
+              {building?.length > 0 ? (
+                building.map((b) => (
+                  <Building key={b._id} building={b} date={date} />
+                ))
+              ) : (
+                <div
+                  style={{
+                    width: "100%",
+                    textAlign: "center",
+                    fontWeight: 600,
+                    fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                Helvetica, Arial, sans-serif`,
+                    color: "rgb(61 60 60)",
+                  }}
+                >
+                  Không có dữ liệu
+                </div>
+              )}
             </div>
           </div>
         </div>

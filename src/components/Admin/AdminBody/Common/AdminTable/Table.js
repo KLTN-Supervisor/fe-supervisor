@@ -13,25 +13,19 @@ import {
   TableRow,
   // Typography,
 } from "@mui/material";
-import { Scrollbar } from "./ScrollBar";
+import { Scrollbar } from "../../UsersManager/ScrollBar";
 import { useMemo } from "react";
-import { applyPagination } from "../../../../untils/apply-pagination";
-import { useSelection } from "../../../../hooks/use-selection";
-import UserTableItem from "./UserTableItem";
+import { applyPagination } from "../../../../../untils/apply-pagination";
+import { useSelection } from "../../../../../hooks/use-selection";
+import TableItem from "./TableItem";
 
-const useUsers = (data, page, rowsPerPage) => {
+const useItemIds = (items) => {
   return useMemo(() => {
-    return applyPagination(data, page, rowsPerPage);
-  }, [data, page, rowsPerPage]);
+    return items.map((item) => item._id);
+  }, [items]);
 };
 
-const useUserIds = (users) => {
-  return useMemo(() => {
-    return users.map((user) => user._id);
-  }, [users]);
-};
-
-export const UserTable = (props) => {
+export const Table = (props) => {
   const {
     count = 0,
     data = [],
@@ -39,21 +33,22 @@ export const UserTable = (props) => {
     onRowsPerPageChange,
     page = 0,
     rowsPerPage = -1,
-    setUsersSelected,
+    setItemsSelected,
     selected = [],
+    colsName = [],
+    colsData = [],
   } = props;
 
-  const users = data;
-  const usersIds = useUserIds(users);
-  const usersSelection = useSelection(usersIds, setUsersSelected);
+  const itemIds = useItemIds(data);
+  const itemsSelection = useSelection(itemIds, setItemsSelected);
 
-  const onDeselectAll = usersSelection.handleDeselectAll;
-  const onDeselectOne = usersSelection.handleDeselectOne;
-  const onSelectAll = usersSelection.handleSelectAll;
-  const onSelectOne = usersSelection.handleSelectOne;
+  const onDeselectAll = itemsSelection.handleDeselectAll;
+  const onDeselectOne = itemsSelection.handleDeselectOne;
+  const onSelectAll = itemsSelection.handleSelectAll;
+  const onSelectOne = itemsSelection.handleSelectOne;
 
-  const selectedSome = selected.length > 0 && selected.length < users.length;
-  const selectedAll = users.length > 0 && selected.length === users.length;
+  const selectedSome = selected.length > 0 && selected.length < data.length;
+  const selectedAll = data.length > 0 && selected.length === data.length;
 
   return (
     <Card>
@@ -75,22 +70,20 @@ export const UserTable = (props) => {
                     }}
                   />
                 </TableCell>
-                <TableCell>Username</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Fullname</TableCell>
-                <TableCell>Signed Up</TableCell>
-                <TableCell>Status</TableCell>
-                {/* <TableCell>Reports</TableCell> */}
+                {colsName.map((header) => (
+                  <TableCell key={header}>{header}</TableCell>
+                ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.map((user) => (
-                <UserTableItem
-                  key={user._id}
-                  user={user}
+              {data.map((row) => (
+                <TableItem
+                  key={row._id}
+                  user={row}
                   onDeselectOne={onDeselectOne}
                   onSelectOne={onSelectOne}
                   selected={selected}
+                  colsData={colsData}
                 />
               ))}
             </TableBody>
@@ -110,7 +103,7 @@ export const UserTable = (props) => {
   );
 };
 
-UserTable.propTypes = {
+Table.propTypes = {
   count: PropTypes.number,
   items: PropTypes.array,
   onDeselectAll: PropTypes.func,

@@ -13,11 +13,11 @@ import {
   TableRow,
   // Typography,
 } from "@mui/material";
-import { Scrollbar } from "./ScrollBar";
+import { Scrollbar } from "../UsersManager/ScrollBar";
 import { useMemo } from "react";
 import { applyPagination } from "../../../../untils/apply-pagination";
 import { useSelection } from "../../../../hooks/use-selection";
-import UserTableItem from "./UserTableItem";
+import UserTableItem from "./StudentTableItem";
 
 const useUsers = (data, page, rowsPerPage) => {
   return useMemo(() => {
@@ -31,7 +31,7 @@ const useUserIds = (users) => {
   }, [users]);
 };
 
-export const UserTable = (props) => {
+export const StudentsTable = (props) => {
   const {
     count = 0,
     data = [],
@@ -41,6 +41,8 @@ export const UserTable = (props) => {
     rowsPerPage = -1,
     setUsersSelected,
     selected = [],
+    colsName = [],
+    colsData = [],
   } = props;
 
   const users = data;
@@ -75,10 +77,11 @@ export const UserTable = (props) => {
                     }}
                   />
                 </TableCell>
-                <TableCell>Username</TableCell>
-                <TableCell>Email</TableCell>
+
+                <TableCell>MSSV</TableCell>
                 <TableCell>Fullname</TableCell>
-                <TableCell>Signed Up</TableCell>
+                <TableCell>Student type</TableCell>
+                <TableCell>Gender</TableCell>
                 <TableCell>Status</TableCell>
                 {/* <TableCell>Reports</TableCell> */}
               </TableRow>
@@ -91,6 +94,7 @@ export const UserTable = (props) => {
                   onDeselectOne={onDeselectOne}
                   onSelectOne={onSelectOne}
                   selected={selected}
+                  colsData={colsData}
                 />
               ))}
             </TableBody>
@@ -110,7 +114,7 @@ export const UserTable = (props) => {
   );
 };
 
-UserTable.propTypes = {
+StudentsTable.propTypes = {
   count: PropTypes.number,
   items: PropTypes.array,
   onDeselectAll: PropTypes.func,

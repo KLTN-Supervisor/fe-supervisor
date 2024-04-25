@@ -13,24 +13,29 @@ import {
   SvgIcon,
   Typography,
 } from "@mui/material";
-import { UserSearch } from "./UserSeach";
-import { UserTable } from "./UserTable";
+import { StudentsSearch } from "./StudentsSearch";
+import { StudentsTable } from "./StudentsTable";
 // import { applyPagination } from "../../../../shared/util/apply-pagination";
 // import { useSelection } from "../../../../shared/hook/use-selection";
 import Modal from "react-bootstrap/Modal";
 import classNames from "classnames/bind";
-import styles from "./UserModal.module.scss";
-import useAdminServices from "../../../../services/useAdminServices";
-import usePrivateHttpClient from "../../../../hooks/http-hook/private-http-hook";
-import ImportInput from "../UploadFile/ImportInput";
+import styles from "../UsersManager/UserModal.module.scss";
+import useAdminServices from "../../../../../services/useAdminServices";
+import usePrivateHttpClient from "../../../../../hooks/http-hook/private-http-hook";
+import ImportInput from "../../UploadFile/ImportInput";
 
 const cx = classNames.bind(styles);
 // const now = new Date();
 
 const UsersManage = () => {
   const privateHttpRequest = usePrivateHttpClient();
-  const { uploadImportFile, getAdminUsers, unBanUsers, banUsers, createUser } =
-    useAdminServices();
+  const {
+    uploadImportFile,
+    getAdminStudents,
+    banUsers,
+    unBanUsers,
+    createUser,
+  } = useAdminServices();
 
   const [visible, setVisible] = useState(false);
 
@@ -78,10 +83,10 @@ const UsersManage = () => {
   };
 
   const getData = useCallback(async () => {
-    const response = await getAdminUsers(page, rowsPerPage, search);
+    const response = await getAdminStudents(page, rowsPerPage, search);
     if (response) {
-      if (page === 1) setData(response.accounts);
-      else setData((prev) => [...prev, ...response.accounts]);
+      if (page === 1) setData(response.students);
+      else setData((prev) => [...prev, ...response.students]);
     }
   }, [page, rowsPerPage, search]);
 
@@ -98,7 +103,9 @@ const UsersManage = () => {
     setData((prev) => []);
 
     try {
-      const banPromises = selectedIds.map((id) => banUsers(id));
+      const banPromises = selectedIds.map((id) =>
+        banUsers(id, privateHttpRequest.privateRequest)
+      );
 
       const responses = await Promise.all(banPromises);
 
@@ -116,7 +123,9 @@ const UsersManage = () => {
     setData((prev) => []);
 
     try {
-      const unBanPromises = selectedIds.map((id) => unBanUsers(id));
+      const unBanPromises = selectedIds.map((id) =>
+        unBanUsers(id, privateHttpRequest.privateRequest)
+      );
 
       const responses = await Promise.all(unBanPromises);
 
@@ -129,7 +138,10 @@ const UsersManage = () => {
   const handleAddUser = async () => {
     privateHttpRequest.clearError();
     try {
-      const response = await createUser(modalData);
+      const response = await createUser(
+        modalData,
+        privateHttpRequest.privateRequest
+      );
 
       if (response) {
         setVisible(false);
@@ -173,15 +185,15 @@ const UsersManage = () => {
               spacing={4}
             >
               <Stack spacing={1}>
-                <Typography variant="h4">Users</Typography>
-                {/* <ImportInput
+                <Typography variant="h4">Students</Typography>
+                <ImportInput
                   file={file}
                   fileIsValid={fileIsValid}
                   setFile={setFile}
                   setFileIsValid={setFileIsValid}
                   removeFile={removeFile}
                   uploadHandler={uploadFileHandler}
-                /> */}
+                />
               </Stack>
               <div>
                 {usersSelected.length > 0 && (
@@ -235,9 +247,9 @@ const UsersManage = () => {
                 </Button>
               </div>
             </Stack>
-            <UserSearch setSearch={setSearch} />
+            <StudentsSearch setSearch={setSearch} />
             {!privateHttpRequest.isLoading && (
-              <UserTable
+              <StudentsTable
                 count={data.length}
                 data={data}
                 onPageChange={handlePageChange}
@@ -246,6 +258,8 @@ const UsersManage = () => {
                 rowsPerPage={rowsPerPage}
                 setUsersSelected={setUsersSelected}
                 selected={usersSelected}
+                colsName={["col1", "col2", "col3"]}
+                colsdata={[]}
               />
             )}
           </Stack>

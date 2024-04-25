@@ -5,7 +5,8 @@ import SchedulePage from "../pages/Supervisor/ScheduleDetailPage";
 import StudentSearchingPage from "../pages/Supervisor/StudentSearchingPage";
 import DashboardBody from "../components/Admin/AdminBody/Dashboard/Dashboard";
 import UsersManage from "../components/Admin/AdminBody/UsersManager/Users";
-import AdminPage from "../pages/AdminPage"
+import StudentsManage from "../components/Admin/AdminBody/StudentsManager/Students";
+import AdminPage from "../pages/AdminPage";
 // public Routes
 const publicRoutes = [
   { path: "/login", component: AuthPage },
@@ -22,6 +23,7 @@ const adminRoutes = [
     components: [
       { path: "dashboard", component: DashboardBody },
       { path: "users", component: UsersManage },
+      { path: "students", component: StudentsManage },
     ],
   },
 ];

@@ -31,7 +31,7 @@ const SideNavAdminData = ({ handleDrawerClose }) => {
       link: "users",
       icon: <PermIdentityIcon />,
     },
-    { label: "Posts", link: "posts", icon: <ArticleIcon /> },
+    { label: "Students", link: "students", icon: <ArticleIcon /> },
     // { label: "Reports", link: "reports", icon: <ReportGmailerrorredOutlinedIcon /> },
     {
       label: "Logout",

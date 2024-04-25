@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import Modal from "react-bootstrap/Modal";
 import classNames from "classnames/bind";
-import styles from "./UserTableItem.scss";
+import styles from "../UsersManager/UserTableItem.scss";
 import { getInitials } from "../../../../untils/get-initials";
 import { useState } from "react";
 import useAdminServices from "../../../../services/useAdminServices";
@@ -21,9 +21,13 @@ import usePrivateHttpClient from "../../../../hooks/http-hook/private-http-hook"
 const cx = classNames.bind(styles);
 
 const UserTableItem = (props) => {
-  const { user, onDeselectOne, onSelectOne, selected = [] } = props;
-
-  const { getUserReportsCount } = useAdminServices();
+  const {
+    user,
+    onDeselectOne,
+    onSelectOne,
+    selected = [],
+    colsData = [],
+  } = props;
 
   const [viewReports, setViewReports] = useState(false);
   const privateHttpRequest = usePrivateHttpClient();
@@ -42,18 +46,21 @@ const UserTableItem = (props) => {
   const isSelected = selected.includes(user._id);
   const createdAt = format(parseISO(user.created_at), "dd/MM/yyyy");
 
-  const loadReportsCount = async () => {
-    try {
-      const response = await getUserReportsCount(user._id);
-      if (response) {
-        setReportsCount(response.reports_group_count);
-        if (anchorEl) handleClose();
-        setViewReports(true);
-      }
-    } catch (err) {
-      console.error("Error loading reports: ", err);
-    }
-  };
+  // const loadReportsCount = async () => {
+  //   try {
+  //     const response = await getUserReportsCount(
+  //       user._id,
+  //       privateHttpRequest.privateRequest
+  //     );
+  //     if (response) {
+  //       setReportsCount(response.reports_group_count);
+  //       if (anchorEl) handleClose();
+  //       setViewReports(true);
+  //     }
+  //   } catch (err) {
+  //     console.error("Error loading reports: ", err);
+  //   }
+  // };
 
   return (
     <>
@@ -70,20 +77,23 @@ const UserTableItem = (props) => {
             }}
           />
         </TableCell>
-        <TableCell>
+        {/* <TableCell>
           <Stack alignItems="center" direction="row" spacing={2}>
             <Avatar src={user.profile_picture}>
               {getInitials(user.username)}
             </Avatar>
             <Typography variant="subtitle2">{user.username}</Typography>
           </Stack>
+          
+        </TableCell> */}
+
+        <TableCell>{user.student_id}</TableCell>
+        <TableCell>
+          {user.last_name + " " + user.middle_name + " " + user.first_name}
         </TableCell>
-        <TableCell>{user.user_info.email}</TableCell>
-        <TableCell>{user.full_name}</TableCell>
-        <TableCell>{createdAt}</TableCell>
-        <TableCell style={{ color: user.banned ? "red" : "green" }}>
-          {user.banned ? "BANNED" : "ACTIVE"}
-        </TableCell>
+        <TableCell>{user.student_type}</TableCell>
+        <TableCell>{user.gender ? "Male" : "Female"}</TableCell>
+        <TableCell>{user.learning_status}</TableCell>
         {/* <TableCell
           aria-controls={open ? "basic-menu" : undefined}
           aria-haspopup="true"
@@ -103,7 +113,7 @@ const UserTableItem = (props) => {
           {user.reports_count}
         </TableCell> */}
       </TableRow>
-      <Menu
+      {/* <Menu
         id="basic-menu"
         anchorEl={anchorEl}
         open={open}
@@ -115,7 +125,7 @@ const UserTableItem = (props) => {
         {user.reports_count > 0 && (
           <MenuItem onClick={loadReportsCount}>View reports</MenuItem>
         )}
-      </Menu>
+      </Menu> */}
 
       <Modal
         show={viewReports}

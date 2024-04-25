@@ -18,11 +18,7 @@ import StudentCard from "../../../components/Supervisor/StudentCard";
 import LoadingCard from "../../../components/LoadingCard";
 import { useNavigate } from "react-router-dom";
 import useStudentServices from "../../../services/useStudentServices";
-import {
-  Alert,
-  Snackbar,
-  CircularProgress
-} from "@mui/material";
+import { Alert, Snackbar, CircularProgress } from "@mui/material";
 
 const cx = classNames.bind(styles);
 
@@ -30,13 +26,12 @@ function RoomingListPage() {
   const [typeSearch, setTypeSearch] = useState("");
   const searchRef = useRef();
   const scrollRef = useRef();
-  const [loadMore, setLoadMore] = useState(false)
+  const [loadMore, setLoadMore] = useState(false);
   const [snackBarOpen, setSnackBarOpen] = useState(false);
   const [snackBarNotif, setSnackBarNotif] = useState({
     severity: "success",
     message: "This is success message!",
   }); //severity: success, error, info, warning
-
 
   const [value, setValue] = useState(dayjs("2022-04-17T15:30"));
   const [modal, setModal] = useState(false);
@@ -80,57 +75,61 @@ function RoomingListPage() {
 
   const handleSearch = async () => {
     if (!studentsLoading && searchRef.current.value != "") {
-        setStudentsLoading(true);
-        try {
-          if(typeSearch == ""){
-            setSnackBarNotif({
-              severity: "error",
-              message: "Vui lòng chọn mục tìm kiếm",
-            });
-            setSnackBarOpen(true);
-          }
-          else{
-            const response = await searchStudents(0, searchRef.current.value, typeSearch);
-            setStudents(response);
-            console.log(response)
-          }
-        } catch (err) {
-          
-          console.log("get students error: ", err);
-        } finally{
-          setStudentsLoading(false);
+      setStudentsLoading(true);
+      try {
+        if (typeSearch == "") {
+          setSnackBarNotif({
+            severity: "error",
+            message: "Vui lòng chọn mục tìm kiếm",
+          });
+          setSnackBarOpen(true);
+        } else {
+          const response = await searchStudents(
+            0,
+            searchRef.current.value,
+            typeSearch
+          );
+          setStudents(response);
+          console.log(response);
         }
-      
+      } catch (err) {
+        console.log("get students error: ", err);
+      } finally {
+        setStudentsLoading(false);
+      }
     }
-  }
+  };
 
   useEffect(() => {
     const handleScroll = async () => {
       const scrollTop = scrollRef.current.scrollTop;
       const scrollHeight = scrollRef.current.scrollHeight;
       if (scrollTop === scrollHeight) {
-        console.log('Đã đạt đến cuoi trang' + students?.length );
-        try{
+        console.log("Đã đạt đến cuoi trang" + students?.length);
+        try {
           setLoadMore(true);
-          const data = await searchStudents(students?.length, searchRef.current.value, typeSearch);
-          setStudents(prev => [...prev, data]);
-        }catch(error){
-          console.log("Lỗi:", error)
-        }finally{
+          const data = await searchStudents(
+            students?.length,
+            searchRef.current.value,
+            typeSearch
+          );
+          setStudents((prev) => [...prev, data]);
+        } catch (error) {
+          console.log("Lỗi:", error);
+        } finally {
           setLoadMore(false);
         }
-      } 
+      }
     };
-    
-    if(scrollRef.current){
-      scrollRef.current.addEventListener('scroll', handleScroll);
+
+    if (scrollRef.current) {
+      scrollRef.current.addEventListener("scroll", handleScroll);
     }
     return () => {
       if (scrollRef.current) {
-        scrollRef.current.removeEventListener('scroll', handleScroll);
+        scrollRef.current.removeEventListener("scroll", handleScroll);
       }
     };
-    
   }, [students]);
 
   useEffect(() => {
@@ -143,8 +142,14 @@ function RoomingListPage() {
         <Sidenav />
       </div>
       <div className={cx("studentPage__content")} ref={scrollRef}>
-        <h1 style={{fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                  Helvetica, Arial, sans-serif`}}>Tra cứu sinh viên</h1>
+        <h1
+          style={{
+            fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                  Helvetica, Arial, sans-serif`,
+          }}
+        >
+          Tra cứu sinh viên
+        </h1>
         <div className={cx("page_content")}>
           <div className={cx("page_content__header")}>
             <FormControl
@@ -196,15 +201,27 @@ function RoomingListPage() {
           </div>
           <div className={cx("page_content__body")}>
             <div className={cx("students")}>
-              {studentsLoading ? <LoadingCard/> :
-              (students?.length > 0 ? 
+              {studentsLoading ? (
+                <LoadingCard />
+              ) : students?.length > 0 ? (
                 students.map((student, i) => (
                   <StudentCard key={i} student={student} />
-                )) : <div style={{width: "100%", textAlign: "center", fontWeight: 600,
-                fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                  Helvetica, Arial, sans-serif`, color: "rgb(61 60 60)"}}>Không tìm thấy kết quả</div>)
-              }
-              {!loadMore && (
+                ))
+              ) : (
+                <div
+                  style={{
+                    width: "100%",
+                    textAlign: "center",
+                    fontWeight: 600,
+                    fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                  Helvetica, Arial, sans-serif`,
+                    color: "rgb(61 60 60)",
+                  }}
+                >
+                  Không tìm thấy kết quả
+                </div>
+              )}
+              {loadMore && (
                 <div
                   style={{
                     width: "100%",
