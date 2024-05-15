@@ -3,10 +3,16 @@ import styles from "./Building.module.scss";
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import { useNavigate } from 'react-router-dom';
 const cx = classNames.bind(styles);
-function Building({building, date}) {
+function Building({building, date, setBuildingClick, home}) {
     const navigate = useNavigate();
     const handleNavigation = () => {
-        navigate('/schedule', { state: { building, date } });
+        console.log(home);
+        if(home){
+            setBuildingClick(building)
+        }
+        else{
+            navigate('/schedule', { state: { building, date } });
+        }
       };
     return(
         <div className={cx("building")} onClick={handleNavigation}>

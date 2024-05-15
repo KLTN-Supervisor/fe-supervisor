@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import styles from "./StudentCard.module.scss";
 import { formatDate } from "../../../untils/format-date";
 const cx = classNames.bind(styles);
-function StudentCard({ student }) {
+function StudentCard({ student, attendance }) {
   const [age, setAge] = useState("");
   const [value, setValue] = React.useState(dayjs("2022-04-17T15:30"));
   const [modal, setModal] = useState(false);
@@ -20,6 +20,7 @@ function StudentCard({ student }) {
       document.title = currentTitle;
     }
     setModal(!modal);
+    console.log(attendance === undefined);
   };
 
   const handleChange = (event) => {
@@ -28,9 +29,9 @@ function StudentCard({ student }) {
   return (
     <>
       <div className={cx("student")} onClick={toggleModal}>
-        <div style={{ height: "250px" }}>
+        <div style={{ height: "235px" }}>
           <img
-            style={{ width: "100%", maxHeight: "250px" }}
+            style={{ width: "100%", maxHeight: "235px" }}
             src={student.portrait_img}
           />
         </div>
@@ -58,6 +59,18 @@ function StudentCard({ student }) {
             " " +
             student.first_name}
         </span>
+        {attendance !== undefined && attendance === false && <span
+          style={{
+            color: "#ed4956",
+            marginBottom: "10px",
+            fontSize: "14px",
+            fontWeight: 500,
+            fontFamily:
+              '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,Helvetica, Arial, sans-serif',
+          }}
+        >
+          Vắng thi
+        </span>}
       </div>
       {modal && (
         <div className={cx("modal active-modal")}>

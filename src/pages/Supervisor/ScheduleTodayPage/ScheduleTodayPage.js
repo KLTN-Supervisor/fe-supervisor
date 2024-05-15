@@ -1,32 +1,49 @@
 import React, { useState, useRef, useEffect } from "react";
 import classNames from "classnames/bind";
-import styles from "./ScheduleDetailPage.module.scss";
+import styles from "./ScheduleTodayPage.scss";
 import Sidenav from "../../../components/Sidenav";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import StudentCard from "../../../components/Supervisor/StudentCard";
-import ApartmentIcon from '@mui/icons-material/Apartment';
+import LoadingCard from "../../../components/LoadingCard";
+import Building from "../../../components/Supervisor/Building";
+import Floor from "../../../components/Supervisor/Floor";
+import useExamScheduleServices from "../../../services/useExamScheduleServices";
+import { useNavigate } from "react-router-dom";
+import { formatHour } from "../../../untils/format-date";
 import ListSubheader from '@mui/material/ListSubheader';
 import List from '@mui/material/List';
-import Floor from "../../../components/Supervisor/Floor";
-import { useLocation } from "react-router-dom";
-import useExamScheduleServices from "../../../services/useExamScheduleServices";
-import LoadingCard from "../../../components/LoadingCard";
-import { formatHour } from "../../../untils/format-date";
-import {
-  Alert,
-  Snackbar,
-  CircularProgress
-} from "@mui/material";
+
 
 const cx = classNames.bind(styles);
-function ScheduleDetailPage() {
-    const location = useLocation();
-    const { building, date } = location.state;
-    const { getTimes, getRooms, getStudents } = useExamScheduleServices();
-    const [loadMore, setLoadMore] = useState(false);
-    const [studentsLoading, setStudentsLoading] = useState(false);
+function ExamSchedulePage() {
+  const navigate = useNavigate();
+  const [date, setDate] = useState("06/05/2024");
+  const [building, setBuilding] = useState([]);
+  const [buildingClick, setBuildingClick] = useState(null);
+  
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const { getBuildings, getTimes, getRooms, getStudents } =
+    useExamScheduleServices();
+  
+  useEffect(() => {
+    const getBuildingsExam = async () => {
+      if (!studentsLoading) {
+        console.log(date)
+        setStudentsLoading(true);
+        try {
+          const response = await getBuildings(date);
+          setBuilding(response);
+          setStudentsLoading(false);
+        } catch (err) {
+          setStudentsLoading(false);
+          console.log("get year error: ", err);
+        }
+      }
+    };
+    getBuildingsExam();
+  }, [date]);
+ 
     const [times, setTimes] = useState([]);
     const [time, setTime] = useState("");
     const [timeClick, setTimeClick] = useState(false);
@@ -36,15 +53,14 @@ function ScheduleDetailPage() {
       setTime(event.target.value);
     };
     const [room, setRoom] = useState([]);
-    const [students, setStudents] = useState([]);
 
 
     useEffect(() => {
         const getTimesExam = async () => {
-          if (!studentsLoading) {
+          if (!studentsLoading && buildingClick) {
             setStudentsLoading(true);
             try {
-              const response = await getTimes(date, building._id);
+              const response = await getTimes(date, buildingClick._id);
               setTimes(response);
               setStudentsLoading(false);
             } catch (err) {
@@ -54,17 +70,16 @@ function ScheduleDetailPage() {
           }
         };
         getTimesExam();
-      },[])
+      },[buildingClick])
 
       useEffect(() => {
         const getRoomsExam = async () => {
           if (!studentsLoading && timeClick) {
             setStudentsLoading(true);
             try {
-              const response = await getRooms(time, building._id);
+              const response = await getRooms(time, buildingClick._id);
               const floors = [...new Set(response.map((room) => room.floor))];
               setFloor(floors);
-              setStudents([]);
               setRoom(response);
               setStudentsLoading(false);
               setTimeClick(false);
@@ -79,31 +94,21 @@ function ScheduleDetailPage() {
       },[time])
 
 
-    const handleRoomClick = (Room) =>{
-        const getStudentsExam = async () => {
-            if (!studentsLoading) {
-              setStudentsLoading(true);
-              try {
-                const response = await getStudents(time, Room);
-                setStudents(response);
-                setStudentsLoading(false);
-              } catch (err) {
-                setStudentsLoading(false);
-                console.log("get time error: ", err);
-              }
-            }
-          };
-          getStudentsExam();
+    const handleRoomClick = (room, time) =>{
+      navigate('/attendance', { state: { time, room } });
     }
-    return (
-        <div className={cx("schedulePage")}>
-        <div className={cx("schedulePage__navWraper")}>
-            <Sidenav />
-        </div>
-        <div className={cx("schedulePage__content")}>
-            <div className={cx("page_content")} style={{marginTop: 20}}>
+
+  return (
+    <div className={cx("schedulePage")}>
+      <div className={cx("schedulePage__navWraper")}>
+        <Sidenav />
+      </div>
+      <div className={cx("schedulePage__content")}>
+        <h1>Lich thi hom nay</h1>
+        {buildingClick ? 
+        <div className={cx("page_content")} style={{marginTop: 20}}>
                 <div className={cx("title")}>
-                    <h6 className={cx("text")}>{building?.building_name}</h6>
+                    <h6 className={cx("text")}>{buildingClick?.building_name}</h6>
                 </div>
                 <div className={cx("page_content__header")}>
                     <FormControl
@@ -144,34 +149,43 @@ function ScheduleDetailPage() {
                                 </ListSubheader>
                             }
                         >
-                            {floor.map((f) => (<Floor key={f} room={room.filter((r) => r.floor === f)} handleRoomClick={handleRoomClick}/>))}
+                            {floor.map((f) => (<Floor key={f} time={time} room={room.filter((r) => r.floor === f)} handleRoomClick={handleRoomClick}/>))}
                         </List>
-                        {studentsLoading ? <LoadingCard/> :
-                            (students?.length > 0 ? 
-                                students.map((student, i) => (
-                                <StudentCard key={i} student={student.student} attendance={student.attendance} />
-                                )) : <div style={{width: "100%", textAlign: "center", fontWeight: 600,
-                                fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                                Helvetica, Arial, sans-serif`, color: "rgb(61 60 60)"}}>Không có dữ liệu
-                            </div>)
-                        }
-                        {loadMore && (
-                            <div
-                            style={{
-                                width: "100%",
-                                display: "flex",
-                                justifyContent: "center",
-                            }}
-                            >
-                            <CircularProgress size={30} />
-                            </div>
-                        )}
+                        {studentsLoading && <LoadingCard/> }
+                        
                     </div>
                 </div>
+            </div> :
+        <div className={cx("page_content")}>
+          <div className={cx("title")}>
+            <h6 className={cx("text")}>Danh sách tòa nhà</h6>
+          </div>
+          <div className={cx("page_content__body")}>
+            <div className={cx("students")}>
+              {building?.length > 0 ? (
+                building.map((b) => (
+                  <Building key={b._id} building={b} date={date} setBuildingClick={setBuildingClick} home={true}/>
+                ))
+              ) : (
+                <div
+                  style={{
+                    width: "100%",
+                    textAlign: "center",
+                    fontWeight: 600,
+                    fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                Helvetica, Arial, sans-serif`,
+                    color: "rgb(61 60 60)",
+                  }}
+                >
+                  Không có dữ liệu
+                </div>
+              )}
             </div>
-        </div>
+          </div>
+        </div>}
       </div>
-    );
+    </div>
+  );
 }
 
-export default ScheduleDetailPage;
+export default ExamSchedulePage;
