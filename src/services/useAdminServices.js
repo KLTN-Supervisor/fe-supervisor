@@ -49,6 +49,18 @@ const useAdminServices = () => {
     }
   };
 
+  const getAdminInspectors = async (page, limit, search = "") => {
+    try {
+      const response = await privateRequest(
+        `/admin/inspectors?page=${page}&limit=${limit}&search=${search}`
+      );
+
+      return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   const getTopAuthors = async () => {
     try {
       const response = await privateRequest("/admin/user/mostpost");
@@ -174,6 +186,7 @@ const useAdminServices = () => {
     getQuickOverview,
     getTopAuthors,
     uploadImagesImportFile,
+    getAdminInspectors,
   };
 };
 

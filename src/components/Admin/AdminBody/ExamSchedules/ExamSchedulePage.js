@@ -11,9 +11,12 @@ import Building from "../../../../components/Supervisor/Building";
 import useExamScheduleServices from "../../../../services/useExamScheduleServices";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../../../untils/format-date";
+import ImportInput from "../UploadFile/ImportInput";
+import useAdminServices from "../../../../services/useAdminServices";
 
 const cx = classNames.bind(styles);
 function ExamSchedules() {
+  const { uploadImportFile } = useAdminServices();
   const [building, setBuilding] = useState([]);
   const [year, setYear] = useState("");
   const [years, setYears] = useState([]);
@@ -117,9 +120,40 @@ function ExamSchedules() {
     getBuildingsExam();
   }, [date]);
 
+  const [file, setFile] = useState();
+  const [fileIsValid, setFileIsValid] = useState();
+
+  const removeFile = () => {
+    setFile(null);
+    setFileIsValid(false);
+  };
+
+  const uploadImportExamSchedulesFileHandler = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await uploadImportFile(formData, "examSchedules");
+      if (response) {
+        removeFile();
+      }
+    } catch (err) {
+      console.log("upload file: ", err);
+    }
+  };
+
   return (
     <div className={cx("schedulePage")}>
       <div className={cx("schedulePage__content")}>
+        <div style={{ width: "100%" }}>
+          <ImportInput
+            file={file}
+            fileIsValid={fileIsValid}
+            setFile={setFile}
+            setFileIsValid={setFileIsValid}
+            removeFile={removeFile}
+            uploadHandler={uploadImportExamSchedulesFileHandler}
+          />
+        </div>
         <h1>Tra cứu lịch thi</h1>
         <div className={cx("page_content")}>
           <div className={cx("page_content__header")}>

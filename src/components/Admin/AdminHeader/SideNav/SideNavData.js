@@ -32,6 +32,7 @@ const SideNavAdminData = ({ handleDrawerClose }) => {
       icon: <PermIdentityIcon />,
     },
     { label: "Sinh viên", link: "students", icon: <ArticleIcon /> },
+    { label: "Thanh tra", link: "inspectors", icon: <PermIdentityIcon /> },
     { label: "Lịch thi", link: "exam-schedules", icon: <ArticleIcon /> },
     // { label: "Reports", link: "reports", icon: <ReportGmailerrorredOutlinedIcon /> },
     {

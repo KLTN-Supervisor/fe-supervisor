@@ -6,7 +6,6 @@ const cx = classNames.bind(styles);
 function Building({ building, date, setBuildingClick, home }) {
   const navigate = useNavigate();
   const handleNavigation = () => {
-    console.log(home);
     if (home) {
       setBuildingClick(building);
     } else {

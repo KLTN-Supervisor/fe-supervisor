@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import React, { useState } from "react";
 import styles from "./StudentCard.module.scss";
 import { formatDate } from "../../../untils/format-date";
+import { getStudentsImageSource } from "../../../untils/getImageSource";
 const cx = classNames.bind(styles);
 function StudentCard({ student, attendance }) {
   const [age, setAge] = useState("");
@@ -32,7 +33,7 @@ function StudentCard({ student, attendance }) {
         <div style={{ height: "235px" }}>
           <img
             style={{ width: "100%", maxHeight: "235px" }}
-            src={student.portrait_img}
+            src={getStudentsImageSource(student.portrait_img)}
           />
         </div>
         <span
@@ -59,18 +60,20 @@ function StudentCard({ student, attendance }) {
             " " +
             student.first_name}
         </span>
-        {attendance !== undefined && attendance === false && <span
-          style={{
-            color: "#ed4956",
-            marginBottom: "10px",
-            fontSize: "14px",
-            fontWeight: 500,
-            fontFamily:
-              '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,Helvetica, Arial, sans-serif',
-          }}
-        >
-          Vắng thi
-        </span>}
+        {attendance !== undefined && attendance === false && (
+          <span
+            style={{
+              color: "#ed4956",
+              marginBottom: "10px",
+              fontSize: "14px",
+              fontWeight: 500,
+              fontFamily:
+                '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,Helvetica, Arial, sans-serif',
+            }}
+          >
+            Vắng thi
+          </span>
+        )}
       </div>
       {modal && (
         <div className={cx("modal active-modal")}>
@@ -98,7 +101,7 @@ function StudentCard({ student, attendance }) {
               <div style={{ height: "250px" }}>
                 <img
                   style={{ width: "100%", maxHeight: "250px" }}
-                  src={student.portrait_img}
+                  src={getStudentsImageSource(student.portrait_img)}
                 />
               </div>
               <div className={cx("info")}>
@@ -129,7 +132,9 @@ function StudentCard({ student, attendance }) {
               </div>
               <div className={cx("info")}>
                 <div className={cx("title")}>Ngày sinh:</div>
-                <span className={cx("span")}>{formatDate(student.date_of_birth)}</span>
+                <span className={cx("span")}>
+                  {formatDate(student.date_of_birth)}
+                </span>
               </div>
               <div className={cx("info")}>
                 <div className={cx("title")}>Nơi sinh:</div>

@@ -7,8 +7,10 @@ import StudentSearchingPage from "../pages/Supervisor/StudentSearchingPage";
 import DashboardBody from "../components/Admin/AdminBody/Dashboard/Dashboard";
 import UsersManage from "../components/Admin/AdminBody/UsersManager/Users";
 import StudentsManage from "../components/Admin/AdminBody/StudentsManager/Students";
+import InspectorsManage from "../components/Admin/AdminBody/InspectorsManager/Inspectors";
 import AdminPage from "../pages/AdminPage";
 import AdminExamSchedules from "../components/Admin/AdminBody/ExamSchedules/ExamSchedulePage";
+import AdminSchedulePage from "../components/Admin/AdminBody/ScheduleDetailPage/ScheduleDetailPage";
 
 // public Routes
 const publicRoutes = [
@@ -29,7 +31,8 @@ const adminRoutes = [
       { path: "users", component: UsersManage },
       { path: "students", component: StudentsManage },
       { path: "exam-schedules", component: AdminExamSchedules },
-      { path: "exam-schedules/schedule", component: SchedulePage },
+      { path: "exam-schedules/schedule", component: AdminSchedulePage },
+      { path: "inspectors", component: InspectorsManage },
     ],
   },
 ];

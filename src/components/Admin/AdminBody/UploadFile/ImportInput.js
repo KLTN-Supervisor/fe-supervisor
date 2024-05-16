@@ -8,7 +8,7 @@ const ImportInput = ({
   fileIsValid,
   setFileIsValid,
   removeFile = () => {},
-  uploadHandler,
+  uploadHandler = () => {},
   acceptFile = "",
   buttonName = "Import",
   uploadType = [],
@@ -18,9 +18,7 @@ const ImportInput = ({
     uploadType.length > 0 ? 0 : -1
   );
 
-  const [accept, setAccept] = useState(
-    uploadType[uploadHandlerIndex].acceptFile
-  );
+  const [accept, setAccept] = useState("");
 
   const pickFileHandler = (e) => {
     let pickedFile;
@@ -43,9 +41,9 @@ const ImportInput = ({
     setAnchorEl(null);
   };
 
-  useEffect(() => {
-    setAccept(uploadType[uploadHandlerIndex].acceptFile);
-  }, [uploadHandlerIndex]);
+  // useEffect(() => {
+  //   setAccept(uploadType[uploadHandlerIndex].acceptFile);
+  // }, [uploadHandlerIndex]);
 
   return (
     <>
