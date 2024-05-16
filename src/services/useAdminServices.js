@@ -105,6 +105,20 @@ const useAdminServices = () => {
     }
   };
 
+  const uploadImagesImportFile = async (formData, type = "students") => {
+    try {
+      const response = await privateRequest(
+        `/admin/${type}/images-import`,
+        "post",
+        formData
+      );
+
+      return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   const lockPost = async (id) => {
     try {
       const response = await privateRequest(`/admin/post/lock/${id}`, "put");
@@ -159,6 +173,7 @@ const useAdminServices = () => {
     getUserReportsCount,
     getQuickOverview,
     getTopAuthors,
+    uploadImagesImportFile,
   };
 };
 

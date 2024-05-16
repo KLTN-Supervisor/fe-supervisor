@@ -17,7 +17,13 @@ import { Scrollbar } from "../../UsersManager/ScrollBar";
 import { useMemo } from "react";
 import { applyPagination } from "../../../../../untils/apply-pagination";
 import { useSelection } from "../../../../../hooks/use-selection";
-import TableItem from "./TableItem";
+import AdminTableItem from "./TableItem";
+import styles from "../../../../Supervisor/StudentCard/StudentCard.module.scss";
+import { formatDate } from "../../../../../untils/format-date";
+import classNames from "classnames/bind";
+import { getStudentsImageSource } from "../../../../../untils/getImageSource";
+
+const cx = classNames.bind(styles);
 
 const useItemIds = (items) => {
   return useMemo(() => {
@@ -25,12 +31,12 @@ const useItemIds = (items) => {
   }, [items]);
 };
 
-export const Table = (props) => {
+export const AdminTable = (props) => {
   const {
     count = 0,
     data = [],
     onPageChange = () => {},
-    onRowsPerPageChange,
+    onRowsPerPageChange = () => {},
     page = 0,
     rowsPerPage = -1,
     setItemsSelected,
@@ -40,15 +46,84 @@ export const Table = (props) => {
   } = props;
 
   const itemIds = useItemIds(data);
-  const itemsSelection = useSelection(itemIds, setItemsSelected);
-
-  const onDeselectAll = itemsSelection.handleDeselectAll;
-  const onDeselectOne = itemsSelection.handleDeselectOne;
-  const onSelectAll = itemsSelection.handleSelectAll;
-  const onSelectOne = itemsSelection.handleSelectOne;
+  const {
+    handleDeselectAll,
+    handleDeselectOne,
+    handleSelectAll,
+    handleSelectOne,
+  } = useSelection(itemIds, setItemsSelected);
 
   const selectedSome = selected.length > 0 && selected.length < data.length;
   const selectedAll = data.length > 0 && selected.length === data.length;
+
+  const renderModalBody = (item) => {
+    return (
+      <div
+        className={cx("modal-navbar-content")}
+        style={{ width: "50%", marginTop: 30 }}
+      >
+        <div className={cx("modal-header")}>Thông tin sinh viên</div>
+        <div className={cx("modal-main")}>
+          <div style={{ height: "250px" }}>
+            <img
+              style={{ width: "100%", maxHeight: "250px" }}
+              src={getStudentsImageSource(item.portrait_img)}
+            />
+          </div>
+          <div className={cx("info")}>
+            <div className={cx("title")}>MSSV:</div>
+            <span className={cx("span")}>{item.student_id}</span>
+          </div>
+          <div className={cx("info")}>
+            <div className={cx("title")}>Họ và tên:</div>
+            <span className={cx("span")}>{item.fullname}</span>
+          </div>
+          <div className={cx("info")}>
+            <div className={cx("title")}>CMND/CCCD:</div>
+            <span className={cx("span")}>
+              {item.citizen_identification_number}
+            </span>
+          </div>
+          <div className={cx("info")}>
+            <div className={cx("title")}>Giới tính:</div>
+            <span className={cx("span")}>{item.gender}</span>
+          </div>
+          <div className={cx("info")}>
+            <div className={cx("title")}>Ngày sinh:</div>
+            <span className={cx("span")}>{formatDate(item.date_of_birth)}</span>
+          </div>
+          <div className={cx("info")}>
+            <div className={cx("title")}>Nơi sinh:</div>
+            <span className={cx("span")}>{item.place_of_birth}</span>
+          </div>
+          <div className={cx("info")}>
+            <div className={cx("title")}>Tỉnh/TP:</div>
+            <span className={cx("span")}>
+              {item.permanent_address.city_or_province}
+            </span>
+          </div>
+          <div className={cx("info")}>
+            <div className={cx("title")}>Quận/huyện:</div>
+            <span className={cx("span")}>
+              {item.permanent_address.district}
+            </span>
+          </div>
+          <div className={cx("info")}>
+            <div className={cx("title")}>Địa chỉ thường trú:</div>
+            <span className={cx("span")}>{item.permanent_address.address}</span>
+          </div>
+          <div className={cx("info")}>
+            <div className={cx("title")}>Quốc tịch:</div>
+            <span className={cx("span")}>{item.nationality}</span>
+          </div>
+          <div className={cx("info")}>
+            <div className={cx("title")}>Lớp học phần:</div>
+            <span className={cx("span")}>{item.class}</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <Card>
@@ -63,9 +138,9 @@ export const Table = (props) => {
                     indeterminate={selectedSome}
                     onChange={(event) => {
                       if (event.target.checked) {
-                        onSelectAll?.();
+                        handleSelectAll?.();
                       } else {
-                        onDeselectAll?.();
+                        handleDeselectAll?.();
                       }
                     }}
                   />
@@ -77,13 +152,17 @@ export const Table = (props) => {
             </TableHead>
             <TableBody>
               {data.map((row) => (
-                <TableItem
+                <AdminTableItem
                   key={row._id}
-                  user={row}
-                  onDeselectOne={onDeselectOne}
-                  onSelectOne={onSelectOne}
+                  item={row}
+                  onDeselectOne={handleDeselectOne}
+                  onSelectOne={handleSelectOne}
                   selected={selected}
                   colsData={colsData}
+                  options={[
+                    { name: "More information", handleClick: "toggleModal" },
+                  ]}
+                  renderModalBody={renderModalBody}
                 />
               ))}
             </TableBody>
@@ -103,7 +182,7 @@ export const Table = (props) => {
   );
 };
 
-Table.propTypes = {
+AdminTable.propTypes = {
   count: PropTypes.number,
   items: PropTypes.array,
   onDeselectAll: PropTypes.func,

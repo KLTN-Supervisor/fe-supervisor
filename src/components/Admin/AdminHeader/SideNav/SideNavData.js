@@ -21,17 +21,18 @@ const cx = classNames.bind(styles);
 const SideNavAdminData = ({ handleDrawerClose }) => {
   const { logout } = useLogout();
   const listItemData = [
+    // {
+    //   label: "Dashboard",
+    //   link: "dashboard",
+    //   icon: <DashboardIcon />,
+    // },
     {
-      label: "Dashboard",
-      link: "dashboard",
-      icon: <DashboardIcon />,
-    },
-    {
-      label: "Users",
+      label: "Tài khoản",
       link: "users",
       icon: <PermIdentityIcon />,
     },
-    { label: "Students", link: "students", icon: <ArticleIcon /> },
+    { label: "Sinh viên", link: "students", icon: <ArticleIcon /> },
+    { label: "Lịch thi", link: "exam-schedules", icon: <ArticleIcon /> },
     // { label: "Reports", link: "reports", icon: <ReportGmailerrorredOutlinedIcon /> },
     {
       label: "Logout",

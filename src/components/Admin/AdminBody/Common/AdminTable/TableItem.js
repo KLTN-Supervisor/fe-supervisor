@@ -12,27 +12,43 @@ import {
 } from "@mui/material";
 import Modal from "react-bootstrap/Modal";
 import classNames from "classnames/bind";
-import styles from "../../UsersManager/UserTableItem.scss";
 import { getInitials } from "../../../../../untils/get-initials";
 import { useState } from "react";
 import useAdminServices from "../../../../../services/useAdminServices";
 import usePrivateHttpClient from "../../../../../hooks/http-hook/private-http-hook";
+import styles from "./TableItem.scss";
+import CloseIcon from "@mui/icons-material/Close";
+import { formatDate } from "../../../../../untils/format-date";
 
 const cx = classNames.bind(styles);
 
-const TableItem = (props) => {
+const AdminTableItem = (props) => {
   const {
     item,
     onDeselectOne,
     onSelectOne,
     selected = [],
     colsData = [],
+    options = [],
+    renderModalBody,
   } = props;
 
   const [viewReports, setViewReports] = useState(false);
   const privateHttpRequest = usePrivateHttpClient();
 
   const [reportsCount, setReportsCount] = useState([]);
+
+  const [modal, setModal] = useState(false);
+
+  const toggleModal = () => {
+    // if (document.body.style.overflow !== "hidden") {
+    //   document.body.style.overflow = "hidden";
+    // } else {
+    //   document.body.style.overflow = "auto";
+    // }
+    handleClose();
+    setModal(!modal);
+  };
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -43,8 +59,8 @@ const TableItem = (props) => {
     setAnchorEl(null);
   };
 
-  const isSelected = selected.includes(user._id);
-  const createdAt = format(parseISO(user.created_at), "dd/MM/yyyy");
+  const isSelected = selected.includes(item._id);
+  const createdAt = format(parseISO(item.created_at), "dd/MM/yyyy");
 
   // const loadReportsCount = async () => {
   //   try {
@@ -64,15 +80,20 @@ const TableItem = (props) => {
 
   return (
     <>
-      <TableRow hover key={user._id} selected={isSelected}>
+      <TableRow
+        hover
+        key={item._id}
+        selected={isSelected}
+        onClick={handleClick}
+      >
         <TableCell padding="checkbox">
           <Checkbox
             checked={isSelected}
             onChange={(event) => {
               if (event.target.checked) {
-                onSelectOne?.(user._id);
+                onSelectOne?.(item._id);
               } else {
-                onDeselectOne?.(user._id);
+                onDeselectOne?.(item._id);
               }
             }}
           />
@@ -109,54 +130,56 @@ const TableItem = (props) => {
           {user.reports_count}
         </TableCell> */}
       </TableRow>
-      {/* <Menu
-        id="basic-menu"
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        MenuListProps={{
-          "aria-labelledby": "basic-button",
-        }}
-      >
-        {user.reports_count > 0 && (
-          <MenuItem onClick={loadReportsCount}>View reports</MenuItem>
-        )}
-      </Menu> */}
-
-      <Modal
-        show={viewReports}
-        onHide={() => setViewReports(false)}
-        className={cx("add-employee-modal")}
-      >
-        <Modal.Header>
-          <div className={cx("title-modal")}>REPORTS</div>
-          {privateHttpRequest.error && (
-            <>
-              <br />
-              <div className={cx("title-modal")}>
-                <Alert severity="error">{privateHttpRequest.error}</Alert>
-              </div>
-            </>
-          )}
-        </Modal.Header>
-        <Modal.Body>
-          {reportsCount.map((item, i) => (
-            <div
-              key={i}
-              className={cx("row align-items-center", "modal-content-report")}
+      {options.length > 0 && (
+        <Menu
+          id="basic-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          MenuListProps={{
+            "aria-labelledby": "basic-button",
+          }}
+          sx={{ width: 400 }}
+        >
+          {options.map((option, i) => (
+            <MenuItem
+              onClick={
+                option.handleClick === "toggleModal"
+                  ? toggleModal
+                  : option.handleClick
+              }
             >
-              <div className={cx("col-lg-8 col-md-8", "report")}>
-                {item.reason}
-              </div>
-              <div className={cx("col-lg-3 col-md-3", "count")}>
-                {item.count}
-              </div>
-            </div>
+              {option.name}
+            </MenuItem>
           ))}
-        </Modal.Body>
-      </Modal>
+        </Menu>
+      )}
+
+      {modal && (
+        <div className={cx("modal active-modal")}>
+          <div
+            onClick={toggleModal}
+            className={cx("overlay")}
+            style={{ alignSelf: "flex-end" }}
+          >
+            <CloseIcon
+              //className={cx("sidenav__icon")}
+              style={{
+                width: "27px",
+                height: "27px",
+                color: "white",
+                margin: "12px 30px",
+                position: "absolute",
+                right: "0",
+                cursor: "pointer",
+              }}
+            />
+          </div>
+          {renderModalBody(item)}
+        </div>
+      )}
     </>
   );
 };
 
-export default TableItem;
+export default AdminTableItem;

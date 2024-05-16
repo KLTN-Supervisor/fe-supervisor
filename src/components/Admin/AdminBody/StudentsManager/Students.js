@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { StudentsSearch } from "./StudentsSearch";
-import { StudentsTable } from "./StudentsTable";
+import { AdminTable } from "../Common/AdminTable/Table";
 // import { applyPagination } from "../../../../shared/util/apply-pagination";
 // import { useSelection } from "../../../../shared/hook/use-selection";
 import Modal from "react-bootstrap/Modal";
@@ -27,7 +27,7 @@ import ImportInput from "../UploadFile/ImportInput";
 const cx = classNames.bind(styles);
 // const now = new Date();
 
-const UsersManage = () => {
+const StudentsManage = () => {
   const privateHttpRequest = usePrivateHttpClient();
   const {
     uploadImportFile,
@@ -35,6 +35,7 @@ const UsersManage = () => {
     banUsers,
     unBanUsers,
     createUser,
+    uploadImagesImportFile,
   } = useAdminServices();
 
   const [visible, setVisible] = useState(false);
@@ -62,11 +63,24 @@ const UsersManage = () => {
     setFileIsValid(false);
   };
 
-  const uploadFileHandler = async () => {
+  const uploadImportStudentsFileHandler = async () => {
     try {
       const formData = new FormData();
       formData.append("file", file);
       const response = await uploadImportFile(formData);
+      if (response) {
+        removeFile();
+      }
+    } catch (err) {
+      console.log("upload file: ", err);
+    }
+  };
+
+  const uploadImportImagesFileHandler = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await uploadImagesImportFile(formData);
       if (response) {
         removeFile();
       }
@@ -84,10 +98,16 @@ const UsersManage = () => {
 
   const getData = useCallback(async () => {
     const response = await getAdminStudents(page, rowsPerPage, search);
-    if (response) {
-      if (page === 1) setData(response.students);
-      else setData((prev) => [...prev, ...response.students]);
-    }
+    if (response)
+      setData(
+        response.students.map((student) => {
+          return {
+            ...student,
+            gender: student.gender ? "MALE" : "FEMALE",
+            fullname: `${student.last_name} ${student.middle_name} ${student.first_name}`,
+          };
+        })
+      );
   }, [page, rowsPerPage, search]);
 
   useEffect(() => {
@@ -192,9 +212,22 @@ const UsersManage = () => {
                   setFile={setFile}
                   setFileIsValid={setFileIsValid}
                   removeFile={removeFile}
-                  uploadHandler={uploadFileHandler}
+                  uploadType={[
+                    {
+                      name: "Students",
+                      acceptFile:
+                        ".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel",
+                      uploadHandler: uploadImportStudentsFileHandler,
+                    },
+                    {
+                      name: "Images",
+                      acceptFile: ".zip,.rar",
+                      uploadHandler: uploadImportImagesFileHandler,
+                    },
+                  ]}
                 />
               </Stack>
+
               <div>
                 {usersSelected.length > 0 && (
                   <>
@@ -249,15 +282,23 @@ const UsersManage = () => {
             </Stack>
             <StudentsSearch setSearch={setSearch} />
             {!privateHttpRequest.isLoading && (
-              <StudentsTable
+              <AdminTable
                 count={data.length}
                 data={data}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
                 page={page}
                 rowsPerPage={rowsPerPage}
-                setUsersSelected={setUsersSelected}
+                setItemsSelected={setUsersSelected}
                 selected={usersSelected}
+                colsName={["MSSV", "Name", "Type", "Gender", "Status"]}
+                colsData={[
+                  "student_id",
+                  "fullname",
+                  "student_type",
+                  "gender",
+                  "learning_status",
+                ]}
               />
             )}
           </Stack>
@@ -268,7 +309,7 @@ const UsersManage = () => {
           className={cx("add-employee-modal")}
         >
           <Modal.Header>
-            <div className={cx("title-modal")}>ADD USER</div>
+            <div className={cx("title-modal")}>ADD STUDENT</div>
             {privateHttpRequest.error && (
               <>
                 <br />
@@ -283,10 +324,10 @@ const UsersManage = () => {
             <div className={cx("row align-items-center", "modal-content-item")}>
               <div>
                 <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Username</div>
+                  <div>First Name</div>
                 </div>
                 <input
-                  id="username"
+                  id="firstname"
                   type="text"
                   onChange={changeHandler}
                   className={cx("col-lg-8 col-md-8")}
@@ -412,4 +453,4 @@ const UsersManage = () => {
   );
 };
 
-export default UsersManage;
+export default StudentsManage;

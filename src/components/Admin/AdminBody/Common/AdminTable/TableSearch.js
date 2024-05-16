@@ -2,7 +2,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import PropTypes from "prop-types";
 import { Card, InputAdornment, OutlinedInput, SvgIcon } from "@mui/material";
 
-export const TableSearch = ({ setSearch }) => {
+export const AdminTableSearch = ({ setSearch }) => {
   const handleSearch = (event) => {
     if (event.key === "Enter") setSearch(event.target.value);
   };
@@ -29,6 +29,6 @@ export const TableSearch = ({ setSearch }) => {
   );
 };
 
-TableSearch.propTypes = {
+AdminTableSearch.propTypes = {
   setSearch: PropTypes.func,
 };

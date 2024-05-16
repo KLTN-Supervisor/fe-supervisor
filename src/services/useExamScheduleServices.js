@@ -5,9 +5,7 @@ const useExamScheduleServices = () => {
 
   const getYears = async () => {
     try {
-      const response = await privateRequest(
-        `/examSchedule/getYear`
-      );
+      const response = await privateRequest(`/examSchedule/getYear`);
 
       return response.data;
     } catch (err) {
@@ -78,7 +76,7 @@ const useExamScheduleServices = () => {
   const getStudents = async (date, room) => {
     try {
       const response = await privateRequest(
-        `/examSchedule/getStudent?date=${date}&&room=${room}`
+        `/examSchedule/getStudent?date=${date}&room=${room}`
       );
 
       return response.data;
@@ -87,7 +85,15 @@ const useExamScheduleServices = () => {
     }
   };
 
-  return { getYears, getTerms, getDate, getBuildings, getTimes, getRooms, getStudents };
+  return {
+    getYears,
+    getTerms,
+    getDate,
+    getBuildings,
+    getTimes,
+    getRooms,
+    getStudents,
+  };
 };
 
 export default useExamScheduleServices;

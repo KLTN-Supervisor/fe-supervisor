@@ -41,7 +41,8 @@ const AdminPage = () => {
   // }, []);
 
   useEffect(() => {
-    if (from === "/administrator") navigate("./users");
+    if (from === "/administrator" || from === "/administrator/")
+      navigate("./exam-schedules");
   }, []);
 
   const [mobileOpen, setMobileOpen] = useState(false);
