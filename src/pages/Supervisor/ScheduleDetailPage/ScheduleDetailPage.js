@@ -25,8 +25,10 @@ function ScheduleDetailPage() {
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [times, setTimes] = useState([]);
   const [time, setTime] = useState("");
+  const [timeClick, setTimeClick] = useState(false);
   const [floor, setFloor] = useState([]);
   const handleChange = (event) => {
+    setTimeClick(true);
     setTime(event.target.value);
   };
   const [room, setRoom] = useState([]);
@@ -51,7 +53,7 @@ function ScheduleDetailPage() {
 
   useEffect(() => {
     const getRoomsExam = async () => {
-      if (!studentsLoading) {
+      if (!studentsLoading && timeClick) {
         setStudentsLoading(true);
         try {
           const response = await getRooms(time, building._id);
@@ -60,9 +62,11 @@ function ScheduleDetailPage() {
           setStudents([]);
           setRoom(response);
           setStudentsLoading(false);
+          setTimeClick(false);
         } catch (err) {
           setStudentsLoading(false);
-          console.log("get time error: ", err);
+          setTimeClick(false);
+          console.log("get room error: ", err);
         }
       }
     };
@@ -75,7 +79,6 @@ function ScheduleDetailPage() {
         setStudentsLoading(true);
         try {
           const response = await getStudents(time, Room);
-          console.log(response);
           setStudents(response);
           setStudentsLoading(false);
         } catch (err) {
@@ -92,7 +95,7 @@ function ScheduleDetailPage() {
         <Sidenav />
       </div>
       <div className={cx("schedulePage__content")}>
-        <div className={cx("page_content")}>
+        <div className={cx("page_content")} style={{ marginTop: 20 }}>
           <div className={cx("title")}>
             <h6 className={cx("text")}>{building?.building_name}</h6>
           </div>
@@ -152,7 +155,11 @@ function ScheduleDetailPage() {
                 <LoadingCard />
               ) : students?.length > 0 ? (
                 students.map((student, i) => (
-                  <StudentCard key={i} student={student} />
+                  <StudentCard
+                    key={i}
+                    student={student.student}
+                    attendance={student.attendance}
+                  />
                 ))
               ) : (
                 <div

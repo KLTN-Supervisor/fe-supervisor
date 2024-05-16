@@ -1,5 +1,6 @@
 import AuthPage from "../pages/AuthPage";
 import HomePage from "../pages/Supervisor/HomePage";
+import ScheduleTodayPage from "../pages/Supervisor/ScheduleTodayPage";
 import ExamSchedulePage from "../pages/Supervisor/ExamSchedulePage";
 import SchedulePage from "../pages/Supervisor/ScheduleDetailPage";
 import StudentSearchingPage from "../pages/Supervisor/StudentSearchingPage";
@@ -15,7 +16,8 @@ const publicRoutes = [
   { path: "/searchExamSchedule", component: ExamSchedulePage },
   { path: "/searchExamSchedule/schedule", component: SchedulePage },
   { path: "/searchStudent", component: StudentSearchingPage },
-  { path: "/", component: HomePage },
+  { path: "/attendance", component: HomePage },
+  { path: "/", component: ScheduleTodayPage },
 ];
 // Private Routes
 const adminRoutes = [

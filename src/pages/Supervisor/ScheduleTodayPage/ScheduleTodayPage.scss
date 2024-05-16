@@ -1,0 +1,124 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+.schedulePage {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.schedulePage__navWraper {
+  position: relative;
+  width:240px;
+}
+
+.schedulePage__content {
+  flex: 1;
+  flex-direction: column;
+  background-color: (244, 245, 247);
+  display: flex;
+  width: calc(100vw - 240px);
+  justify-content: center;
+  align-items: center;
+
+  .page_content{
+      width: 90%;
+      padding: 16px 16px 24px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+      box-shadow: rgba(255, 255, 255, 0.144) 0px 1px 2px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+      .page_content__header{
+          display: flex;
+          justify-content: center;
+          margin-top: 10px;
+      }
+      .title{
+        border-width: 0px 0px thin;
+        border-bottom: rgba(0, 0, 0, 0.12) solid 0.5px;
+        margin: 30px 25px 0 15px;
+        .text{
+          margin: 0;
+          display: inline-block;
+          padding: 0 18px;
+          text-transform: uppercase;
+          line-height: 37px;
+          position: relative;
+          color: #fff;
+          background: #00558d;
+          font-size: 1.0938rem;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+          font-weight: 700;
+          box-sizing: border-box;
+        }
+        .text::before{
+          border-right: 20px solid transparent;
+          border-bottom: 35px solid #7b848a;
+          content: "";
+          display: inline-block;
+          height: 0;
+          position: absolute;
+          right: -20px;
+          top: 0;
+          width: 0;
+        }
+      }
+      .page_content__body{
+          margin-top: 20px;
+          display: flex;
+          width: 100%;
+          justify-content: center;
+          align-items: center;
+          .students{
+            display: flex;
+            flex: 1;
+            // justify-content: center;
+            flex-wrap: wrap;
+          }
+      }
+  }
+}
+@media (max-width: 1064px){
+  .schedulePage {
+    .schedulePage__navWraper {
+      position: relative;
+      width: 80px;
+    }
+    .schedulePage__content {
+      width: calc(100vw - 80px);
+      .page_content{
+        .page_content__header{
+          .search__button {
+            .span{
+              display: none;
+            }
+          }
+        }
+      }
+    }
+
+  }
+}
+
+@media (max-width: 527px){
+  .schedulePage {
+    .schedulePage__content {
+      .page_content{
+        .page_content__header{
+          flex-direction: column;
+          .form__select{
+            width: 90%;
+            margin-bottom: 10px;
+          }
+        }
+        .page_content__body{
+          .students{
+            justify-content: center;
+          }
+        }
+      }
+    }
+
+  }
+}
