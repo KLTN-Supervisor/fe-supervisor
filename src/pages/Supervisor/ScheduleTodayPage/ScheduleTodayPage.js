@@ -95,7 +95,8 @@ function ExamSchedulePage() {
 
 
     const handleRoomClick = (room, time) =>{
-      navigate('/attendance', { state: { time, room } });
+      console.log(time, room);
+      navigate("attendance", { state: { time, room } });
     }
 
   return (

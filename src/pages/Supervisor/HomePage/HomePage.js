@@ -5,19 +5,36 @@ import Sidenav from "../../../components/Sidenav";
 import { useLocation, useNavigate } from "react-router-dom";
 import * as faceapi from "face-api.js";
 import { Alert, Snackbar, CircularProgress } from "@mui/material";
+import Button from "@mui/material/Button";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
 import CollectionsOutlinedIcon from "@mui/icons-material/CollectionsOutlined";
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
+import CloseIcon from "@mui/icons-material/Close";
 import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import useExamScheduleServices from "../../../services/useExamScheduleServices";
-const img1 = require('../../../data/Duong/1.jpeg')
-const img2 = require('../../../data/Duong/2.jpeg')
+import ImageList from '@mui/material/ImageList';
+import ImageListItem from '@mui/material/ImageListItem';
+import ImageListItemBar from '@mui/material/ImageListItemBar';
+import ListSubheader from '@mui/material/ListSubheader';
+import IconButton from '@mui/material/IconButton';
+import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
+import usePrivateHttpClient from "../../../hooks/http-hook/private-http-hook";
 const cx = classNames.bind(styles);
 
 function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  let time ;
-  let room ;
+  const { privateRequest } = usePrivateHttpClient();
+  const { time, room } = location.state ?? { time: '', room: '' };
+
+  // let time, room;
+
+  // if (location.state) {
+  //   ({ time, room } = location.state);
+  // }
+  
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [students, setStudents] = useState([]);
   const [isFetched, setIsFetched] = useState(false);
@@ -28,6 +45,7 @@ function HomePage() {
 
   const videoRef = useRef();
   const canvasRef = useRef();
+  const canvasImageRef = useRef();
   const isLoadCanvasRef = useRef(true);
   const intervalRef = useRef(null);
   let faceMatcher;
@@ -52,9 +70,9 @@ function HomePage() {
   // }, []);
 
   useEffect(() => {
-    time = location.state.time;
-    room = location.state.room;
-    getStudentsExam()
+    // time = location.state.time;
+    // room = location.state.room;
+    // getStudentsExam()
 
     const handleBeforeUnload = () => {
       clear();
@@ -95,28 +113,24 @@ function HomePage() {
   };
 
 
-
-  async function loadTrainingData(){
-    const labels = ['20110627 - Nguyễn Khắc Dương']
-    const faceDescriptors = []
-    for (const label of labels){
-      const descriptors = []
-      // for(let i=1; i<3; i++){
-      //   const image = await faceapi.fetchImage(`../../../data/${label}/${i}.jpeg`)
-      //   const detection = await faceapi.detectSingleFace(image).withFaceLandmarks().withFaceDescriptor()
-      //   descriptors.push(detection.descriptor)
-      // }
-      const image1 = await faceapi.fetchImage(img1)
-      const detection = await faceapi.detectSingleFace(image1).withFaceLandmarks().withFaceDescriptor()
-      descriptors.push(detection.descriptor)
-      const image2 = await faceapi.fetchImage(img2)
-      const detection2 = await faceapi.detectSingleFace(image2).withFaceLandmarks().withFaceDescriptor()
-      descriptors.push(detection2.descriptor)
-      faceDescriptors.push(new faceapi.LabeledFaceDescriptors(label, descriptors))
+  const loadTrainingData = async () => {
+    try {
+      const response = await privateRequest(
+        `/train/`
+      );
+      console.log(response);
+      const labeledFaceDescriptors = response.data.map((x) => {
+        console.log(x);
+        const descriptors = x.descriptors.map((descriptor) => new Float32Array(descriptor));
+        console.log(descriptors);
+        return new faceapi.LabeledFaceDescriptors(x.label, descriptors);
+      }).filter(Boolean);
+      return labeledFaceDescriptors;
+    } catch (err) {
+      throw err;
     }
-    console.log(faceDescriptors);
-    return faceDescriptors;
-  }
+  };
+  
 
   // STOP VIDEO STREAM FUNCTION
   const stopVideoStream = async () => {
@@ -149,12 +163,7 @@ function HomePage() {
   const loadModels = async () => {
     if(students.length > 0){
       console.log(students)
-      await Promise.all([
-        // THIS FOR FACE DETECT AND LOAD FROM YOU PUBLIC/MODELS DIRECTORY
-        faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
-        faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-        faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-      ])
+      
       const trainingData = await loadTrainingData();
       faceMatcher = new faceapi.FaceMatcher(trainingData, 0.3);
       console.log(faceMatcher);
@@ -174,12 +183,12 @@ function HomePage() {
       // DRAW YOU FACE IN WEBCAM
       canvasRef.current.innerHTML  = faceapi.createCanvas(videoRef.current);
       faceapi.matchDimensions(canvasRef.current, {
-        width: canvasRef.current && canvasRef.current.offsetWidth,
+        width: imageRef.current && imageRef.current.offsetWidth,
         height: 650,
       });
 
       const resized = faceapi.resizeResults(detections, {
-        width: canvasRef.current && canvasRef.current.offsetWidth,
+        width: imageRef.current && imageRef.current.offsetWidth,
         height: 650,
       });
 
@@ -239,6 +248,9 @@ function HomePage() {
       }
     }
   };
+  useEffect(() => {
+    getStudentsExam();
+  },[time,room])
   useEffect(() => {
     console.log(students)
     loadModels();
@@ -302,39 +314,51 @@ function HomePage() {
   }
 
   const onFileSelect = async (event) => {
+    !faceMatcher && loadModels(); 
+    !students && getStudents(); 
     setIsDropping(true);
     
     const file = event.target.files[0];
     const image = await faceapi.bufferToImage(file);
-    const canvas = faceapi.createCanvasFromMedia(image);
-    
-    imageRef.current.innerHTML = "";
-    imageRef.current.append(image);
-    imageRef.current.append(canvas);
+    console.log(image);
+    if (imageRef.current) {
+      imageRef.current.src = image.src;
 
-    const size = {
-      width: image.width,
-      height: image.height
-    }
-    
+      const detections = await faceapi
+          .detectAllFaces(imageRef.current)
+          .withFaceLandmarks()
+          .withFaceDescriptors();
 
-    faceapi.matchDimensions(canvas, size);
+      canvasImageRef.current.innerHTML  = faceapi.createCanvas(imageRef.current);
+      faceapi.matchDimensions(canvasImageRef.current, {
+        width: canvasImageRef.current && canvasImageRef.current.offsetWidth,
+        height: 650,
+      });
 
-    const detections = await faceapi
-        .detectAllFaces(image)
-        .withFaceLandmarks()
-        .withFaceDescriptors();
-    const resized = faceapi.resizeResults(detections, size);
-    console.log(resized);
+    const resized = faceapi.resizeResults(detections, {
+      width: canvasImageRef.current && canvasImageRef.current.offsetWidth,
+      height: 650,
+    });
+  
 
     for(const detection of resized){
       const box = detection.detection.box
+      console.log("faceMatcher ne", faceMatcher)
       const drawBox = new faceapi.draw.DrawBox(box, {
         label: faceMatcher && faceMatcher.findBestMatch(detection.descriptor).toString()
       })
-      if(students.find(student => {
-        // Kiểm tra nếu student_id bằng với giá trị tương ứng
-        return student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label.substring(0, 9).trim()}) 
+      let check = false;
+      if(students){
+        for(const student of students){
+          console.log(student.student.student_id);
+          if(student.student.student_id.toString() === faceMatcher.findBestMatch(detection.descriptor)._label.substring(0, 9).trim()){
+            check = true;
+            break;
+          }
+        }
+      }
+      console.log(students);
+      if( check 
         && !attendanceList.includes(faceMatcher.findBestMatch(detection.descriptor)._label) 
         && faceMatcher.findBestMatch(detection.descriptor)._label!="unknown")
         {
@@ -353,10 +377,18 @@ function HomePage() {
           setSnackBarOpen(true);
           console.log(attendanceList);
         }
-      
-      drawBox.draw(canvas)
+      drawBox.draw(canvasImageRef.current)
+    }
+    
     }
   }
+
+  useEffect(() => {
+    if (canvasRef.current) {
+      const canvasContext = canvasRef.current.getContext('2d');
+      canvasContext.willReadFrequently = true;
+    }
+  }, [canvasRef]);
 
   const handleAttendance = (studentId) => {
     const updatedStudents = students.map(student => {
@@ -369,12 +401,57 @@ function HomePage() {
     console.log(students)
   }
 
+
+  //reports
+  const [modal, setModal] = useState(false);
+  const [currentTitle, setCurrentTitle] = useState(document.title);
+
+  const toggleModal = () => {
+    if (document.body.style.overflow !== "hidden") {
+      document.body.style.overflow = "hidden";
+      document.title = "Trang chủ";
+    } else {
+      document.body.style.overflow = "auto";
+      document.title = currentTitle;
+    }
+    setModal(!modal);
+  };
+
+  const [report, setReport] = useState("");
+  const handleChange = (event) => {
+    setReport(event.target.value);
+  };
+
+  const [imageModals, setImageModals] = useState([]);
+
+  function onFileModalSelect(event) {
+    const files = event.target.files;
+    if (files.length === 0) return;
+    for (let i = 0; i < files.length; i++) {
+      if (notValidFile(files[i])) continue;
+      if (!imageModals.some((e) => e.name === files[i].name)) {
+        setImageModals((prevImages) => [
+          ...prevImages,
+          {
+            name: files[i].name,
+            url: URL.createObjectURL(files[i]),
+            file: files[i],
+          },
+        ]);
+      }
+    }
+  }
+
+  function deleteImage(index) {
+    setImageModals((prevImages) => prevImages.filter((_, i) => i !== index));
+  }
+
   
 
   return (
     <div className={cx("homepage")}>
       <div className={cx("homepage__navWraper")}>
-        <Sidenav />
+        <Sidenav clear={clear}/>
       </div>
       <div className={cx("homepage__timeline")}>
         <div className={cx("myapp")}>
@@ -445,20 +522,21 @@ function HomePage() {
               onDrop={isDropping ? null : onDrop}>
             {isDropping ? (
               <div
-                className={cx("modal-navbar-content")}
+                className={cx("content")}
               >
                 <div
-                  className={cx("modal-main")}
+                  className={cx("main")}
                   style={isDragging ? { backgroundColor: "black" } : null}
                 >
                   <div
+                    
                     className={cx("container")}
                     style={{
                       borderRadius: "10px 10px 10px 10px",
                       display: "flex",
                     }}
                   >
-                    <div
+                     <div
                       className={cx("image")}
                       style={{
                         minHeight: "400px",
@@ -467,8 +545,9 @@ function HomePage() {
                         overflow: "hidden",
                       }}
                     >
+                      
                       <div
-                        ref={imageRef}
+                        
                         className={cx("img-slider")}
                         style={{
                           width: "100%",
@@ -479,8 +558,8 @@ function HomePage() {
                           borderRadius: "0px 0px 10px 10px",
                         }}
                       >
-                        {/* <img
-                          
+                        <img
+                          ref={imageRef}
                           style={{
                             width: "100%",
                             objectFit: "contain",
@@ -490,15 +569,15 @@ function HomePage() {
                             flexGrow: "0",
                             borderRadius: "10px 10px 10px 10px",
                           }}
-                          src={images[0].url}
+                          // src={images[0].url}
                           
-                        /> */}
-                        {/* <canvas
-                          ref={canvasRef}
-                          width={imageRef && imageRef?.current.offsetWidth}
-                          height="650"
+                        />
+                        <canvas
+                          ref={canvasImageRef}
+                          width={imageRef && imageRef?.current?.offsetWidth}
+                          height={imageRef && imageRef?.current?.offsetHeight}
                           className={cx("appcanvas")}
-                        /> */}
+                        />
                       </div>
                     </div>
                     
@@ -507,10 +586,10 @@ function HomePage() {
               </div>
             ) : (
               <div
-                className={cx("modal-navbar-content")}
+                className={cx("content")}
               >
                 <div
-                  className={cx("modal-main")}
+                  className={cx("main")}
                   style={isDragging ? { backgroundColor: "#0094f61b" } : null}
                 >
                   <div>
@@ -555,6 +634,14 @@ function HomePage() {
         </div>
         <div className={cx("title")}>
             <h6 className={cx("text")}>Danh sách điểm danh</h6>
+            <div onClick={toggleModal} style={{position: "absolute",
+              right: "4%",
+              bottom: "-60px",
+              display: "inline-block",
+              backgroundColor: "#0095f6",
+              padding: "10px",
+              color: "white",
+              borderRadius: "10px"}}>Lập biên bản</div>
           </div>
         <div className={cx("attendance")}>
           <div className={cx("student__attend")}>
@@ -563,7 +650,7 @@ function HomePage() {
             <div className={cx("table__title", "check")}>Điểm danh</div>
           </div>
           {!studentsLoading?
-          (students.length > 0 && students.map((student, key) => (<div className={cx("student__attend")}>
+          (students.length > 0 && students.map((student) => (<div key={student.student.student_id} className={cx("student__attend")}>
               <div className={cx("table__content", "mssv")}>{student.student.student_id}</div>
               <div className={cx("table__content", "name")}>{student.student.last_name + " " + student.student.middle_name + " " + student.student.first_name}</div>
               <div className={cx("table__content", "check")} style={{cursor: "pointer"}} onClick={() => handleAttendance(student.student.student_id)}>{student.attendance ? "Có mặt" : "Vắng"}</div>
@@ -579,6 +666,137 @@ function HomePage() {
           </div>}
         </div>
       </div>
+      {modal && (
+        <div className={cx("modal active-modal")}>
+          <div
+            onClick={toggleModal}
+            className={cx("overlay")}
+            style={{ alignSelf: "flex-end" }}
+          >
+            <CloseIcon
+              className={cx("sidenav__icon")}
+              style={{
+                width: "27px",
+                height: "27px",
+                color: "white",
+                margin: "12px 30px",
+                position: "absolute",
+                right: "0",
+                cursor: "pointer",
+              }}
+            />
+          </div>
+          <div className={cx("modal-navbar-content")} style={{ width: "50%" }}>
+            <div className={cx("modal-header")}>Biên bản báo cáo</div>
+            <div className={cx("modal-main")}>
+            <div style={{width: "100%", display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center"}}>
+              <div className={cx("modal-main-title")}>Loại biên bản:</div>
+                <FormControl
+                  variant="standard"
+                  className={cx("form__select")}
+                  sx={{
+                      width: 0.9,
+                      border: "1px solid rgba(0, 85, 141, 0.5)",
+                      padding: "3px 16px",
+                      borderRadius: "10px",
+                  }}
+                  >
+                  <Select
+                      value={report}
+                      onChange={handleChange}
+                      displayEmpty
+                      disableUnderline
+                      inputProps={{ "aria-label": "Without label" }}
+                      sx={{ height: "100%" }}
+                  >
+                      <MenuItem value="">
+                      <em>Chọn loại biên bản</em>
+                      </MenuItem>
+                      <MenuItem value="Absence">Vắng thi</MenuItem>
+                      <MenuItem value="Foul">Vi phạm qui chế thi</MenuItem>
+                      <MenuItem value="Other">Khác</MenuItem>
+                  </Select>
+                </FormControl>
+              </div>
+              <div style={{width: "100%", display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center"}}>
+                <div className={cx("modal-main-title")}>Ghi chú:</div>
+                <textarea
+                  className={cx("modal-main-input")}
+                  // value={bio}
+                  // onChange={(e) => {
+                  //   setBio(e.target.value);
+                  // }}
+                  placeholder="Ghi chú..."
+                ></textarea>
+              </div>
+              <div className={cx("modal-input")}>
+                <div className={cx("modal-main-title")} style={{width: "auto", margin: "4%"}}>Hình ảnh:</div>
+                <input
+                  type="file"
+                  accept="image/jpg,image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+                  multiple
+                  ref={fileInputRef}
+                  onChange={onFileModalSelect}
+                  id="myFileInput"
+                  style={{ display: "none" }}
+                />
+                <label
+                  role="button"
+                  onClick={selectFiles}
+                  className={cx("modal-upload")}
+                >
+                  Chọn ảnh
+                </label>
+              </div>
+              <ImageList sx={{ width: 0.92 }}>
+                {imageModals.map((item, index) => (
+                  <ImageListItem key={item.url}>
+                    <img
+                      // srcSet={`${item.url}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                      // src={`${item.url}?w=248&fit=crop&auto=format`}
+                      src={item.url}
+                      alt={item.name}
+                      loading="lazy"
+                    />
+                    <ImageListItemBar
+                      subtitle={item.name}
+                      actionIcon={
+                        <IconButton
+                          sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                          aria-label={`info about ${item.name}`}
+                        >
+                          <CancelRoundedIcon onClick={() => deleteImage(index)}/>
+                        </IconButton>
+                      }
+                    />
+                  </ImageListItem>
+                ))}
+              </ImageList>
+              <div
+              className={cx("modal-main-button")}
+              style={{
+                position: "relative",
+              }}
+            >
+              <Button
+                sx={{
+                  fontFamily: "inherit",
+                  textTransform: "none",
+                  ":hover": {
+                    opacity: 0.8,
+                  },
+                  // opacity: !bioModified || updateProfileLoading ? 0.5 : 1,
+                }}
+                // onClick={updateBio}
+                // disabled={!bioModified || updateProfileLoading}
+              >
+                Lập biên bản
+              </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <Snackbar
         open={snackBarOpen}
         autoHideDuration={6000}

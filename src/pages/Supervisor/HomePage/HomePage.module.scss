@@ -22,6 +22,7 @@ html, body {
     justify-content: center;
     align-items: center;
     .title{
+      width: 90%;
       border-width: 0px 0px thin;
       border-bottom: rgba(0, 0, 0, 0.12) solid 0.5px;
       margin: 30px 25px 0 15px;
@@ -138,14 +139,14 @@ html, body {
     }
   }
 
-  .modal-navbar-content {
+  .content {
     width: 100%;
     height: 100%;
     line-height: 1.4;
     background: white;
     border-radius: 10px;
     min-height: 400px;
-    .modal-main {
+    .main {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -153,7 +154,7 @@ html, body {
       border-radius: 0px 0px 10px 10px;
       width: 100%;
       .container {
-        width: 100%;
+        width: 80%;
         .image {
           flex: 1;
           max-height: 567px;
@@ -233,6 +234,146 @@ html, body {
         sans-serif;
     }
   }
+
+  //Modal
+.active-modal {
+  overflow-y: hidden;
+}
+
+.btn-modal {
+  padding: 10px 20px;
+  display: block;
+  margin: 100px auto 0;
+  font-size: 18px;
+}
+
+.modal,
+.overlay {
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: fixed;
+  z-index: 3;
+}
+
+.overlay {
+  background: rgba(4, 3, 3, 0.8);
+}
+.modal-navbar-content {
+  position: fixed;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  transform: translate(-50%, -50%);
+  line-height: 1.4;
+  border-radius: 10px;
+  max-width: 900px;
+  min-width: 300px;
+  min-height: 400px;
+  max-height: 90%;
+  overflow-y: auto;
+  .modal-header {
+    color: white;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: #303030 solid 1px;
+    background-color: #00558d;
+    border-radius: 10px 10px 0px 0px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 10px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+      sans-serif;
+    .header-next {
+      font-size: 14px;
+      color: #0095f6;
+    }
+    .header-next:hover {
+      color: white;
+      cursor: pointer;
+    }
+  }
+  .modal-main {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0 30px 0px;
+    border-radius: 0px 0px 10px 10px;
+    width: 100%;
+    background-color: #fff;
+    .modal-main-title {
+      width: 92%;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      font-family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,Helvetica, Arial, sans-serif';
+      font-weight: 600;
+    }
+    .modal-main-input {
+      width: 92%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 85, 141, 0.5);
+      resize: none;
+      height: 100px;
+      overflow: auto;
+      font-size: 16px;
+      font-weight: 450;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+        sans-serif;
+    }
+    .modal-main-input:focus {
+      outline: none;
+    }
+    .modal-input {
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+    .modal-upload {
+      background-color: #565555a9;
+      color: white;
+      padding: 7px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+        sans-serif;
+    }
+    .modal-main-button > button {
+      height: 32px;
+      background-color: #0095f6;
+      font-size: 14px;
+      color: white;
+      font-weight: 600;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+        sans-serif;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+    }
+  }
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 7px;
+}
+
   @media (max-width: 1064px){
     .homepage {
       .homepage__navWraper {

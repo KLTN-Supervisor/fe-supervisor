@@ -1,11 +1,20 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import { publicRoutes, adminRoutes } from "./routes";
 //import { DefaultLayout } from './Layout';
 import { ToastContainer } from "react-toastify";
+import * as faceapi from "face-api.js";
 
 function App() {
+  useEffect(() =>{
+    Promise.all([
+      // THIS FOR FACE DETECT AND LOAD FROM YOU PUBLIC/MODELS DIRECTORY
+      faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+      faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+      faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+    ])
+  })
   return (
     <div className="App">
       <Routes>

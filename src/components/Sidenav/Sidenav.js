@@ -15,7 +15,7 @@ import useLogout from "../../hooks/auth-hook/logout-hook";
 import NavBarLogo from "../../assets/logo-white.png";
 import NavBarIcon from "../../assets/NESTME-2.png";
 const cx = classNames.bind(styles);
-function Sidenav() {
+function Sidenav({clear}) {
     const locate = window.location.pathname;
     const { logout } = useLogout();
     const navigate = useNavigate();
@@ -28,7 +28,8 @@ function Sidenav() {
                 >
                     <img
                     style={{ cursor: "pointer", width: "27px", height: "27px", borderRadius: "5px" }}
-                    onClick={() => {
+                    onClick={() => { 
+                        clear && clear();
                         navigate("/", { replace: true });
                     }}
                     className={cx("sidenav__logo")}
@@ -41,6 +42,7 @@ function Sidenav() {
                     <img
                     style={{ cursor: "pointer" }}
                     onClick={() => {
+                        clear && clear();
                         navigate("/", { replace: true });
                     }}
                     className={cx("sidenav__logo")}
@@ -52,7 +54,8 @@ function Sidenav() {
                 <div className={cx("sidenav__buttons")}>
                     <button
                         onClick={() => {
-                        navigate("/", { replace: true });
+                            clear && clear();
+                            navigate("/", { replace: true });
                         }}
                         className={cx("sidenav__button")}
                         style={
@@ -77,7 +80,8 @@ function Sidenav() {
                     <button
                         className={cx("sidenav__button")}
                         onClick={() => {
-                            navigate("/searchExamSchedule", { replace: true });
+                                clear && clear();
+                                navigate("/searchExamSchedule", { replace: true });
                             }}
                             style={
                                 locate === "/searchExamSchedule"
@@ -93,7 +97,8 @@ function Sidenav() {
                     </button>
                     <button
                         onClick={() => {
-                        navigate("/searchStudent", { replace: true });
+                            clear && clear();
+                            navigate("/searchStudent", { replace: true });
                         }}
                         className={cx("sidenav__button")}
                         style={
@@ -119,6 +124,10 @@ function Sidenav() {
                     <div className={cx("sidenav__more")}>
                         <button
                             className={cx("sidenav__button")}
+                            onClick={() => {
+                                clear && clear();
+                                navigate("/searchStudent", { replace: true });
+                            }}
                         >
                             <LogoutIcon
                             className={cx("sidenav__icon")}
