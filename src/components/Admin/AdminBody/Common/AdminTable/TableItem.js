@@ -175,7 +175,7 @@ const AdminTableItem = (props) => {
               }}
             />
           </div>
-          {renderModalBody(item)}
+          {renderModalBody(item, toggleModal)}
         </div>
       )}
     </>

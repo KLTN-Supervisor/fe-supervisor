@@ -11,6 +11,7 @@ import InspectorsManage from "../components/Admin/AdminBody/InspectorsManager/In
 import AdminPage from "../pages/AdminPage";
 import AdminExamSchedules from "../components/Admin/AdminBody/ExamSchedules/ExamSchedulePage";
 import AdminSchedulePage from "../components/Admin/AdminBody/ScheduleDetailPage/ScheduleDetailPage";
+import AdminReportPage from "../components/Admin/AdminBody/ReportsManager/Reports";
 
 // public Routes
 const publicRoutes = [
@@ -33,6 +34,7 @@ const adminRoutes = [
       { path: "exam-schedules", component: AdminExamSchedules },
       { path: "exam-schedules/schedule", component: AdminSchedulePage },
       { path: "inspectors", component: InspectorsManage },
+      { path: "report", component: AdminReportPage },
     ],
   },
 ];

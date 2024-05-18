@@ -22,6 +22,21 @@
   font-size: 18px;
 }
 
+.button {
+  width: 100px;
+  height: 35px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: medium;
+  &:hover {
+    opacity: 0.8;
+  }
+  &:active {
+    opacity: 0.5;
+  }
+}
+
 .modal,
 .overlay {
   width: 100vw;

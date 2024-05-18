@@ -10,16 +10,16 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import CollectionsOutlinedIcon from "@mui/icons-material/CollectionsOutlined";
-import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
+import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
 import CloseIcon from "@mui/icons-material/Close";
-import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
+import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import useExamScheduleServices from "../../../services/useExamScheduleServices";
-import ImageList from '@mui/material/ImageList';
-import ImageListItem from '@mui/material/ImageListItem';
-import ImageListItemBar from '@mui/material/ImageListItemBar';
-import ListSubheader from '@mui/material/ListSubheader';
-import IconButton from '@mui/material/IconButton';
-import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
+import ImageList from "@mui/material/ImageList";
+import ImageListItem from "@mui/material/ImageListItem";
+import ImageListItemBar from "@mui/material/ImageListItemBar";
+import ListSubheader from "@mui/material/ListSubheader";
+import IconButton from "@mui/material/IconButton";
+import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import usePrivateHttpClient from "../../../hooks/http-hook/private-http-hook";
 const cx = classNames.bind(styles);
 
@@ -30,15 +30,15 @@ function HomePage() {
   // Lưu giá trị vào localStorage khi trang được tải
   useEffect(() => {
     if (location.state) {
-      localStorage.setItem('time', location.state.time);
-      localStorage.setItem('room', location.state.room);
+      localStorage.setItem("time", location.state.time);
+      localStorage.setItem("room", location.state.room);
     }
   }, [location.state]);
 
   // Đọc giá trị từ localStorage khi trang được tải lại
   const { time, room } = location.state ?? {
-    time: localStorage.getItem('time') || '',
-    room: localStorage.getItem('room') || '',
+    time: localStorage.getItem("time") || "",
+    room: localStorage.getItem("room") || "",
   };
 
   // let time, room;
@@ -46,12 +46,11 @@ function HomePage() {
   // if (location.state) {
   //   ({ time, room } = location.state);
   // }
-  
+
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [students, setStudents] = useState([]);
   const [isFetched, setIsFetched] = useState(false);
 
-    
   const [state, setState] = useState(0);
   const { getStudents } = useExamScheduleServices();
 
@@ -72,7 +71,7 @@ function HomePage() {
   // // LOAD FROM USEEFFECT
   // useEffect(() => {
   //   isLoadCanvasRef.current = true;
-    
+
   //   startVideo();
   //   videoRef?.current && loadModels();
 
@@ -97,20 +96,19 @@ function HomePage() {
     isLoadCanvasRef.current = true;
     startVideo();
     loadModels();
-    
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
     navigate(handleRouteChange);
 
     return async () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
       await clear();
       console.log("Chuyen trang ne");
     };
   }, []);
   useEffect(() => {
-    console.log(videoRef.current?.srcObject)
-    console.log("faceMatcher",faceMatcher)
+    console.log(videoRef.current?.srcObject);
+    console.log("faceMatcher", faceMatcher);
   }, [videoRef.current?.srcObject, faceMatcher]);
 
   // STOP VIDEO STREAM
@@ -124,37 +122,39 @@ function HomePage() {
     }
   };
 
-
   const loadTrainingData = async () => {
     try {
-      const response = await privateRequest(
-        `/train/`
-      );
+      const response = await privateRequest(`/train/`);
       console.log(response);
-      const labeledFaceDescriptors = response.data.map((x) => {
-        console.log(x);
-        const descriptors = x.descriptors.map((descriptor) => new Float32Array(descriptor));
-        console.log(descriptors);
-        return new faceapi.LabeledFaceDescriptors(x.label, descriptors);
-      }).filter(Boolean);
+      const labeledFaceDescriptors = response.data
+        .map((x) => {
+          console.log(x);
+          const descriptors = x.descriptors.map(
+            (descriptor) => new Float32Array(descriptor)
+          );
+          console.log(descriptors);
+          return new faceapi.LabeledFaceDescriptors(x.label, descriptors);
+        })
+        .filter(Boolean);
       return labeledFaceDescriptors;
     } catch (err) {
       throw err;
     }
   };
-  
 
   // STOP VIDEO STREAM FUNCTION
   const stopVideoStream = async () => {
-    console.log("toi ch")
-    navigator.mediaDevices.addEventListener("removetrack", (event) => {console.log(`${event.track.kind} track removed`);});
-    console.log(videoRef.current && videoRef.current?.srcObject)
+    console.log("toi ch");
+    navigator.mediaDevices.addEventListener("removetrack", (event) => {
+      console.log(`${event.track.kind} track removed`);
+    });
+    console.log(videoRef.current && videoRef.current?.srcObject);
     if (videoRef.current && videoRef.current.srcObject) {
       const stream = videoRef.current?.srcObject;
       const tracks = stream?.getTracks();
 
       await tracks.forEach((track) => track.stop());
-      console.log("tat ch")
+      console.log("tat ch");
       videoRef.current.srcObject = null;
     }
   };
@@ -173,19 +173,18 @@ function HomePage() {
   // LOAD MODELS FROM FACE API
 
   const loadModels = async () => {
-    if(students.length > 0){
-      console.log(students)
-      
+    if (students.length > 0) {
+      console.log(students);
+
       const trainingData = await loadTrainingData();
-      faceMatcher = new faceapi.FaceMatcher(trainingData, 0.3);
+      faceMatcher = new faceapi.FaceMatcher(trainingData, 0.4);
       console.log(faceMatcher);
-      videoRef?.current && (intervalRef.current = setInterval(runFaceDetection, 2000))
+      videoRef?.current &&
+        (intervalRef.current = setInterval(runFaceDetection, 2000));
     }
-    
   };
 
   const runFaceDetection = useCallback(async () => {
-    
     if (isLoadCanvasRef.current) {
       const detections = await faceapi
         .detectAllFaces(videoRef.current)
@@ -193,7 +192,7 @@ function HomePage() {
         .withFaceDescriptors();
 
       // DRAW YOU FACE IN WEBCAM
-      canvasRef.current.innerHTML  = faceapi.createCanvas(videoRef.current);
+      canvasRef.current.innerHTML = faceapi.createCanvas(videoRef.current);
       faceapi.matchDimensions(canvasRef.current, {
         width: videoRef.current && videoRef.current.offsetWidth,
         height: 650,
@@ -204,26 +203,56 @@ function HomePage() {
         height: 650,
       });
 
-      for(const detection of resized){
-        const box = detection.detection.box
+      for (const detection of resized) {
+        const box = detection.detection.box;
         const drawBox = new faceapi.draw.DrawBox(box, {
-          label: await faceMatcher.findBestMatch(detection.descriptor).toString()
-        })
-        
-        let check = false
-        for(const student of students){
-          if(student.student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label.substring(0, 9).trim()){
+          label: await faceMatcher
+            .findBestMatch(detection.descriptor)
+            .toString(),
+        });
+
+        let check = false;
+        for (const student of students) {
+          if (
+            student.student.student_id.toString().trim() ===
+            faceMatcher
+              .findBestMatch(detection.descriptor)
+              ._label.substring(0, 9)
+              .trim()
+          ) {
             check = true;
             break;
           }
-            
         }
-        
-        if(check && !attendanceList.includes(faceMatcher.findBestMatch(detection.descriptor)._label) && faceMatcher.findBestMatch(detection.descriptor)._label!="unknown"){
-          attendanceList.push(faceMatcher.findBestMatch(detection.descriptor)._label);
-          const updatedStudents = students.map(student => {
-            console.log(student.student.student_id.toString().localeCompare(faceMatcher.findBestMatch(detection.descriptor)._label.substring(0, 9).toString()));
-            if (student.student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label.substring(0, 9).trim()) {
+
+        if (
+          check &&
+          !attendanceList.includes(
+            faceMatcher.findBestMatch(detection.descriptor)._label
+          ) &&
+          faceMatcher.findBestMatch(detection.descriptor)._label != "unknown"
+        ) {
+          attendanceList.push(
+            faceMatcher.findBestMatch(detection.descriptor)._label
+          );
+          const updatedStudents = students.map((student) => {
+            console.log(
+              student.student.student_id
+                .toString()
+                .localeCompare(
+                  faceMatcher
+                    .findBestMatch(detection.descriptor)
+                    ._label.substring(0, 9)
+                    .toString()
+                )
+            );
+            if (
+              student.student.student_id.toString().trim() ===
+              faceMatcher
+                .findBestMatch(detection.descriptor)
+                ._label.substring(0, 9)
+                .trim()
+            ) {
               return { ...student, attendance: true };
             }
             return student;
@@ -231,13 +260,15 @@ function HomePage() {
           setStudents(updatedStudents);
           setSnackBarNotif({
             severity: "success",
-            message: "Điểm danh thành công " + faceMatcher.findBestMatch(detection.descriptor)._label,
+            message:
+              "Điểm danh thành công " +
+              faceMatcher.findBestMatch(detection.descriptor)._label,
           });
           setSnackBarOpen(true);
           console.log(attendanceList);
         }
-        
-        drawBox.draw(canvasRef.current)
+
+        drawBox.draw(canvasRef.current);
       }
       // faceapi.draw.drawDetections(canvasRef.current, resized);
       // faceapi.draw.drawFaceLandmarks(canvasRef.current, resized);
@@ -245,7 +276,6 @@ function HomePage() {
     }
   }, [students]);
 
-  
   const getStudentsExam = async () => {
     if (!studentsLoading) {
       setStudentsLoading(true);
@@ -253,7 +283,7 @@ function HomePage() {
         const response = await getStudents(time, room);
         setStudents(response);
         setStudentsLoading(false);
-        setIsFetched(true)
+        setIsFetched(true);
       } catch (err) {
         setStudentsLoading(false);
         console.log("get time error: ", err);
@@ -262,12 +292,11 @@ function HomePage() {
   };
   useEffect(() => {
     getStudentsExam();
-  },[time,room])
+  }, [time, room]);
   useEffect(() => {
-    console.log(students)
+    console.log(students);
     loadModels();
   }, [isFetched]);
-
 
   //Hinh anh
   const [images, setImages] = useState([]);
@@ -304,7 +333,6 @@ function HomePage() {
       }
     }
     setIsDropping(true);
-
   }
 
   //Validate file
@@ -326,10 +354,10 @@ function HomePage() {
   }
 
   const onFileSelect = async (event) => {
-    !faceMatcher && loadModels(); 
-    !students && getStudents(); 
+    !faceMatcher && loadModels();
+    !students && getStudents();
     setIsDropping(true);
-    
+
     const file = event.target.files[0];
     const image = await faceapi.bufferToImage(file);
     console.log(image);
@@ -337,46 +365,64 @@ function HomePage() {
       imageRef.current.src = image.src;
 
       const detections = await faceapi
-          .detectAllFaces(imageRef.current)
-          .withFaceLandmarks()
-          .withFaceDescriptors();
+        .detectAllFaces(imageRef.current)
+        .withFaceLandmarks()
+        .withFaceDescriptors();
 
-      canvasImageRef.current.innerHTML  = faceapi.createCanvas(imageRef.current);
+      canvasImageRef.current.innerHTML = faceapi.createCanvas(imageRef.current);
       faceapi.matchDimensions(canvasImageRef.current, {
         width: imageRef.current && imageRef.current.offsetWidth,
         height: 650,
       });
 
-    const resized = faceapi.resizeResults(detections, {
-      width: imageRef.current && imageRef.current.offsetWidth,
-      height: 650,
-    });
-  
+      const resized = faceapi.resizeResults(detections, {
+        width: imageRef.current && imageRef.current.offsetWidth,
+        height: 650,
+      });
 
-    for(const detection of resized){
-      const box = detection.detection.box
-      console.log("faceMatcher ne", faceMatcher)
-      const drawBox = new faceapi.draw.DrawBox(box, {
-        label: faceMatcher && faceMatcher.findBestMatch(detection.descriptor).toString()
-      })
-      let check = false;
-      if(students){
-        for(const student of students){
-          console.log(student.student.student_id);
-          if(student.student.student_id.toString() === faceMatcher.findBestMatch(detection.descriptor)._label.substring(0, 9).trim()){
-            check = true;
-            break;
+      for (const detection of resized) {
+        const box = detection.detection.box;
+        console.log("faceMatcher ne", faceMatcher);
+        const drawBox = new faceapi.draw.DrawBox(box, {
+          label:
+            faceMatcher &&
+            faceMatcher.findBestMatch(detection.descriptor).toString(),
+        });
+        let check = false;
+        if (students) {
+          for (const student of students) {
+            console.log(student.student.student_id);
+            if (
+              student.student.student_id.toString() ===
+              faceMatcher
+                .findBestMatch(detection.descriptor)
+                ._label.substring(0, 9)
+                .trim()
+            ) {
+              check = true;
+              break;
+            }
           }
         }
-      }
-      console.log(students);
-      if( check 
-        && !attendanceList.includes(faceMatcher.findBestMatch(detection.descriptor)._label) 
-        && faceMatcher.findBestMatch(detection.descriptor)._label!="unknown")
-        {
-          attendanceList.push(faceMatcher.findBestMatch(detection.descriptor)._label);
-          const updatedStudents = students.map(student => {
-            if (student.student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label.substring(0, 9).trim()) {
+        console.log(students);
+        if (
+          check &&
+          !attendanceList.includes(
+            faceMatcher.findBestMatch(detection.descriptor)._label
+          ) &&
+          faceMatcher.findBestMatch(detection.descriptor)._label != "unknown"
+        ) {
+          attendanceList.push(
+            faceMatcher.findBestMatch(detection.descriptor)._label
+          );
+          const updatedStudents = students.map((student) => {
+            if (
+              student.student.student_id.toString().trim() ===
+              faceMatcher
+                .findBestMatch(detection.descriptor)
+                ._label.substring(0, 9)
+                .trim()
+            ) {
               return { ...student, attendance: true };
             }
             return student;
@@ -384,35 +430,35 @@ function HomePage() {
           setStudents(updatedStudents);
           setSnackBarNotif({
             severity: "success",
-            message: "Điểm danh thành công " + faceMatcher.findBestMatch(detection.descriptor)._label,
+            message:
+              "Điểm danh thành công " +
+              faceMatcher.findBestMatch(detection.descriptor)._label,
           });
           setSnackBarOpen(true);
           console.log(attendanceList);
         }
-      drawBox.draw(canvasImageRef.current)
+        drawBox.draw(canvasImageRef.current);
+      }
     }
-    
-    }
-  }
+  };
 
   useEffect(() => {
     if (canvasRef.current) {
-      const canvasContext = canvasRef.current.getContext('2d');
+      const canvasContext = canvasRef.current.getContext("2d");
       canvasContext.willReadFrequently = true;
     }
   }, [canvasRef]);
 
   const handleAttendance = (studentId) => {
-    const updatedStudents = students.map(student => {
+    const updatedStudents = students.map((student) => {
       if (student.student.student_id === studentId) {
         return { ...student, attendance: !student.attendance };
       }
       return student;
     });
     setStudents(updatedStudents);
-    console.log(students)
-  }
-
+    console.log(students);
+  };
 
   //reports
   const [modal, setModal] = useState(false);
@@ -458,12 +504,10 @@ function HomePage() {
     setImageModals((prevImages) => prevImages.filter((_, i) => i !== index));
   }
 
-  
-
   return (
     <div className={cx("homepage")}>
       <div className={cx("homepage__navWraper")}>
-        <Sidenav clear={clear}/>
+        <Sidenav clear={clear} />
       </div>
       <div className={cx("homepage__timeline")}>
         <div className={cx("myapp")}>
@@ -474,14 +518,19 @@ function HomePage() {
                 className={cx("choose")}
                 style={
                   state === 0
-                    ? { color: "#00558d", borderBottom: "#00558d solid 1px", marginRight: "25px" }
-                    : {marginRight: "25px"}
+                    ? {
+                        color: "#00558d",
+                        borderBottom: "#00558d solid 1px",
+                        marginRight: "25px",
+                      }
+                    : { marginRight: "25px" }
                 }
                 onClick={() => {
                   isLoadCanvasRef.current = true;
                   startVideo();
-                  console.log(videoRef?.current)
-                  videoRef?.current && (intervalRef.current = setInterval(runFaceDetection, 2000))
+                  console.log(videoRef?.current);
+                  videoRef?.current &&
+                    (intervalRef.current = setInterval(runFaceDetection, 2000));
                   setState(0);
                 }}
               >
@@ -499,11 +548,15 @@ function HomePage() {
                 className={cx("choose")}
                 style={
                   state === 1
-                    ? { color: "#00558d", borderBottom: "#00558d solid 1px", marginLeft: "25px" }
-                    : {marginLeft: "25px"}
+                    ? {
+                        color: "#00558d",
+                        borderBottom: "#00558d solid 1px",
+                        marginLeft: "25px",
+                      }
+                    : { marginLeft: "25px" }
                 }
-                onClick={async() => {
-                  await clear(); 
+                onClick={async () => {
+                  await clear();
                   setState(1);
                 }}
               >
@@ -517,169 +570,193 @@ function HomePage() {
               </div>
             </a>
           </div>
-          {state === 0 ? (<><div className={cx("appvide")}>
-            <video
-              crossOrigin="anonymous"
-              ref={videoRef}
-              autoPlay
-              style={{ borderRadius: 10 }}
-            ></video>
-          </div>
-          <canvas
-            ref={canvasRef}
-            width={videoRef?.current && videoRef?.current.offsetWidth}
-            height="650"
-            className={cx("appcanvas")}
-          /></>) : (
+          {state === 0 ? (
+            <>
+              <div className={cx("appvide")}>
+                <video
+                  crossOrigin="anonymous"
+                  ref={videoRef}
+                  autoPlay
+                  style={{ borderRadius: 10 }}
+                ></video>
+              </div>
+              <canvas
+                ref={canvasRef}
+                width={videoRef?.current && videoRef?.current.offsetWidth}
+                height="650"
+                className={cx("appcanvas")}
+              />
+            </>
+          ) : (
             <div
-              style={{width: "100%", height: 650}} 
+              style={{ width: "100%", height: 650 }}
               onDragOver={isDropping ? null : onDragOver}
               onDragLeave={isDropping ? null : onDragLeave}
-              onDrop={isDropping ? null : onDrop}>
-            {isDropping ? (
-              <div
-                className={cx("content")}
-              >
-                <div
-                  className={cx("main")}
-                  style={isDragging ? { backgroundColor: "black" } : null}
-                >
+              onDrop={isDropping ? null : onDrop}
+            >
+              {isDropping ? (
+                <div className={cx("content")}>
                   <div
-                    
-                    className={cx("container")}
-                    style={{
-                      borderRadius: "10px 10px 10px 10px",
-                      display: "flex",
-                    }}
+                    className={cx("main")}
+                    style={isDragging ? { backgroundColor: "black" } : null}
                   >
-                     <div
-                      className={cx("image")}
+                    <div
+                      className={cx("container")}
                       style={{
-                        minHeight: "400px",
-                        width: "100%",
+                        borderRadius: "10px 10px 10px 10px",
                         display: "flex",
-                        overflow: "hidden",
                       }}
                     >
-                      
                       <div
-                        
-                        className={cx("img-slider")}
+                        className={cx("image")}
                         style={{
+                          minHeight: "400px",
                           width: "100%",
-                          transition: "transform 0.2s",
                           display: "flex",
-                          flexShrink: "0",
-                          flexGrow: "0",
-                          borderRadius: "0px 0px 10px 10px",
+                          overflow: "hidden",
                         }}
                       >
-                        <img
-                          ref={imageRef}
+                        <div
+                          className={cx("img-slider")}
                           style={{
                             width: "100%",
-                            objectFit: "contain",
-                            height: "650px",
-                            display: "block",
+                            transition: "transform 0.2s",
+                            display: "flex",
                             flexShrink: "0",
                             flexGrow: "0",
-                            borderRadius: "10px 10px 10px 10px",
+                            borderRadius: "0px 0px 10px 10px",
                           }}
-                          // src={images[0].url}
-                          
-                        />
-                        <canvas
-                          ref={canvasImageRef}
-                          style={{position: "absolute"}}
-                          width={imageRef && imageRef?.current?.offsetWidth}
-                          height="650px"
-                        />
+                        >
+                          <img
+                            ref={imageRef}
+                            style={{
+                              width: "100%",
+                              objectFit: "contain",
+                              height: "650px",
+                              display: "block",
+                              flexShrink: "0",
+                              flexGrow: "0",
+                              borderRadius: "10px 10px 10px 10px",
+                            }}
+                            // src={images[0].url}
+                          />
+                          <canvas
+                            ref={canvasImageRef}
+                            style={{ position: "absolute" }}
+                            width={imageRef && imageRef?.current?.offsetWidth}
+                            height="650px"
+                          />
+                        </div>
                       </div>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div
-                className={cx("content")}
-              >
-                <div
-                  className={cx("main")}
-                  style={isDragging ? { backgroundColor: "#0094f61b" } : null}
-                >
-                  <div>
-                    <div className={cx("modal-image")}>
-                      <CollectionsOutlinedIcon className={cx("modal-logo")} />
-                    </div>
-                    {isDragging ? (
-                      <div className={cx("modal-text")}>
-                        Thả hình ảnh vào đây
-                      </div>
-                    ) : (
-                      <div className={cx("modal-text")}>
-                        Kéo hình ảnh vào đây
-                      </div>
-                    )}
-  
-                    <div className={cx("modal-input")}>
-                      <input
-                        type="file"
-                        accept="image/jpg,image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
-                        multiple
-                        ref={fileInputRef}
-                        onChange={onFileSelect}
-                        id="myFileInput"
-                        style={{ display: "none" }}
-                      />
-                      <label
-                        role="button"
-                        onClick={selectFiles}
-                        className={cx("modal-upload")}
-                      >
-                        Select from device
-                      </label>
                     </div>
                   </div>
                 </div>
-              </div>
-            )} 
+              ) : (
+                <div className={cx("content")}>
+                  <div
+                    className={cx("main")}
+                    style={isDragging ? { backgroundColor: "#0094f61b" } : null}
+                  >
+                    <div>
+                      <div className={cx("modal-image")}>
+                        <CollectionsOutlinedIcon className={cx("modal-logo")} />
+                      </div>
+                      {isDragging ? (
+                        <div className={cx("modal-text")}>
+                          Thả hình ảnh vào đây
+                        </div>
+                      ) : (
+                        <div className={cx("modal-text")}>
+                          Kéo hình ảnh vào đây
+                        </div>
+                      )}
+
+                      <div className={cx("modal-input")}>
+                        <input
+                          type="file"
+                          accept="image/jpg,image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+                          multiple
+                          ref={fileInputRef}
+                          onChange={onFileSelect}
+                          id="myFileInput"
+                          style={{ display: "none" }}
+                        />
+                        <label
+                          role="button"
+                          onClick={selectFiles}
+                          className={cx("modal-upload")}
+                        >
+                          Select from device
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
-          
         </div>
         <div className={cx("title")}>
-            <h6 className={cx("text")}>Danh sách điểm danh</h6>
-            <div onClick={toggleModal} style={{position: "absolute",
+          <h6 className={cx("text")}>Danh sách điểm danh</h6>
+          <div
+            onClick={toggleModal}
+            style={{
+              position: "absolute",
               right: "4%",
               bottom: "-60px",
               display: "inline-block",
               backgroundColor: "#0095f6",
               padding: "10px",
               color: "white",
-              borderRadius: "10px"}}>Lập biên bản</div>
+              borderRadius: "10px",
+            }}
+          >
+            Lập biên bản
           </div>
+        </div>
         <div className={cx("attendance")}>
           <div className={cx("student__attend")}>
             <div className={cx("table__title", "mssv")}>MSSV</div>
             <div className={cx("table__title", "name")}>Họ tên</div>
             <div className={cx("table__title", "check")}>Điểm danh</div>
           </div>
-          {!studentsLoading?
-          (students.length > 0 && students.map((student) => (<div key={student.student.student_id} className={cx("student__attend")}>
-              <div className={cx("table__content", "mssv")}>{student.student.student_id}</div>
-              <div className={cx("table__content", "name")}>{student.student.last_name + " " + student.student.middle_name + " " + student.student.first_name}</div>
-              <div className={cx("table__content", "check")} style={{cursor: "pointer"}} onClick={() => handleAttendance(student.student.student_id)}>{student.attendance ? "Có mặt" : "Vắng"}</div>
-            </div>))) : 
+          {!studentsLoading ? (
+            students.length > 0 &&
+            students.map((student) => (
+              <div
+                key={student.student.student_id}
+                className={cx("student__attend")}
+              >
+                <div className={cx("table__content", "mssv")}>
+                  {student.student.student_id}
+                </div>
+                <div className={cx("table__content", "name")}>
+                  {student.student.last_name +
+                    " " +
+                    student.student.middle_name +
+                    " " +
+                    student.student.first_name}
+                </div>
+                <div
+                  className={cx("table__content", "check")}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => handleAttendance(student.student.student_id)}
+                >
+                  {student.attendance ? "Có mặt" : "Vắng"}
+                </div>
+              </div>
+            ))
+          ) : (
             <div
               style={{
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
               }}
-              >
+            >
               <CircularProgress size={30} />
-          </div>}
+            </div>
+          )}
         </div>
       </div>
       {modal && (
@@ -705,36 +782,52 @@ function HomePage() {
           <div className={cx("modal-navbar-content")} style={{ width: "50%" }}>
             <div className={cx("modal-header")}>Biên bản báo cáo</div>
             <div className={cx("modal-main")}>
-            <div style={{width: "100%", display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center"}}>
-              <div className={cx("modal-main-title")}>Loại biên bản:</div>
+              <div
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <div className={cx("modal-main-title")}>Loại biên bản:</div>
                 <FormControl
                   variant="standard"
                   className={cx("form__select")}
                   sx={{
-                      width: 0.9,
-                      border: "1px solid rgba(0, 85, 141, 0.5)",
-                      padding: "3px 16px",
-                      borderRadius: "10px",
+                    width: 0.9,
+                    border: "1px solid rgba(0, 85, 141, 0.5)",
+                    padding: "3px 16px",
+                    borderRadius: "10px",
                   }}
-                  >
+                >
                   <Select
-                      value={report}
-                      onChange={handleChange}
-                      displayEmpty
-                      disableUnderline
-                      inputProps={{ "aria-label": "Without label" }}
-                      sx={{ height: "100%" }}
+                    value={report}
+                    onChange={handleChange}
+                    displayEmpty
+                    disableUnderline
+                    inputProps={{ "aria-label": "Without label" }}
+                    sx={{ height: "100%" }}
                   >
-                      <MenuItem value="">
+                    <MenuItem value="">
                       <em>Chọn loại biên bản</em>
-                      </MenuItem>
-                      <MenuItem value="Absence">Vắng thi</MenuItem>
-                      <MenuItem value="Foul">Vi phạm qui chế thi</MenuItem>
-                      <MenuItem value="Other">Khác</MenuItem>
+                    </MenuItem>
+                    <MenuItem value="Absence">Vắng thi</MenuItem>
+                    <MenuItem value="Foul">Vi phạm qui chế thi</MenuItem>
+                    <MenuItem value="Other">Khác</MenuItem>
                   </Select>
                 </FormControl>
               </div>
-              <div style={{width: "100%", display: "flex", justifyContent: "center", flexDirection: "column", alignItems: "center"}}>
+              <div
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
                 <div className={cx("modal-main-title")}>Ghi chú:</div>
                 <textarea
                   className={cx("modal-main-input")}
@@ -746,7 +839,12 @@ function HomePage() {
                 ></textarea>
               </div>
               <div className={cx("modal-input")}>
-                <div className={cx("modal-main-title")} style={{width: "auto", margin: "4%"}}>Hình ảnh:</div>
+                <div
+                  className={cx("modal-main-title")}
+                  style={{ width: "auto", margin: "4%" }}
+                >
+                  Hình ảnh:
+                </div>
                 <input
                   type="file"
                   accept="image/jpg,image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
@@ -778,11 +876,11 @@ function HomePage() {
                       subtitle={item.name}
                       actionIcon={
                         <IconButton
-                          sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                          sx={{ color: "rgba(255, 255, 255, 0.54)" }}
                           aria-label={`info about ${item.name}`}
                           onClick={() => deleteImage(index)}
                         >
-                          <CancelRoundedIcon/>
+                          <CancelRoundedIcon />
                         </IconButton>
                       }
                     />
@@ -790,25 +888,25 @@ function HomePage() {
                 ))}
               </ImageList>
               <div
-              className={cx("modal-main-button")}
-              style={{
-                position: "relative",
-              }}
-            >
-              <Button
-                sx={{
-                  fontFamily: "inherit",
-                  textTransform: "none",
-                  ":hover": {
-                    opacity: 0.8,
-                  },
-                  // opacity: !bioModified || updateProfileLoading ? 0.5 : 1,
+                className={cx("modal-main-button")}
+                style={{
+                  position: "relative",
                 }}
-                // onClick={updateBio}
-                // disabled={!bioModified || updateProfileLoading}
               >
-                Lập biên bản
-              </Button>
+                <Button
+                  sx={{
+                    fontFamily: "inherit",
+                    textTransform: "none",
+                    ":hover": {
+                      opacity: 0.8,
+                    },
+                    // opacity: !bioModified || updateProfileLoading ? 0.5 : 1,
+                  }}
+                  // onClick={updateBio}
+                  // disabled={!bioModified || updateProfileLoading}
+                >
+                  Lập biên bản
+                </Button>
               </div>
             </div>
           </div>

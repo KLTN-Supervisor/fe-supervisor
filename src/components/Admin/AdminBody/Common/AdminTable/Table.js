@@ -56,7 +56,7 @@ export const AdminTable = (props) => {
   const selectedSome = selected.length > 0 && selected.length < data.length;
   const selectedAll = data.length > 0 && selected.length === data.length;
 
-  const renderModalBody = (item) => {
+  const renderModalBody = (item, toggleModal) => {
     return (
       <div
         className={cx("modal-navbar-content")}
@@ -119,6 +119,33 @@ export const AdminTable = (props) => {
           <div className={cx("info")}>
             <div className={cx("title")}>Lớp học phần:</div>
             <span className={cx("span")}>{item.class}</span>
+          </div>
+          <div
+            style={{
+              width: "80%",
+              marginTop: 15,
+              flexDirection: "row",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <button
+              className={cx("button")}
+              style={{
+                backgroundColor: "lightpink",
+              }}
+              onClick={toggleModal}
+            >
+              Đóng
+            </button>
+            <button
+              className={cx("button")}
+              style={{
+                backgroundColor: "lightgreen",
+              }}
+            >
+              Chỉnh sửa
+            </button>
           </div>
         </div>
       </div>
