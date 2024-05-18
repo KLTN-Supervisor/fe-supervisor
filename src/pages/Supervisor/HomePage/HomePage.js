@@ -27,7 +27,19 @@ function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { privateRequest } = usePrivateHttpClient();
-  const { time, room } = location.state ?? { time: '', room: '' };
+  // Lưu giá trị vào localStorage khi trang được tải
+  useEffect(() => {
+    if (location.state) {
+      localStorage.setItem('time', location.state.time);
+      localStorage.setItem('room', location.state.room);
+    }
+  }, [location.state]);
+
+  // Đọc giá trị từ localStorage khi trang được tải lại
+  const { time, room } = location.state ?? {
+    time: localStorage.getItem('time') || '',
+    room: localStorage.getItem('room') || '',
+  };
 
   // let time, room;
 
@@ -183,12 +195,12 @@ function HomePage() {
       // DRAW YOU FACE IN WEBCAM
       canvasRef.current.innerHTML  = faceapi.createCanvas(videoRef.current);
       faceapi.matchDimensions(canvasRef.current, {
-        width: imageRef.current && imageRef.current.offsetWidth,
+        width: videoRef.current && videoRef.current.offsetWidth,
         height: 650,
       });
 
       const resized = faceapi.resizeResults(detections, {
-        width: imageRef.current && imageRef.current.offsetWidth,
+        width: videoRef.current && videoRef.current.offsetWidth,
         height: 650,
       });
 
@@ -331,12 +343,12 @@ function HomePage() {
 
       canvasImageRef.current.innerHTML  = faceapi.createCanvas(imageRef.current);
       faceapi.matchDimensions(canvasImageRef.current, {
-        width: canvasImageRef.current && canvasImageRef.current.offsetWidth,
+        width: imageRef.current && imageRef.current.offsetWidth,
         height: 650,
       });
 
     const resized = faceapi.resizeResults(detections, {
-      width: canvasImageRef.current && canvasImageRef.current.offsetWidth,
+      width: imageRef.current && imageRef.current.offsetWidth,
       height: 650,
     });
   
@@ -466,6 +478,10 @@ function HomePage() {
                     : {marginRight: "25px"}
                 }
                 onClick={() => {
+                  isLoadCanvasRef.current = true;
+                  startVideo();
+                  console.log(videoRef?.current)
+                  videoRef?.current && (intervalRef.current = setInterval(runFaceDetection, 2000))
                   setState(0);
                 }}
               >
@@ -563,7 +579,7 @@ function HomePage() {
                           style={{
                             width: "100%",
                             objectFit: "contain",
-                            height: "auto",
+                            height: "650px",
                             display: "block",
                             flexShrink: "0",
                             flexGrow: "0",
@@ -574,9 +590,9 @@ function HomePage() {
                         />
                         <canvas
                           ref={canvasImageRef}
+                          style={{position: "absolute"}}
                           width={imageRef && imageRef?.current?.offsetWidth}
-                          height={imageRef && imageRef?.current?.offsetHeight}
-                          className={cx("appcanvas")}
+                          height="650px"
                         />
                       </div>
                     </div>
@@ -756,7 +772,7 @@ function HomePage() {
                       // src={`${item.url}?w=248&fit=crop&auto=format`}
                       src={item.url}
                       alt={item.name}
-                      loading="lazy"
+                      // loading="lazy"
                     />
                     <ImageListItemBar
                       subtitle={item.name}
@@ -764,8 +780,9 @@ function HomePage() {
                         <IconButton
                           sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
                           aria-label={`info about ${item.name}`}
+                          onClick={() => deleteImage(index)}
                         >
-                          <CancelRoundedIcon onClick={() => deleteImage(index)}/>
+                          <CancelRoundedIcon/>
                         </IconButton>
                       }
                     />
