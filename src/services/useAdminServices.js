@@ -175,6 +175,23 @@ const useAdminServices = () => {
     }
   };
 
+  const updateStudent = async (id, formData) => {
+    try {
+      const response = await privateRequest(
+        `/admin/students/${id}`,
+        "put",
+        formData,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   return {
     getAdminUsers,
     uploadImportFile,
@@ -187,6 +204,7 @@ const useAdminServices = () => {
     getTopAuthors,
     uploadImagesImportFile,
     getAdminInspectors,
+    updateStudent,
   };
 };
 

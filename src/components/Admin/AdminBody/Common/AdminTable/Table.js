@@ -19,9 +19,8 @@ import { applyPagination } from "../../../../../untils/apply-pagination";
 import { useSelection } from "../../../../../hooks/use-selection";
 import AdminTableItem from "./TableItem";
 import styles from "../../../../Supervisor/StudentCard/StudentCard.module.scss";
-import { formatDate } from "../../../../../untils/format-date";
+
 import classNames from "classnames/bind";
-import { getStudentsImageSource } from "../../../../../untils/getImageSource";
 
 const cx = classNames.bind(styles);
 
@@ -43,6 +42,7 @@ export const AdminTable = (props) => {
     selected = [],
     colsName = [],
     colsData = [],
+    renderModalBody = () => {},
   } = props;
 
   const itemIds = useItemIds(data);
@@ -55,102 +55,6 @@ export const AdminTable = (props) => {
 
   const selectedSome = selected.length > 0 && selected.length < data.length;
   const selectedAll = data.length > 0 && selected.length === data.length;
-
-  const renderModalBody = (item, toggleModal) => {
-    return (
-      <div
-        className={cx("modal-navbar-content")}
-        style={{ width: "50%", marginTop: 30 }}
-      >
-        <div className={cx("modal-header")}>Thông tin sinh viên</div>
-        <div className={cx("modal-main")}>
-          <div style={{ height: "250px" }}>
-            <img
-              style={{ width: "100%", maxHeight: "250px" }}
-              src={getStudentsImageSource(item.portrait_img)}
-            />
-          </div>
-          <div className={cx("info")}>
-            <div className={cx("title")}>MSSV:</div>
-            <span className={cx("span")}>{item.student_id}</span>
-          </div>
-          <div className={cx("info")}>
-            <div className={cx("title")}>Họ và tên:</div>
-            <span className={cx("span")}>{item.fullname}</span>
-          </div>
-          <div className={cx("info")}>
-            <div className={cx("title")}>CMND/CCCD:</div>
-            <span className={cx("span")}>
-              {item.citizen_identification_number}
-            </span>
-          </div>
-          <div className={cx("info")}>
-            <div className={cx("title")}>Giới tính:</div>
-            <span className={cx("span")}>{item.gender}</span>
-          </div>
-          <div className={cx("info")}>
-            <div className={cx("title")}>Ngày sinh:</div>
-            <span className={cx("span")}>{formatDate(item.date_of_birth)}</span>
-          </div>
-          <div className={cx("info")}>
-            <div className={cx("title")}>Nơi sinh:</div>
-            <span className={cx("span")}>{item.place_of_birth}</span>
-          </div>
-          <div className={cx("info")}>
-            <div className={cx("title")}>Tỉnh/TP:</div>
-            <span className={cx("span")}>
-              {item.permanent_address.city_or_province}
-            </span>
-          </div>
-          <div className={cx("info")}>
-            <div className={cx("title")}>Quận/huyện:</div>
-            <span className={cx("span")}>
-              {item.permanent_address.district}
-            </span>
-          </div>
-          <div className={cx("info")}>
-            <div className={cx("title")}>Địa chỉ thường trú:</div>
-            <span className={cx("span")}>{item.permanent_address.address}</span>
-          </div>
-          <div className={cx("info")}>
-            <div className={cx("title")}>Quốc tịch:</div>
-            <span className={cx("span")}>{item.nationality}</span>
-          </div>
-          <div className={cx("info")}>
-            <div className={cx("title")}>Lớp học phần:</div>
-            <span className={cx("span")}>{item.class}</span>
-          </div>
-          <div
-            style={{
-              width: "80%",
-              marginTop: 15,
-              flexDirection: "row",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <button
-              className={cx("button")}
-              style={{
-                backgroundColor: "lightpink",
-              }}
-              onClick={toggleModal}
-            >
-              Đóng
-            </button>
-            <button
-              className={cx("button")}
-              style={{
-                backgroundColor: "lightgreen",
-              }}
-            >
-              Chỉnh sửa
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <Card>

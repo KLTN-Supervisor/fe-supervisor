@@ -105,6 +105,10 @@ const InspectorsManage = () => {
             ...inspector,
             gender: inspector.gender ? "Nam" : "Nữ",
             fullname: `${inspector.last_name} ${inspector.middle_name} ${inspector.first_name}`,
+            working_status:
+              inspector.working_status === "WORKING"
+                ? "Còn làm việc"
+                : "Không xác định",
           };
         })
       );

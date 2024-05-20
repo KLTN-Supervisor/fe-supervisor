@@ -20,11 +20,19 @@ import { AdminTable } from "../Common/AdminTable/Table";
 import Modal from "react-bootstrap/Modal";
 import classNames from "classnames/bind";
 import styles from "../UsersManager/UserModal.module.scss";
+import styles2 from "../../../Supervisor/StudentCard/StudentCard.module.scss";
 import useAdminServices from "../../../../services/useAdminServices";
 import usePrivateHttpClient from "../../../../hooks/http-hook/private-http-hook";
 import ImportInput from "../UploadFile/ImportInput";
+import { getStudentsImageSource } from "../../../../untils/getImageSource";
+import { formatDate } from "../../../../untils/format-date";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs from "dayjs";
 
 const cx = classNames.bind(styles);
+const cx2 = classNames.bind(styles2);
 // const now = new Date();
 
 const StudentsManage = () => {
@@ -45,8 +53,11 @@ const StudentsManage = () => {
 
   const [search, setSearch] = useState("");
   const [data, setData] = useState([]);
+  const [totalRecord, setTotalRecord] = useState(0);
 
   const [usersSelected, setUsersSelected] = useState([]);
+
+  const [isEdit, setIsEdit] = useState(false);
   const [modalData, setModalData] = useState({
     email: "",
     fullname: "",
@@ -96,18 +107,32 @@ const StudentsManage = () => {
     }));
   };
 
+  const learningStatus = {
+    LEARNING: "Còn học",
+    PAUSE: "Tạm hoãn",
+    STOPPED: "Dừng học",
+    GRADUATED: "Đã tốt nghiệp",
+  };
+
   const getData = useCallback(async () => {
     const response = await getAdminStudents(page, rowsPerPage, search);
-    if (response)
+    if (response) {
       setData(
         response.students.map((student) => {
           return {
             ...student,
-            gender: student.gender ? "MALE" : "FEMALE",
+            gender: student.gender ? "Nam" : "Nữ",
             fullname: `${student.last_name} ${student.middle_name} ${student.first_name}`,
+            student_type:
+              student.student_type === "FORMAL"
+                ? "Chính quy"
+                : "Không xác định",
+            learning_status: learningStatus[student.learning_status],
           };
         })
       );
+      setTotalRecord(response.total_students);
+    }
   }, [page, rowsPerPage, search]);
 
   useEffect(() => {
@@ -180,12 +205,143 @@ const StudentsManage = () => {
   };
 
   const handlePageChange = useCallback((event, value) => {
-    setPage(value);
+    setPage(value + 1);
   }, []);
 
   const handleRowsPerPageChange = useCallback((event) => {
     setRowsPerPage(event.target.value);
   }, []);
+
+  const handleEdit = async () => {};
+
+  const handleEditClick = () => {
+    setIsEdit(!isEdit);
+  };
+
+  const renderModalBody = (item, toggleModal) => {
+    return (
+      <div
+        className={cx2("modal-navbar-content")}
+        style={{ width: "50%", marginTop: 30 }}
+      >
+        <div className={cx2("modal-header")}>Thông tin sinh viên</div>
+        <div className={cx2("modal-main")}>
+          <div style={{ height: "250px" }}>
+            <img
+              style={{ width: "100%", maxHeight: "250px" }}
+              src={getStudentsImageSource(item.portrait_img)}
+            />
+          </div>
+          <div className={cx2("info")}>
+            <div className={cx2("title")}>MSSV:</div>
+            <input
+              className={cx2("input-span", !isEdit && "input-span-focus")}
+              value={item.student_id}
+              readOnly={!isEdit}
+              disabled={!isEdit}
+            />
+          </div>
+          <div className={cx2("info")}>
+            <div className={cx2("title")}>Họ và tên:</div>
+            <input
+              className={cx2("input-span", !isEdit && "input-span-focus")}
+              value={item.fullname}
+              readOnly={!isEdit}
+            />
+          </div>
+          <div className={cx2("info")}>
+            <div className={cx2("title")}>CMND/CCCD:</div>
+            <span className={cx2("span")}>
+              {item.citizen_identification_number}
+            </span>
+          </div>
+          <div className={cx2("info")}>
+            <div className={cx2("title")}>Giới tính:</div>
+            <span className={cx2("span")}>{item.gender}</span>
+          </div>
+          <div className={cx2("info")}>
+            <div className={cx2("title")}>Ngày sinh:</div>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                slotProps={{
+                  textField: {
+                    inputProps: {
+                      style: { padding: 0 },
+                    },
+                    sx: {
+                      p: 0,
+                      width: 150,
+                    },
+                    variant: "standard",
+                  },
+                }}
+                value={dayjs(formatDate(item.date_of_birth))}
+                disabled={!isEdit}
+              />
+            </LocalizationProvider>
+          </div>
+          <div className={cx2("info")}>
+            <div className={cx2("title")}>Nơi sinh:</div>
+            <span className={cx2("span")}>{item.place_of_birth}</span>
+          </div>
+          <div className={cx2("info")}>
+            <div className={cx2("title")}>Tỉnh/TP:</div>
+            <span className={cx2("span")}>
+              {item.permanent_address.city_or_province}
+            </span>
+          </div>
+          <div className={cx2("info")}>
+            <div className={cx2("title")}>Quận/huyện:</div>
+            <span className={cx2("span")}>
+              {item.permanent_address.district}
+            </span>
+          </div>
+          <div className={cx2("info")}>
+            <div className={cx2("title")}>Địa chỉ thường trú:</div>
+            <span className={cx2("span")}>
+              {item.permanent_address.address}
+            </span>
+          </div>
+          <div className={cx2("info")}>
+            <div className={cx2("title")}>Quốc tịch:</div>
+            <span className={cx2("span")}>{item.nationality}</span>
+          </div>
+          <div className={cx2("info")}>
+            <div className={cx2("title")}>Lớp học phần:</div>
+            <span className={cx2("span")}>{item.class}</span>
+          </div>
+          <div
+            style={{
+              width: "80%",
+              marginTop: 15,
+              flexDirection: "row",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <button
+              className={cx2("button")}
+              style={{
+                backgroundColor: "lightpink",
+              }}
+              onClick={isEdit ? handleEditClick : toggleModal}
+            >
+              {isEdit ? "Hủy" : "Đóng"}
+            </button>
+            <button
+              className={cx2("button")}
+              style={{
+                backgroundColor: "lightgreen",
+              }}
+              onClick={isEdit ? handleEdit : handleEditClick}
+            >
+              {isEdit ? "Lưu" : "Chỉnh sửa"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <>
@@ -283,7 +439,7 @@ const StudentsManage = () => {
             <StudentsSearch setSearch={setSearch} />
             {!privateHttpRequest.isLoading && (
               <AdminTable
-                count={data.length}
+                count={totalRecord}
                 data={data}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
@@ -291,7 +447,7 @@ const StudentsManage = () => {
                 rowsPerPage={rowsPerPage}
                 setItemsSelected={setUsersSelected}
                 selected={usersSelected}
-                colsName={["MSSV", "Name", "Type", "Gender", "Status"]}
+                colsName={["MSSV", "Họ tên", "Hệ", "Giới tính", "Tình trạng"]}
                 colsData={[
                   "student_id",
                   "fullname",
@@ -299,6 +455,7 @@ const StudentsManage = () => {
                   "gender",
                   "learning_status",
                 ]}
+                renderModalBody={renderModalBody}
               />
             )}
           </Stack>
