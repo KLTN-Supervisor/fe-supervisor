@@ -117,6 +117,21 @@ const useAdminServices = () => {
     }
   };
 
+  const uploadExamSchedulesExcelFiles = async (formData, type = "students") => {
+    try {
+      const response = await privateRequest(
+        `/admin/${type}/excels-upload`,
+        "post",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   const uploadImagesImportFile = async (formData, type = "students") => {
     try {
       const response = await privateRequest(
@@ -205,6 +220,7 @@ const useAdminServices = () => {
     uploadImagesImportFile,
     getAdminInspectors,
     updateStudent,
+    uploadExamSchedulesExcelFiles,
   };
 };
 

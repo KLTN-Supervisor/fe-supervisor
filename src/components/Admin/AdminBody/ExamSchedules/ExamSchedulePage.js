@@ -13,10 +13,12 @@ import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../../../untils/format-date";
 import ImportInput from "../UploadFile/ImportInput";
 import useAdminServices from "../../../../services/useAdminServices";
+import UploadInput from "../UploadFile/UploadInput";
 
 const cx = classNames.bind(styles);
 function ExamSchedules() {
-  const { uploadImportFile } = useAdminServices();
+  const { uploadImportFile, uploadExamSchedulesExcelFiles } =
+    useAdminServices();
   const [building, setBuilding] = useState([]);
   const [year, setYear] = useState("");
   const [years, setYears] = useState([]);
@@ -123,9 +125,17 @@ function ExamSchedules() {
   const [file, setFile] = useState();
   const [fileIsValid, setFileIsValid] = useState();
 
+  const [files, setFiles] = useState();
+  const [filesIsValid, setFilesIsValid] = useState();
+
   const removeFile = () => {
     setFile(null);
     setFileIsValid(false);
+  };
+
+  const removeFiles = () => {
+    setFiles(null);
+    setFilesIsValid(false);
   };
 
   const uploadImportExamSchedulesFileHandler = async () => {
@@ -141,17 +151,41 @@ function ExamSchedules() {
     }
   };
 
+  const uploadExamSchedulesFilesHandler = async () => {
+    try {
+      const formData = new FormData();
+      files.map((file, i) => formData.append("file", file));
+      const response = await uploadExamSchedulesExcelFiles(
+        formData,
+        "examSchedules"
+      );
+      if (response) {
+        removeFiles();
+      }
+    } catch (err) {
+      console.log("upload file: ", err);
+    }
+  };
+
   return (
     <div className={cx("schedulePage")}>
       <div className={cx("schedulePage__content")}>
         <div style={{ width: "100%" }}>
-          <ImportInput
+          {/* <ImportInput
             file={file}
             fileIsValid={fileIsValid}
             setFile={setFile}
             setFileIsValid={setFileIsValid}
             removeFile={removeFile}
             uploadHandler={uploadImportExamSchedulesFileHandler}
+          /> */}
+          <UploadInput
+            files={files}
+            fileIsValid={filesIsValid}
+            setFiles={setFiles}
+            setFileIsValid={setFilesIsValid}
+            removeFile={removeFiles}
+            uploadHandler={uploadExamSchedulesFilesHandler}
           />
         </div>
         <h1>Tra cứu lịch thi</h1>
