@@ -1,4 +1,7 @@
 export const getStudentsImageSource = (source) => {
+  if (source === "") {
+    return "/no-avatar.png";
+  }
   if (source.startsWith("https:")) {
     return source;
   } else {
