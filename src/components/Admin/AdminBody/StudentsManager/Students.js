@@ -238,7 +238,6 @@ const StudentsManage = () => {
               className={cx2("input-span", !isEdit && "input-span-focus")}
               value={item.student_id}
               readOnly={!isEdit}
-              disabled={!isEdit}
             />
           </div>
           <div className={cx2("info")}>
@@ -251,9 +250,11 @@ const StudentsManage = () => {
           </div>
           <div className={cx2("info")}>
             <div className={cx2("title")}>CMND/CCCD:</div>
-            <span className={cx2("span")}>
-              {item.citizen_identification_number}
-            </span>
+            <input
+              className={cx2("input-span", !isEdit && "input-span-focus")}
+              value={item.citizen_identification_number}
+              readOnly={!isEdit}
+            />
           </div>
           <div className={cx2("info")}>
             <div className={cx2("title")}>Giới tính:</div>
@@ -276,39 +277,57 @@ const StudentsManage = () => {
                   },
                 }}
                 value={dayjs(formatDate(item.date_of_birth))}
-                disabled={!isEdit}
+                readOnly={!isEdit}
               />
             </LocalizationProvider>
           </div>
           <div className={cx2("info")}>
             <div className={cx2("title")}>Nơi sinh:</div>
-            <span className={cx2("span")}>{item.place_of_birth}</span>
+            <input
+              className={cx2("input-span", !isEdit && "input-span-focus")}
+              value={item.place_of_birth}
+              readOnly={!isEdit}
+            />
           </div>
           <div className={cx2("info")}>
             <div className={cx2("title")}>Tỉnh/TP:</div>
-            <span className={cx2("span")}>
-              {item.permanent_address.city_or_province}
-            </span>
+            <input
+              className={cx2("input-span", !isEdit && "input-span-focus")}
+              value={item.permanent_address.city_or_province}
+              readOnly={!isEdit}
+            />
           </div>
           <div className={cx2("info")}>
             <div className={cx2("title")}>Quận/huyện:</div>
-            <span className={cx2("span")}>
-              {item.permanent_address.district}
-            </span>
+            <input
+              className={cx2("input-span", !isEdit && "input-span-focus")}
+              value={item.permanent_address.district}
+              readOnly={!isEdit}
+            />
           </div>
           <div className={cx2("info")}>
             <div className={cx2("title")}>Địa chỉ thường trú:</div>
-            <span className={cx2("span")}>
-              {item.permanent_address.address}
-            </span>
+            <input
+              className={cx2("input-span", !isEdit && "input-span-focus")}
+              value={item.permanent_address.address}
+              readOnly={!isEdit}
+            />
           </div>
           <div className={cx2("info")}>
             <div className={cx2("title")}>Quốc tịch:</div>
-            <span className={cx2("span")}>{item.nationality}</span>
+            <input
+              className={cx2("input-span", !isEdit && "input-span-focus")}
+              value={item.nationality}
+              readOnly={!isEdit}
+            />
           </div>
           <div className={cx2("info")}>
             <div className={cx2("title")}>Lớp học phần:</div>
-            <span className={cx2("span")}>{item.class}</span>
+            <input
+              className={cx2("input-span", !isEdit && "input-span-focus")}
+              value={item.class}
+              readOnly={!isEdit}
+            />
           </div>
           <div
             style={{

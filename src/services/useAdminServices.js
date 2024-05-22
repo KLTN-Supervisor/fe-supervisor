@@ -61,6 +61,35 @@ const useAdminServices = () => {
     }
   };
 
+  const getExamFilesUploaded = async () => {
+    try {
+      const response = await privateRequest(`/admin/examSchedules/excel-files`);
+
+      return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const importExamFromFiles = async (ids = []) => {
+    try {
+      const response = await privateRequest(
+        `/admin/examSchedules/excel-import`,
+        "post",
+        {
+          chooseFiles: ids,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   const getTopAuthors = async () => {
     try {
       const response = await privateRequest("/admin/user/mostpost");
@@ -221,6 +250,8 @@ const useAdminServices = () => {
     getAdminInspectors,
     updateStudent,
     uploadExamSchedulesExcelFiles,
+    getExamFilesUploaded,
+    importExamFromFiles,
   };
 };
 
