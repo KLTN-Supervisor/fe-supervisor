@@ -12,7 +12,7 @@ import usePrivateHttpClient from "../../../hooks/http-hook/private-http-hook";
 import { Alert, Snackbar, CircularProgress } from "@mui/material";
 const cx = classNames.bind(styles);
 
-function StudentCard({ student, attendance, home, updateAttendance }) {
+function StudentCard({ student, attendance, home, updateAttendance, updateAttendanceTrue }) {
   const [modal, setModal] = useState(false);
   const [currentTitle, setCurrentTitle] = useState(document.title);
   const [isAttendance, setIsAttendance] = useState(attendance);
@@ -164,18 +164,20 @@ function StudentCard({ student, attendance, home, updateAttendance }) {
 
       for (const detection of resized) {
         const box = detection.detection.box;
+        const context = canvasRef.current.getContext('2d');
         const drawBox = new faceapi.draw.DrawBox(box, {
           label: await faceMatcher
             .findBestMatch(detection.descriptor)
             .toString(),
         });
+        
         console.log(isAttendance);
         if( !isAttendance && student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label &&
           faceMatcher.findBestMatch(detection.descriptor)._label != "unknown"
         ) {
           isLoadCanvasRef.current = false;
           setIsAttendance(true)
-          updateAttendance();
+          await updateAttendanceTrue();
           setSnackBarNotif({
             severity: "success",
             message:
@@ -187,13 +189,13 @@ function StudentCard({ student, attendance, home, updateAttendance }) {
           imageRef.current = null;
           setIsDropping(false);
           setModalAttendance(false);
+          document.body.style.overflow = "hidden";
         }
 
-        drawBox.draw(canvasRef.current);
+        drawBox.draw(context);
       }
-      // faceapi.draw.drawDetections(canvasRef.current, resized);
-      // faceapi.draw.drawFaceLandmarks(canvasRef.current, resized);
-      // faceapi.draw.drawFaceExpressions(canvasRef.current, resized);
+      
+      
     }
   },[student, isAttendance, setIsAttendance]);
 
@@ -356,6 +358,7 @@ function StudentCard({ student, attendance, home, updateAttendance }) {
       setIsAttendance(!isAttendance);
     }
   };
+  
   return (
     <>
       <div className={cx("student")} onClick={toggleModal}>
@@ -432,7 +435,7 @@ function StudentCard({ student, attendance, home, updateAttendance }) {
                   style={{ width: "100%", maxHeight: "250px", marginBottom: "15px" }}
                   src={getStudentsImageSource(student.portrait_img)}
                 />
-                {!attendance ? (
+                {!attendance && !isAttendance ? (
                   <span
                     style={{
                       cursor: home ? "pointer" : "default",
@@ -463,7 +466,7 @@ function StudentCard({ student, attendance, home, updateAttendance }) {
                     Có mặt
                   </span>
                 )}
-                {home && !attendance &&
+                {home && !attendance && !isAttendance &&
                   <div
                     onClick={toggleModalAttendance}
                     style={{

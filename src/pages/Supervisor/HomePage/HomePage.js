@@ -26,12 +26,13 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from '@mui/icons-material/Delete';
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import useExamScheduleServices from "../../../services/useExamScheduleServices";
+import ro from "date-fns/esm/locale/ro/index.js";
 
 const cx = classNames.bind(styles);
 
 function HomePage() {
   const location = useLocation();
-  const { getStudents } = useExamScheduleServices();
+  const { getStudents, attendanceStudent } = useExamScheduleServices();
   // Lưu giá trị vào localStorage khi trang được tải
   useEffect(() => {
     if (location.state) {
@@ -198,13 +199,27 @@ function HomePage() {
     setReport((prev) => prev.filter((_, i) => i !== index));
   }
 
-  const updateAttendance = (studentId) => {
-    const updatedStudents = students.map(student => {
+  const updateAttendance = async  (studentId) => {
+    const updatedStudents = await Promise.all( students.map( async (student) => {
       if (student.student.student_id === studentId) {
+        await attendanceStudent(time, room, studentId, !student.attendance)
         return { ...student, attendance: !student.attendance };
       }
       return student;
-    });
+    }));
+
+    setStudents(updatedStudents);
+  };
+
+  const updateAttendanceTrue = async  (studentId) => {
+    const updatedStudents = await Promise.all( students.map( async (student) => {
+      if (student.student.student_id === studentId) {
+        await attendanceStudent(time, room, studentId, true)
+        return { ...student, attendance: true };
+      }
+      return student;
+    }));
+
     setStudents(updatedStudents);
   };
 
@@ -248,6 +263,7 @@ function HomePage() {
                     attendance={student.attendance}
                     home={true}
                     updateAttendance={() => updateAttendance(student.student.student_id)}
+                    updateAttendanceTrue={() => updateAttendanceTrue(student.student.student_id)}
                   />
                 ))
               ) : (
