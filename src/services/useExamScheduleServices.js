@@ -100,10 +100,25 @@ const useExamScheduleServices = () => {
   const attendanceStudent = async (date, room, studentId, attendance) => {
     try {
       const response = await privateRequest(
-        `/examSchedule/attendance?date=${date}&room=${room}&studentId=${studentId}&attendance=${attendance}`, "put"
+        `/examSchedule/attendance?date=${date}&room=${room}&studentId=${studentId}&attendance=${attendance}`,
+        "put"
       );
 
       return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const noteReport = async (date, room, formData) => {
+    try {
+      const response = await privateRequest(
+        `/examSchedule/report?date=${date}&room=${room}`,
+        "post",
+        formData
+      );
+
+      return response.data;
     } catch (err) {
       throw err;
     }
@@ -119,6 +134,7 @@ const useExamScheduleServices = () => {
     getStudents,
     getSuspiciousStudents,
     attendanceStudent,
+    noteReport,
   };
 };
 

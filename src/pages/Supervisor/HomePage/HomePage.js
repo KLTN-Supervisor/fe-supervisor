@@ -14,16 +14,16 @@ import CloseIcon from "@mui/icons-material/Close";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import ImageListItemBar from "@mui/material/ImageListItemBar";
-import Box from '@mui/material/Box';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/Inbox';
-import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import Box from "@mui/material/Box";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import InboxIcon from "@mui/icons-material/Inbox";
+import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import IconButton from "@mui/material/IconButton";
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from "@mui/icons-material/Delete";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import useExamScheduleServices from "../../../services/useExamScheduleServices";
 import ro from "date-fns/esm/locale/ro/index.js";
@@ -32,7 +32,8 @@ const cx = classNames.bind(styles);
 
 function HomePage() {
   const location = useLocation();
-  const { getStudents, attendanceStudent } = useExamScheduleServices();
+  const { getStudents, attendanceStudent, noteReport } =
+    useExamScheduleServices();
   // Lưu giá trị vào localStorage khi trang được tải
   useEffect(() => {
     if (location.state) {
@@ -49,15 +50,14 @@ function HomePage() {
     roomName: localStorage.getItem("roomName") || "",
   };
 
-  const [students, setStudents] = useState([])
-  const [studentsLoading, setStudentsLoading] = useState(false)
-  const [isFetched, setIsFetched] = useState(false)
+  const [students, setStudents] = useState([]);
+  const [studentsLoading, setStudentsLoading] = useState(false);
+  const [isFetched, setIsFetched] = useState(false);
   const [snackBarOpen, setSnackBarOpen] = useState(false);
-    const [snackBarNotif, setSnackBarNotif] = useState({
-      severity: "success",
-      message: "This is success message!",
-    }); //severity: success, error, info, warning
-
+  const [snackBarNotif, setSnackBarNotif] = useState({
+    severity: "success",
+    message: "This is success message!",
+  }); //severity: success, error, info, warning
 
   const getStudentsExam = async () => {
     if (!studentsLoading) {
@@ -83,7 +83,6 @@ function HomePage() {
 
   const fileInputRef = useRef(null);
   //Kéo thả ảnh vào phần tạo bài viết
-  
 
   //Validate file
   const notValidFile = (file) => {
@@ -103,7 +102,6 @@ function HomePage() {
     fileInputRef.current.click();
   }
 
- 
   //reports
   const [modal, setModal] = useState(false);
   const [modalCreate, setModalCreate] = useState(false);
@@ -137,11 +135,9 @@ function HomePage() {
     }
     setNote("");
     setReportType("");
-    setImageModals([])
+    setImageModals([]);
     setModalCreate(!modalCreate);
   };
-
-  
 
   function onFileModalSelect(event) {
     const files = event.target.files;
@@ -165,11 +161,9 @@ function HomePage() {
     setImageModals((prevImages) => prevImages.filter((_, i) => i !== index));
   }
 
-  
-  
-  const [report, setReport]= useState([]);
-  const [creatingReport, setCreatingReport] = useState(false)
-  const handleCreateReport = () => {
+  const [report, setReport] = useState([]);
+  const [creatingReport, setCreatingReport] = useState(false);
+  const handleCreateReport = async () => {
     try {
       setCreatingReport(true);
       if (reportType == "") {
@@ -178,52 +172,68 @@ function HomePage() {
           message: "Vui lòng chọn loại biên bản",
         });
         setSnackBarOpen(true);
-      } else{
+      } else {
         const newReport = {
           reportType: reportType,
           note: note,
           images: imageModals,
+          date: time,
+          room: room,
+        };
+        setReport((prev) => [...prev, newReport]);
+
+        const formData = new FormData();
+        formData.append("note", note);
+        formData.append("reportType", reportType);
+
+        imageModals.map((imageModal, i) => {
+          formData.append("image", imageModal.file);
+        });
+
+        const response = await noteReport(time, room, formData);
+        if (response) {
+          toggleModalCreate();
         }
-        setReport((prev) => [...prev, newReport])
-        toggleModalCreate();
-      }} catch (err) {
-        
-        toggleModalCreate();
-        console.log("get students error: ", err);
-      } finally{
-        setCreatingReport(false);
       }
-  }
+    } catch (err) {
+      toggleModalCreate();
+      console.log("get students error: ", err);
+    } finally {
+      setCreatingReport(false);
+    }
+  };
 
   function deleteReport(index) {
     setReport((prev) => prev.filter((_, i) => i !== index));
   }
 
-  const updateAttendance = async  (studentId) => {
-    const updatedStudents = await Promise.all( students.map( async (student) => {
-      if (student.student.student_id === studentId) {
-        await attendanceStudent(time, room, studentId, !student.attendance)
-        return { ...student, attendance: !student.attendance };
-      }
-      return student;
-    }));
+  const updateAttendance = async (studentId) => {
+    const updatedStudents = await Promise.all(
+      students.map(async (student) => {
+        if (student.student.student_id === studentId) {
+          await attendanceStudent(time, room, studentId, !student.attendance);
+          return { ...student, attendance: !student.attendance };
+        }
+        return student;
+      })
+    );
 
     setStudents(updatedStudents);
   };
 
-  const updateAttendanceTrue = async  (studentId) => {
-    const updatedStudents = await Promise.all( students.map( async (student) => {
-      if (student.student.student_id === studentId) {
-        await attendanceStudent(time, room, studentId, true)
-        return { ...student, attendance: true };
-      }
-      return student;
-    }));
+  const updateAttendanceTrue = async (studentId) => {
+    const updatedStudents = await Promise.all(
+      students.map(async (student) => {
+        if (student.student.student_id === studentId) {
+          await attendanceStudent(time, room, studentId, true);
+          return { ...student, attendance: true };
+        }
+        return student;
+      })
+    );
 
     setStudents(updatedStudents);
   };
-
-
 
   return (
     <div className={cx("homepage")}>
@@ -262,8 +272,12 @@ function HomePage() {
                     student={student.student}
                     attendance={student.attendance}
                     home={true}
-                    updateAttendance={() => updateAttendance(student.student.student_id)}
-                    updateAttendanceTrue={() => updateAttendanceTrue(student.student.student_id)}
+                    updateAttendance={() =>
+                      updateAttendance(student.student.student_id)
+                    }
+                    updateAttendanceTrue={() =>
+                      updateAttendanceTrue(student.student.student_id)
+                    }
                   />
                 ))
               ) : (
@@ -305,53 +319,60 @@ function HomePage() {
             />
           </div>
           <div className={cx("modal-navbar-content")} style={{ width: "50%" }}>
-            <div className={cx("modal-header")}>Biên bản báo cáo
-                <div
-                  onClick={toggleModalCreate}
-                  style={{
-                    position: "absolute",
-                    right: "10px",
-                    top: "5px",
-                    display: "inline-block",
-                    borderRadius: "10px",
-                    cursor: "pointer",
-                  }}
-                >
-                 <AddCircleOutlineOutlinedIcon style={{width: 30, height: 30}}/>
+            <div className={cx("modal-header")}>
+              Biên bản báo cáo
+              <div
+                onClick={toggleModalCreate}
+                style={{
+                  position: "absolute",
+                  right: "10px",
+                  top: "5px",
+                  display: "inline-block",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                }}
+              >
+                <AddCircleOutlineOutlinedIcon
+                  style={{ width: 30, height: 30 }}
+                />
               </div>
             </div>
             <div className={cx("modal-main")}>
-              <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
+              <Box sx={{ width: "100%", bgcolor: "background.paper" }}>
                 <nav aria-label="main mailbox folders">
                   <List>
-                    {report.length > 0 ? report.map((r, index) => (
+                    {report.length > 0 ? (
+                      report.map((r, index) => (
                         <ListItem
-                        disablePadding
-                        secondaryAction={
-                          <IconButton edge="end" aria-label="delete">
-                              <DeleteIcon onClick={() => deleteReport(index)}/>
-                          </IconButton>
-                        }
-                      >
-                        <ListItemButton>
-                          <ListItemIcon>
-                            <InboxIcon />
-                          </ListItemIcon>
-                          <ListItemText primary={r.reportType} />
-                        </ListItemButton>
-                      </ListItem>
-                    )): <div
-                      style={{
-                        width: "100%",
-                        textAlign: "center",
-                        fontWeight: 600,
-                        fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                          disablePadding
+                          secondaryAction={
+                            <IconButton edge="end" aria-label="delete">
+                              <DeleteIcon onClick={() => deleteReport(index)} />
+                            </IconButton>
+                          }
+                        >
+                          <ListItemButton>
+                            <ListItemIcon>
+                              <InboxIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={r.reportType} />
+                          </ListItemButton>
+                        </ListItem>
+                      ))
+                    ) : (
+                      <div
+                        style={{
+                          width: "100%",
+                          textAlign: "center",
+                          fontWeight: 600,
+                          fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
                       Helvetica, Arial, sans-serif`,
-                        color: "rgb(61 60 60)",
-                      }}
-                    >
-                      Không có báo cáo
-                    </div>}
+                          color: "rgb(61 60 60)",
+                        }}
+                      >
+                        Không có báo cáo
+                      </div>
+                    )}
                   </List>
                 </nav>
               </Box>
