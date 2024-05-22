@@ -130,11 +130,11 @@ function ScheduleDetailPage() {
           <div className={cx("page_content__body")}>
             <div className={cx("students")}>
               <List
-                sx={{ width: "100%", bgcolor: "background.paper" }}
+                sx={{ width: "100%", bgcolor: "#efefef" }}
                 component="nav"
                 aria-labelledby="nested-list-subheader"
                 subheader={
-                  <ListSubheader component="div" id="nested-list-subheader">
+                  <ListSubheader sx={{ bgcolor: "#efefef" }} component="div" id="nested-list-subheader">
                     Danh sách tầng
                   </ListSubheader>
                 }

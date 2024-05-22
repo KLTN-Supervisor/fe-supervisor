@@ -578,10 +578,10 @@ const StudentsManage = () => {
         </Modal>
       </Box>
       {modal && (
-        <div className={cx("modal active-modal")}>
+        <div className={cx2("modal active-modal")}>
           <div
             onClick={toggleModal}
-            className={cx("overlay")}
+            className={cx2("overlay")}
             style={{ alignSelf: "flex-end" }}
           >
             <CloseIcon
@@ -599,189 +599,193 @@ const StudentsManage = () => {
           </div>
           <div
             className={cx2("modal-navbar-content")}
-            style={{ width: "50%", marginTop: 30 }}
+            style={{ width: "80%", marginTop: 30 }}
           >
             <div className={cx2("modal-header")}>Thông tin sinh viên</div>
-            <div className={cx2("modal-main")}>
-              <div
-                style={{ height: "250px", cursor: isEdit ? "pointer" : "" }}
-                onClick={() => {
-                  if (isEdit) imgRef.current.click();
-                }}
-              >
-                <img
-                  style={{ width: "100%", maxHeight: "250px" }}
-                  src={getStudentsImageSource(
-                    previewPortraitImg
-                      ? previewPortraitImg
-                      : modalViewStudent?.portrait_img
-                  )}
-                  alt="Ảnh thẻ sinh viên"
-                />
-                <input
-                  id="portrait_img"
-                  ref={imgRef}
-                  type="file"
-                  hidden
-                  accept=".png,.jpg,.jpeg"
-                  disabled={!isEdit}
-                  onChange={pickImgFileHandler}
-                />
-              </div>
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>MSSV:</div>
-                <input
-                  id="student_id"
-                  className={cx2("input-span", !isEdit && "input-span-focus")}
-                  value={modalData?.student_id}
-                  readOnly={!isEdit}
-                  onChange={changeHandler}
-                />
-              </div>
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>Họ và tên:</div>
-                <input
-                  id="fullname"
-                  className={cx2("input-span", !isEdit && "input-span-focus")}
-                  value={modalData?.fullname}
-                  readOnly={!isEdit}
-                  onChange={changeHandler}
-                />
-              </div>
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>CMND/CCCD:</div>
-                <input
-                  id="citizen_identification_number"
-                  className={cx2("input-span", !isEdit && "input-span-focus")}
-                  value={modalData?.citizen_identification_number}
-                  readOnly={!isEdit}
-                  onChange={changeHandler}
-                />
-              </div>
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>Giới tính:</div>
-                <FormControl>
-                  <RadioGroup
-                    row
-                    defaultValue="Nữ"
-                    value={modalData?.gender}
-                    onChange={changeHandler}
-                  >
-                    <FormControlLabel
-                      value="Nữ"
-                      control={
-                        <Radio
-                          id="gender"
-                          size="small"
-                          readOnly={!isEdit}
-                          sx={{ p: 0, ml: 1.5, mr: 0.5 }}
-                        />
-                      }
-                      label="Nữ"
-                    />
-                    <FormControlLabel
-                      value="Nam"
-                      control={
-                        <Radio
-                          id="gender"
-                          size="small"
-                          readOnly={!isEdit}
-                          sx={{ p: 0, ml: 5, mr: 0.5 }}
-                        />
-                      }
-                      label="Nam"
-                    />
-                  </RadioGroup>
-                </FormControl>
-              </div>
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>Ngày sinh:</div>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    slotProps={{
-                      textField: {
-                        inputProps: {
-                          style: { padding: 0 },
-                        },
-                        sx: {
-                          p: 0,
-                          width: 150,
-                        },
-                        variant: "standard",
-                      },
-                    }}
-                    value={dayjs(new Date(modalData?.date_of_birth))}
-                    format="DD/MM/YYYY"
-                    readOnly={!isEdit}
-                    onChange={(value) => {
-                      setModalData((prev) => ({
-                        ...prev,
-                        date_of_birth: value,
-                      }));
-                    }}
+            <div className={cx2("modal-main")} style={{display: "flex", padding: "20px 0 30px 0px"}}>
+              <div style={{ flex: 0.2, height: "100%", display: "flex", flexDirection:"column", justifyContent: "center", alignItems: "center"}}>
+                <div
+                  style={{ height: "250px", cursor: isEdit ? "pointer" : "" }}
+                  onClick={() => {
+                    if (isEdit) imgRef.current.click();
+                  }}
+                >
+                  <img
+                    style={{ width: "100%", maxHeight: "250px" }}
+                    src={getStudentsImageSource(
+                      previewPortraitImg
+                        ? previewPortraitImg
+                        : modalViewStudent?.portrait_img
+                    )}
+                    alt="Ảnh thẻ sinh viên"
                   />
-                </LocalizationProvider>
+                  <input
+                    id="portrait_img"
+                    ref={imgRef}
+                    type="file"
+                    hidden
+                    accept=".png,.jpg,.jpeg"
+                    disabled={!isEdit}
+                    onChange={pickImgFileHandler}
+                  />
+                </div>
               </div>
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>Nơi sinh:</div>
-                <input
-                  id="place_of_birth"
-                  className={cx2("input-span", !isEdit && "input-span-focus")}
-                  value={modalData?.place_of_birth}
-                  readOnly={!isEdit}
-                  onChange={changeHandler}
-                />
-              </div>
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>Tỉnh/TP:</div>
-                <input
-                  id="city_or_province"
-                  className={cx2("input-span", !isEdit && "input-span-focus")}
-                  value={modalData?.city_or_province}
-                  readOnly={!isEdit}
-                  onChange={changeHandler}
-                />
-              </div>
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>Quận/huyện:</div>
-                <input
-                  id="district"
-                  className={cx2("input-span", !isEdit && "input-span-focus")}
-                  value={modalData?.district}
-                  readOnly={!isEdit}
-                  onChange={changeHandler}
-                />
-              </div>
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>Địa chỉ thường trú:</div>
-                <input
-                  id="address"
-                  className={cx2("input-span", !isEdit && "input-span-focus")}
-                  value={modalData?.address}
-                  readOnly={!isEdit}
-                  onChange={changeHandler}
-                />
-              </div>
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>Quốc tịch:</div>
-                <input
-                  id="nationality"
-                  className={cx2("input-span", !isEdit && "input-span-focus")}
-                  value={modalData?.nationality}
-                  readOnly={!isEdit}
-                  onChange={changeHandler}
-                />
-              </div>
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>Lớp học phần:</div>
-                <input
-                  id="class"
-                  className={cx2("input-span", !isEdit && "input-span-focus")}
-                  value={modalData?.class}
-                  readOnly={!isEdit}
-                  onChange={changeHandler}
-                />
-              </div>
+              <div className={cx2("modal-info")}>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>MSSV:</div>
+                  <input
+                    id="student_id"
+                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    value={modalData?.student_id}
+                    readOnly={!isEdit}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Họ và tên:</div>
+                  <input
+                    id="fullname"
+                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    value={modalData?.fullname}
+                    readOnly={!isEdit}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>CMND/CCCD:</div>
+                  <input
+                    id="citizen_identification_number"
+                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    value={modalData?.citizen_identification_number}
+                    readOnly={!isEdit}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Giới tính:</div>
+                  <FormControl>
+                    <RadioGroup
+                      row
+                      defaultValue="Nữ"
+                      value={modalData?.gender}
+                      onChange={changeHandler}
+                    >
+                      <FormControlLabel
+                        value="Nữ"
+                        control={
+                          <Radio
+                            id="gender"
+                            size="small"
+                            readOnly={!isEdit}
+                            sx={{ p: 0, ml: 1.5, mr: 0.5 }}
+                          />
+                        }
+                        label="Nữ"
+                      />
+                      <FormControlLabel
+                        value="Nam"
+                        control={
+                          <Radio
+                            id="gender"
+                            size="small"
+                            readOnly={!isEdit}
+                            sx={{ p: 0, ml: 5, mr: 0.5 }}
+                          />
+                        }
+                        label="Nam"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Ngày sinh:</div>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      slotProps={{
+                        textField: {
+                          inputProps: {
+                            style: { padding: 0 },
+                          },
+                          sx: {
+                            p: 0,
+                            width: 150,
+                          },
+                          variant: "standard",
+                        },
+                      }}
+                      value={dayjs(new Date(modalData?.date_of_birth))}
+                      format="DD/MM/YYYY"
+                      readOnly={!isEdit}
+                      onChange={(value) => {
+                        setModalData((prev) => ({
+                          ...prev,
+                          date_of_birth: value,
+                        }));
+                      }}
+                    />
+                  </LocalizationProvider>
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Nơi sinh:</div>
+                  <input
+                    id="place_of_birth"
+                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    value={modalData?.place_of_birth}
+                    readOnly={!isEdit}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Tỉnh/TP:</div>
+                  <input
+                    id="city_or_province"
+                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    value={modalData?.city_or_province}
+                    readOnly={!isEdit}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Quận/huyện:</div>
+                  <input
+                    id="district"
+                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    value={modalData?.district}
+                    readOnly={!isEdit}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Địa chỉ thường trú:</div>
+                  <input
+                    id="address"
+                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    value={modalData?.address}
+                    readOnly={!isEdit}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Quốc tịch:</div>
+                  <input
+                    id="nationality"
+                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    value={modalData?.nationality}
+                    readOnly={!isEdit}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Lớp học phần:</div>
+                  <input
+                    id="class"
+                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    value={modalData?.class}
+                    readOnly={!isEdit}
+                    onChange={changeHandler}
+                  />
+                </div>
+              
               <div
                 style={{
                   width: "80%",
@@ -809,6 +813,7 @@ const StudentsManage = () => {
                 >
                   {isEdit ? "Lưu" : "Chỉnh sửa"}
                 </button>
+              </div>
               </div>
             </div>
           </div>
