@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import classNames from "classnames/bind";
 import styles from "./ScheduleTodayPage.scss";
 import Sidenav from "../../../components/Sidenav";
@@ -13,17 +13,22 @@ import { useNavigate } from "react-router-dom";
 import { formatHour } from "../../../untils/format-date";
 import ListSubheader from '@mui/material/ListSubheader';
 import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
+import { CircularProgress } from "@mui/material";
 
 
 const cx = classNames.bind(styles);
 function ExamSchedulePage() {
   const navigate = useNavigate();
-  const [date, setDate] = useState("06/05/2024");
+  const [date, setDate] = useState("17/03/2024");
   const [building, setBuilding] = useState([]);
   const [buildingClick, setBuildingClick] = useState(null);
   
   const [studentsLoading, setStudentsLoading] = useState(false);
-  const { getBuildings, getTimes, getRooms, getStudents } =
+  const { getBuildings, getTimes, getRooms, getSuspiciousStudents } =
     useExamScheduleServices();
   
   useEffect(() => {
@@ -42,6 +47,7 @@ function ExamSchedulePage() {
       }
     };
     getBuildingsExam();
+    getStudentsSuspicious();
   }, [date]);
  
     const [times, setTimes] = useState([]);
@@ -94,10 +100,27 @@ function ExamSchedulePage() {
       },[time])
 
 
-    const handleRoomClick = (room, time) =>{
+    const handleRoomClick = (room, time, roomName) =>{
       console.log(time, room);
-      navigate("attendance", { state: { time, room } });
+      navigate("attendance", { state: { time, room, roomName } });
+      // toggleModalAttendance();
     }
+
+    const [students, setStudents] = useState([]);
+
+    const getStudentsSuspicious = async () => {
+      if (!studentsLoading) {
+        setStudentsLoading(true);
+        try {
+          const response = await getSuspiciousStudents(date);
+          setStudents(response);
+          setStudentsLoading(false);
+        } catch (err) {
+          setStudentsLoading(false);
+          console.log("get time error: ", err);
+        }
+      }
+    };
 
   return (
     <div className={cx("schedulePage")}>
@@ -106,8 +129,63 @@ function ExamSchedulePage() {
       </div>
       <div className={cx("schedulePage__content")}>
         <h1>Lich thi hom nay</h1>
+        <List
+          sx={{ width: '90%',  bgcolor: '#ff6773', color:"white" }}
+          component="nav"
+          aria-labelledby="nested-list-subheader"
+          subheader={
+            <ListSubheader sx={{ bgcolor: '#ed4956', color:"white" }} component="div" id="nested-list-subheader">
+              Danh sách sinh viên thi hơn 2 ca trong ngày
+            </ListSubheader>
+          }
+        >
+          {studentsLoading ? (
+                  <div
+                  style={{
+                    width: "100%",
+                    height: "50px",
+                    textAlign: "center",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    display: "flex",
+                    color: "white",
+                  }}
+                >
+                  <CircularProgress size={25}/>
+                </div>
+                
+              ) : students?.length > 0 ? (
+                students.map((student, i) => (
+                <ListItemButton>
+                  <ListItemIcon>
+                    <WarningAmberRoundedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={`MSSV: ${student.student_id}`} />
+                  <ListItemText primary={`Họ và tên: ${student.last_name} ${student.middle_name} ${student.first_name}`} />
+                </ListItemButton>))
+              ) : (
+            <div
+              style={{
+                width: "100%",
+                height: "50px",
+                textAlign: "center",
+                alignItems: "center",
+                justifyContent: "center",
+                display: "flex",
+                fontWeight: 600,
+                fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            Helvetica, Arial, sans-serif`,
+                color: "white",
+              }}
+            >
+              Không có sinh viên khả nghi nào
+            </div>
+          )}
+
+        </List>
         {buildingClick ? 
         <div className={cx("page_content")} style={{marginTop: 20}}>
+          
                 <div className={cx("title")}>
                     <h6 className={cx("text")}>{buildingClick?.building_name}</h6>
                 </div>

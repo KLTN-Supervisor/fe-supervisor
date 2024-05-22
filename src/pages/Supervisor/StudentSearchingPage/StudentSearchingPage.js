@@ -34,7 +34,6 @@ function RoomingListPage() {
   }); //severity: success, error, info, warning
 
   const [value, setValue] = useState(dayjs("2022-04-17T15:30"));
-  const [modal, setModal] = useState(false);
   const [currentTitle, setCurrentTitle] = useState(document.title);
 
   const { getStudentsPaginated, searchStudents } = useStudentServices();
@@ -43,16 +42,7 @@ function RoomingListPage() {
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [page, setPage] = useState(1);
 
-  const toggleModal = () => {
-    if (document.body.style.overflow !== "hidden") {
-      document.body.style.overflow = "hidden";
-      document.title = "Trang chủ";
-    } else {
-      document.body.style.overflow = "auto";
-      document.title = currentTitle;
-    }
-    setModal(!modal);
-  };
+  
 
   const handleChange = (event) => {
     setTypeSearch(event.target.value);
@@ -236,102 +226,7 @@ function RoomingListPage() {
           </div>
         </div>
       </div>
-      {/* {modal && (
-        <div className={cx("modal active-modal")}>
-          <div
-            onClick={toggleModal}
-            className={cx("overlay")}
-            style={{ alignSelf: "flex-end" }}
-          >
-            <CloseIcon
-              className={cx("sidenav__icon")}
-              style={{
-                width: "27px",
-                height: "27px",
-                color: "white",
-                margin: "12px 30px",
-                position: "absolute",
-                right: "0",
-                cursor: "pointer",
-              }}
-            />
-          </div>
-          <div className={cx("modal-navbar-content")} style={{ width: "50%" }}>
-            <div className={cx("modal-header")}>Chỉnh sửa lịch thi</div>
-            <div className={cx("modal-main")}>
-              <FormControl variant="standard" sx={{ m: 1, width: "80%" }}>
-                <InputLabel id="demo-simple-select-standard-label">
-                  Tòa nhà
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-standard-label"
-                  id="demo-simple-select-standard"
-                  value={age}
-                  onChange={handleChange}
-                  label="Age"
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  <MenuItem value={10}>Ten</MenuItem>
-                  <MenuItem value={20}>Twenty</MenuItem>
-                  <MenuItem value={30}>Thirty</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl variant="standard" sx={{ m: 1, width: "80%" }}>
-                <InputLabel id="demo-simple-select-standard-label">
-                  Tầng
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-standard-label"
-                  id="demo-simple-select-standard"
-                  value={age}
-                  onChange={handleChange}
-                  label="Age"
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  <MenuItem value={10}>Ten</MenuItem>
-                  <MenuItem value={20}>Twenty</MenuItem>
-                  <MenuItem value={30}>Thirty</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControl variant="standard" sx={{ m: 1, width: "80%" }}>
-                <InputLabel id="demo-simple-select-standard-label">
-                  Phòng
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-standard-label"
-                  id="demo-simple-select-standard"
-                  value={age}
-                  onChange={handleChange}
-                  label="Age"
-                >
-                  <MenuItem value="">
-                    <em>None</em>
-                  </MenuItem>
-                  <MenuItem value={10}>Ten</MenuItem>
-                  <MenuItem value={20}>Twenty</MenuItem>
-                  <MenuItem value={30}>Thirty</MenuItem>
-                </Select>
-              </FormControl>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DemoContainer
-                  components={["DateTimePicker"]}
-                  sx={{ m: 1, width: "80%" }}
-                >
-                  <DateTimePicker
-                    label="Thời gian thi"
-                    value={value}
-                    onChange={(newValue) => setValue(newValue)}
-                  />
-                </DemoContainer>
-              </LocalizationProvider>
-            </div>
-          </div>
-        </div>
-      )} */}
+
       <Snackbar
         open={snackBarOpen}
         autoHideDuration={6000}

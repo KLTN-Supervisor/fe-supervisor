@@ -1,5 +1,5 @@
 import classNames from 'classnames/bind';
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 import styles from "./Floor.module.scss";
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -30,7 +30,7 @@ function Floor({room, handleRoomClick, time}) {
                 <div className={cx("floor")}>
                 {room.map((r) => (
                     <Room key={r._id} room={r} 
-                        handleRoomClick={() => {handleRoomClick(r._id, time)}} />
+                        handleRoomClick={() => {handleRoomClick(r._id, time, r.room_name)}} />
                 ))}
                 </div>
             </Collapse>

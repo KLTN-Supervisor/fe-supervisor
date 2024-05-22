@@ -85,6 +85,18 @@ const useExamScheduleServices = () => {
     }
   };
 
+  const getSuspiciousStudents = async (date) => {
+    try {
+      const response = await privateRequest(
+        `/examSchedule/getSuspicious?date=${date}`
+      );
+
+      return response.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   return {
     getYears,
     getTerms,
@@ -93,6 +105,7 @@ const useExamScheduleServices = () => {
     getTimes,
     getRooms,
     getStudents,
+    getSuspiciousStudents
   };
 };
 
