@@ -113,6 +113,7 @@ function ExamSchedulePage() {
         setStudentsLoading(true);
         try {
           const response = await getSuspiciousStudents(date);
+          console.log("getStudentsSuspicious", response)
           setStudents(response);
           setStudentsLoading(false);
         } catch (err) {
@@ -156,7 +157,7 @@ function ExamSchedulePage() {
                 
               ) : students?.length > 0 ? (
                 students.map((student, i) => (
-                <ListItemButton>
+                <ListItemButton key={student.student_id}>
                   <ListItemIcon>
                     <WarningAmberRoundedIcon />
                   </ListItemIcon>
