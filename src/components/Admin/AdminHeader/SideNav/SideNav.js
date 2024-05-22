@@ -32,6 +32,7 @@ const SideNavAdmin = ({
             width: 240,
             marginTop: 8.125,
           },
+          zIndex: 1,
         }}
       >
         <SideNavAdminData handleDrawerClose={handleDrawerClose} />
@@ -45,6 +46,7 @@ const SideNavAdmin = ({
             width: 240,
             marginTop: 8.125,
           },
+          zIndex: 1,
         }}
         open
       >

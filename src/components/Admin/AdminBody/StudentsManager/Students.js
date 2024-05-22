@@ -49,6 +49,7 @@ const StudentsManage = () => {
     unBanUsers,
     createUser,
     uploadImagesImportFile,
+    updateStudent,
   } = useAdminServices();
 
   const [visible, setVisible] = useState(false);
@@ -175,47 +176,6 @@ const StudentsManage = () => {
     getData();
   }, [page, rowsPerPage, search]);
 
-  // useEffect(() => {}, [data]);
-
-  const handleBanUsers = async () => {
-    const selectedIds = [...usersSelected]; // Sao chép usersSelected vào một mảng tạm thời
-    setUsersSelected([]);
-
-    setData((prev) => []);
-
-    try {
-      const banPromises = selectedIds.map((id) =>
-        banUsers(id, privateHttpRequest.privateRequest)
-      );
-
-      const responses = await Promise.all(banPromises);
-
-      if (responses) await getData();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleUnBanUsers = async () => {
-    const selectedIds = [...usersSelected]; // Sao chép usersSelected vào một mảng tạm thời
-
-    setUsersSelected([]);
-
-    setData((prev) => []);
-
-    try {
-      const unBanPromises = selectedIds.map((id) =>
-        unBanUsers(id, privateHttpRequest.privateRequest)
-      );
-
-      const responses = await Promise.all(unBanPromises);
-
-      if (responses) await getData();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const handleAddUser = async () => {
     privateHttpRequest.clearError();
     try {
@@ -247,8 +207,6 @@ const StudentsManage = () => {
   const handleRowsPerPageChange = useCallback((event) => {
     setRowsPerPage(event.target.value);
   }, []);
-
-  const handleEdit = async () => {};
 
   const handleEditClick = () => {
     if (isEdit) clearPortrailImg();
@@ -312,6 +270,52 @@ const StudentsManage = () => {
     }
   }, [modalViewStudent]);
 
+  const handleUpdateStudent = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("image", portraitImgFile);
+      formData.append("student_id", modalData?.student_id);
+      formData.append(
+        "citizen_identification_number",
+        modalData?.citizen_identification_number
+      );
+      formData.append("gender", modalData?.gender === "Nam" ? true : false);
+      formData.append("date_of_birth", modalData?.date_of_birth);
+      formData.append("place_of_birth", modalData?.place_of_birth);
+      formData.append("city_or_province", modalData?.city_or_province);
+      formData.append("district", modalData?.district);
+      formData.append("address", modalData?.address);
+      formData.append("nationality", modalData?.nationality);
+      formData.append("class", modalData?.class);
+
+      const fullname = modalData?.fullname; // Lấy fullname từ nguồn dữ liệu
+
+      if (fullname) {
+        const nameParts = fullname.split(" ");
+        const first_name = nameParts[nameParts.length - 1]; // Phần tử cuối cùng
+        const last_name = nameParts[0]; // Phần tử đầu tiên
+
+        // Xác định middle_name
+        let middle_name = "";
+        if (nameParts.length > 2) {
+          // Nếu có ít nhất ba phần tử
+          middle_name = nameParts.slice(1, nameParts.length - 1).join(" ");
+        }
+        formData.append("first_name", first_name);
+        formData.append("last_name", last_name);
+        formData.append("middle_name", middle_name);
+      }
+
+      const response = await updateStudent(modalViewStudent._id, formData);
+
+      if (response) {
+        console.log(response);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <>
       <Box
@@ -352,7 +356,7 @@ const StudentsManage = () => {
                 />
               </Stack>
 
-              <div>
+              {/* <div>
                 {usersSelected.length > 0 && (
                   <>
                     <Button
@@ -402,7 +406,7 @@ const StudentsManage = () => {
                 >
                   Add
                 </Button>
-              </div>
+              </div> */}
             </Stack>
             <StudentsSearch setSearch={setSearch} />
             {!privateHttpRequest.isLoading && (
@@ -602,8 +606,20 @@ const StudentsManage = () => {
             style={{ width: "80%", marginTop: 30 }}
           >
             <div className={cx2("modal-header")}>Thông tin sinh viên</div>
-            <div className={cx2("modal-main")} style={{display: "flex", padding: "20px 0 30px 0px"}}>
-              <div style={{ flex: 0.2, height: "100%", display: "flex", flexDirection:"column", justifyContent: "center", alignItems: "center"}}>
+            <div
+              className={cx2("modal-main")}
+              style={{ display: "flex", padding: "20px 0 30px 0px" }}
+            >
+              <div
+                style={{
+                  flex: 0.2,
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <div
                   style={{ height: "250px", cursor: isEdit ? "pointer" : "" }}
                   onClick={() => {
@@ -677,6 +693,11 @@ const StudentsManage = () => {
                             id="gender"
                             size="small"
                             readOnly={!isEdit}
+                            disabled={
+                              modalData?.gender === "Nam" && !isEdit
+                                ? true
+                                : false
+                            }
                             sx={{ p: 0, ml: 1.5, mr: 0.5 }}
                           />
                         }
@@ -689,6 +710,11 @@ const StudentsManage = () => {
                             id="gender"
                             size="small"
                             readOnly={!isEdit}
+                            disabled={
+                              modalData?.gender === "Nữ" && !isEdit
+                                ? true
+                                : false
+                            }
                             sx={{ p: 0, ml: 5, mr: 0.5 }}
                           />
                         }
@@ -785,35 +811,35 @@ const StudentsManage = () => {
                     onChange={changeHandler}
                   />
                 </div>
-              
-              <div
-                style={{
-                  width: "80%",
-                  marginTop: 15,
-                  flexDirection: "row",
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <button
-                  className={cx2("button")}
+
+                <div
                   style={{
-                    backgroundColor: "lightpink",
+                    width: "80%",
+                    marginTop: 15,
+                    flexDirection: "row",
+                    display: "flex",
+                    justifyContent: "space-between",
                   }}
-                  onClick={isEdit ? handleEditClick : toggleModal}
                 >
-                  {isEdit ? "Hủy" : "Đóng"}
-                </button>
-                <button
-                  className={cx2("button")}
-                  style={{
-                    backgroundColor: "lightgreen",
-                  }}
-                  onClick={isEdit ? handleEdit : handleEditClick}
-                >
-                  {isEdit ? "Lưu" : "Chỉnh sửa"}
-                </button>
-              </div>
+                  <button
+                    className={cx2("button")}
+                    style={{
+                      backgroundColor: "lightpink",
+                    }}
+                    onClick={isEdit ? handleEditClick : toggleModal}
+                  >
+                    {isEdit ? "Hủy" : "Đóng"}
+                  </button>
+                  <button
+                    className={cx2("button")}
+                    style={{
+                      backgroundColor: "lightgreen",
+                    }}
+                    onClick={isEdit ? handleUpdateStudent : handleEditClick}
+                  >
+                    {isEdit ? "Lưu" : "Chỉnh sửa"}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
