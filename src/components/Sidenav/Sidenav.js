@@ -15,7 +15,7 @@ import useLogout from "../../hooks/auth-hook/logout-hook";
 import NavBarLogo from "../../assets/logo-white.png";
 import NavBarIcon from "../../assets/NESTME-2.png";
 const cx = classNames.bind(styles);
-function Sidenav({clear}) {
+function Sidenav() {
     const locate = window.location.pathname;
     const { logout } = useLogout();
     const navigate = useNavigate();
@@ -29,7 +29,6 @@ function Sidenav({clear}) {
                     <img
                     style={{ cursor: "pointer", width: "27px", height: "27px", borderRadius: "5px" }}
                     onClick={() => { 
-                        clear && clear();
                         navigate("/", { replace: true });
                     }}
                     className={cx("sidenav__logo")}
@@ -42,7 +41,6 @@ function Sidenav({clear}) {
                     <img
                     style={{ cursor: "pointer" }}
                     onClick={() => {
-                        clear && clear();
                         navigate("/", { replace: true });
                     }}
                     className={cx("sidenav__logo")}
@@ -54,7 +52,6 @@ function Sidenav({clear}) {
                 <div className={cx("sidenav__buttons")}>
                     <button
                         onClick={() => {
-                            clear && clear();
                             navigate("/", { replace: true });
                         }}
                         className={cx("sidenav__button")}
@@ -80,7 +77,6 @@ function Sidenav({clear}) {
                     <button
                         className={cx("sidenav__button")}
                         onClick={() => {
-                                clear && clear();
                                 navigate("/searchExamSchedule", { replace: true });
                             }}
                             style={
@@ -97,7 +93,6 @@ function Sidenav({clear}) {
                     </button>
                     <button
                         onClick={() => {
-                            clear && clear();
                             navigate("/searchStudent", { replace: true });
                         }}
                         className={cx("sidenav__button")}
@@ -125,7 +120,6 @@ function Sidenav({clear}) {
                         <button
                             className={cx("sidenav__button")}
                             onClick={() => {
-                                clear && clear();
                                 navigate("/searchStudent", { replace: true });
                             }}
                         >
