@@ -17,8 +17,6 @@ import { useState } from "react";
 import useAdminServices from "../../../../../services/useAdminServices";
 import usePrivateHttpClient from "../../../../../hooks/http-hook/private-http-hook";
 import styles from "./TableItem.scss";
-import CloseIcon from "@mui/icons-material/Close";
-import { formatDate } from "../../../../../untils/format-date";
 
 const cx = classNames.bind(styles);
 
@@ -30,25 +28,7 @@ const AdminTableItem = (props) => {
     selected = [],
     colsData = [],
     options = [],
-    renderModalBody,
   } = props;
-
-  const [viewReports, setViewReports] = useState(false);
-  const privateHttpRequest = usePrivateHttpClient();
-
-  const [reportsCount, setReportsCount] = useState([]);
-
-  const [modal, setModal] = useState(false);
-
-  const toggleModal = () => {
-    // if (document.body.style.overflow !== "hidden") {
-    //   document.body.style.overflow = "hidden";
-    // } else {
-    //   document.body.style.overflow = "auto";
-    // }
-    handleClose();
-    setModal(!modal);
-  };
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -61,22 +41,6 @@ const AdminTableItem = (props) => {
 
   const isSelected = selected.includes(item._id);
   const createdAt = format(parseISO(item.created_at), "dd/MM/yyyy");
-
-  // const loadReportsCount = async () => {
-  //   try {
-  //     const response = await getUserReportsCount(
-  //       user._id,
-  //       privateHttpRequest.privateRequest
-  //     );
-  //     if (response) {
-  //       setReportsCount(response.reports_group_count);
-  //       if (anchorEl) handleClose();
-  //       setViewReports(true);
-  //     }
-  //   } catch (err) {
-  //     console.error("Error loading reports: ", err);
-  //   }
-  // };
 
   return (
     <>
@@ -143,40 +107,15 @@ const AdminTableItem = (props) => {
         >
           {options.map((option, i) => (
             <MenuItem
-              onClick={
-                option.handleClick === "toggleModal"
-                  ? toggleModal
-                  : option.handleClick
-              }
+              onClick={() => {
+                handleClose();
+                option.handleClick(item);
+              }}
             >
               {option.name}
             </MenuItem>
           ))}
         </Menu>
-      )}
-
-      {modal && (
-        <div className={cx("modal active-modal")}>
-          <div
-            onClick={toggleModal}
-            className={cx("overlay")}
-            style={{ alignSelf: "flex-end" }}
-          >
-            <CloseIcon
-              //className={cx("sidenav__icon")}
-              style={{
-                width: "27px",
-                height: "27px",
-                color: "white",
-                margin: "12px 30px",
-                position: "absolute",
-                right: "0",
-                cursor: "pointer",
-              }}
-            />
-          </div>
-          {renderModalBody(item, toggleModal)}
-        </div>
       )}
     </>
   );

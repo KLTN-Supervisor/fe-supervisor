@@ -487,7 +487,7 @@ function ExamSchedules() {
                 backgroundColor: "#ff0000",
                 border: "none",
                 color: "white",
-                borderRadius: "10px",
+                borderRadius: 8,
               }}
               onClick={() => setVisible(false)}
             >
@@ -499,7 +499,7 @@ function ExamSchedules() {
                 backgroundColor: "#1976d2",
                 border: "none",
                 color: "white",
-                borderRadius: "10px",
+                borderRadius: "8px",
               }}
               onClick={handleImportData}
             >

@@ -9,6 +9,10 @@ import {
   Box,
   Button,
   Container,
+  FormControl,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
   Stack,
   SvgIcon,
   Typography,
@@ -25,11 +29,12 @@ import useAdminServices from "../../../../services/useAdminServices";
 import usePrivateHttpClient from "../../../../hooks/http-hook/private-http-hook";
 import ImportInput from "../UploadFile/ImportInput";
 import { getStudentsImageSource } from "../../../../untils/getImageSource";
-import { formatDate } from "../../../../untils/format-date";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
+import UploadInput from "../UploadFile/UploadInput";
+import CloseIcon from "@mui/icons-material/Close";
 
 const cx = classNames.bind(styles);
 const cx2 = classNames.bind(styles2);
@@ -59,19 +64,49 @@ const StudentsManage = () => {
 
   const [isEdit, setIsEdit] = useState(false);
   const [modalData, setModalData] = useState({
-    email: "",
+    student_id: "",
     fullname: "",
-    username: "",
-    password: "",
-    admin: true,
+    citizen_identification_number: "",
+    gender: "",
+    date_of_birth: "",
+    place_of_birth: "",
+    city_or_province: "",
+    district: "",
+    address: "",
+    nationality: "",
+    class: "",
   });
+
+  const clearModalData = () => {
+    setModalData({
+      student_id: "",
+      fullname: "",
+      citizen_identification_number: "",
+      gender: "",
+      date_of_birth: "",
+      place_of_birth: "",
+      city_or_province: "",
+      district: "",
+      address: "",
+      nationality: "",
+      class: "",
+    });
+  };
 
   const [file, setFile] = useState();
   const [fileIsValid, setFileIsValid] = useState();
 
+  const [files, setFiles] = useState();
+  const [filesIsValid, setFilesIsValid] = useState();
+
   const removeFile = () => {
     setFile(null);
     setFileIsValid(false);
+  };
+
+  const removeArchiveFiles = () => {
+    setFiles([]);
+    setFilesIsValid(false);
   };
 
   const uploadImportStudentsFileHandler = async () => {
@@ -101,6 +136,7 @@ const StudentsManage = () => {
   };
 
   const changeHandler = (e) => {
+    console.log(e.target.id);
     setModalData((prev) => ({
       ...prev,
       [e.target.id]: e.target.value,
@@ -215,152 +251,66 @@ const StudentsManage = () => {
   const handleEdit = async () => {};
 
   const handleEditClick = () => {
+    if (isEdit) clearPortrailImg();
     setIsEdit(!isEdit);
   };
 
-  const renderModalBody = (item, toggleModal) => {
-    return (
-      <div
-        className={cx2("modal-navbar-content")}
-        style={{ width: "50%", marginTop: 30 }}
-      >
-        <div className={cx2("modal-header")}>Thông tin sinh viên</div>
-        <div className={cx2("modal-main")}>
-          <div style={{ height: "250px" }}>
-            <img
-              style={{ width: "100%", maxHeight: "250px" }}
-              src={getStudentsImageSource(item.portrait_img)}
-            />
-          </div>
-          <div className={cx2("info")}>
-            <div className={cx2("title")}>MSSV:</div>
-            <input
-              className={cx2("input-span", !isEdit && "input-span-focus")}
-              value={item.student_id}
-              readOnly={!isEdit}
-            />
-          </div>
-          <div className={cx2("info")}>
-            <div className={cx2("title")}>Họ và tên:</div>
-            <input
-              className={cx2("input-span", !isEdit && "input-span-focus")}
-              value={item.fullname}
-              readOnly={!isEdit}
-            />
-          </div>
-          <div className={cx2("info")}>
-            <div className={cx2("title")}>CMND/CCCD:</div>
-            <input
-              className={cx2("input-span", !isEdit && "input-span-focus")}
-              value={item.citizen_identification_number}
-              readOnly={!isEdit}
-            />
-          </div>
-          <div className={cx2("info")}>
-            <div className={cx2("title")}>Giới tính:</div>
-            <span className={cx2("span")}>{item.gender}</span>
-          </div>
-          <div className={cx2("info")}>
-            <div className={cx2("title")}>Ngày sinh:</div>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                slotProps={{
-                  textField: {
-                    inputProps: {
-                      style: { padding: 0 },
-                    },
-                    sx: {
-                      p: 0,
-                      width: 150,
-                    },
-                    variant: "standard",
-                  },
-                }}
-                value={dayjs(formatDate(item.date_of_birth))}
-                readOnly={!isEdit}
-              />
-            </LocalizationProvider>
-          </div>
-          <div className={cx2("info")}>
-            <div className={cx2("title")}>Nơi sinh:</div>
-            <input
-              className={cx2("input-span", !isEdit && "input-span-focus")}
-              value={item.place_of_birth}
-              readOnly={!isEdit}
-            />
-          </div>
-          <div className={cx2("info")}>
-            <div className={cx2("title")}>Tỉnh/TP:</div>
-            <input
-              className={cx2("input-span", !isEdit && "input-span-focus")}
-              value={item.permanent_address.city_or_province}
-              readOnly={!isEdit}
-            />
-          </div>
-          <div className={cx2("info")}>
-            <div className={cx2("title")}>Quận/huyện:</div>
-            <input
-              className={cx2("input-span", !isEdit && "input-span-focus")}
-              value={item.permanent_address.district}
-              readOnly={!isEdit}
-            />
-          </div>
-          <div className={cx2("info")}>
-            <div className={cx2("title")}>Địa chỉ thường trú:</div>
-            <input
-              className={cx2("input-span", !isEdit && "input-span-focus")}
-              value={item.permanent_address.address}
-              readOnly={!isEdit}
-            />
-          </div>
-          <div className={cx2("info")}>
-            <div className={cx2("title")}>Quốc tịch:</div>
-            <input
-              className={cx2("input-span", !isEdit && "input-span-focus")}
-              value={item.nationality}
-              readOnly={!isEdit}
-            />
-          </div>
-          <div className={cx2("info")}>
-            <div className={cx2("title")}>Lớp học phần:</div>
-            <input
-              className={cx2("input-span", !isEdit && "input-span-focus")}
-              value={item.class}
-              readOnly={!isEdit}
-            />
-          </div>
-          <div
-            style={{
-              width: "80%",
-              marginTop: 15,
-              flexDirection: "row",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <button
-              className={cx2("button")}
-              style={{
-                backgroundColor: "lightpink",
-              }}
-              onClick={isEdit ? handleEditClick : toggleModal}
-            >
-              {isEdit ? "Hủy" : "Đóng"}
-            </button>
-            <button
-              className={cx2("button")}
-              style={{
-                backgroundColor: "lightgreen",
-              }}
-              onClick={isEdit ? handleEdit : handleEditClick}
-            >
-              {isEdit ? "Lưu" : "Chỉnh sửa"}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+  const imgRef = useRef();
+  const [portraitImgFile, setPortraitImgFile] = useState();
+  const [previewPortraitImg, setPreviewPortraitImg] = useState();
+
+  const pickImgFileHandler = (e) => {
+    let pickedFile;
+
+    if (e.target.files) {
+      pickedFile = e.target.files[0];
+      setPortraitImgFile(pickedFile);
+    }
   };
+
+  const clearPortrailImg = () => {
+    setPortraitImgFile(null);
+    setPreviewPortraitImg(null);
+    imgRef.current.value = null;
+  };
+
+  useEffect(() => {
+    if (!portraitImgFile) return;
+
+    const fileReader = new FileReader();
+    fileReader.onload = () => {
+      setPreviewPortraitImg(fileReader.result);
+    };
+    fileReader.readAsDataURL(portraitImgFile);
+  }, [portraitImgFile]);
+
+  const [isCreateNew, setIsCreateNew] = useState(false);
+
+  const [modal, setModal] = useState(false);
+  const [modalViewStudent, setModalViewStudent] = useState(null);
+  const toggleModal = () => {
+    setModal(!modal);
+  };
+
+  useEffect(() => {
+    if (!isCreateNew) {
+      setPreviewPortraitImg(modalViewStudent?.portrait_img);
+      setModalData({
+        student_id: modalViewStudent?.student_id,
+        fullname: modalViewStudent?.fullname,
+        citizen_identification_number:
+          modalViewStudent?.citizen_identification_number,
+        gender: modalViewStudent?.gender,
+        date_of_birth: modalViewStudent?.date_of_birth,
+        place_of_birth: modalViewStudent?.place_of_birth,
+        city_or_province: modalViewStudent?.permanent_address.city_or_province,
+        district: modalViewStudent?.permanent_address.district,
+        address: modalViewStudent?.permanent_address.address,
+        nationality: modalViewStudent?.nationality,
+        class: modalViewStudent?.class,
+      });
+    }
+  }, [modalViewStudent]);
 
   return (
     <>
@@ -380,26 +330,25 @@ const StudentsManage = () => {
               spacing={4}
             >
               <Stack spacing={1}>
-                <Typography variant="h4">Students</Typography>
+                <Typography variant="h4">Sinh viên</Typography>
                 <ImportInput
                   file={file}
                   fileIsValid={fileIsValid}
                   setFile={setFile}
                   setFileIsValid={setFileIsValid}
                   removeFile={removeFile}
-                  uploadType={[
-                    {
-                      name: "Students",
-                      acceptFile:
-                        ".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel",
-                      uploadHandler: uploadImportStudentsFileHandler,
-                    },
-                    {
-                      name: "Images",
-                      acceptFile: ".zip,.rar",
-                      uploadHandler: uploadImportImagesFileHandler,
-                    },
-                  ]}
+                  uploadHandler={uploadImportStudentsFileHandler}
+                  buttonName="Import sinh viên"
+                />
+                <UploadInput
+                  files={files}
+                  fileIsValid={filesIsValid}
+                  setFiles={setFiles}
+                  setFileIsValid={setFilesIsValid}
+                  removeFile={removeArchiveFiles}
+                  buttonName="Tải lên hình ảnh"
+                  acceptFile=".zip,.rar"
+                  uploadHandler={uploadImportImagesFileHandler}
                 />
               </Stack>
 
@@ -474,7 +423,10 @@ const StudentsManage = () => {
                   "gender",
                   "learning_status",
                 ]}
-                renderModalBody={renderModalBody}
+                onClickItem={(item) => {
+                  setModalViewStudent(item);
+                  toggleModal();
+                }}
               />
             )}
           </Stack>
@@ -625,6 +577,243 @@ const StudentsManage = () => {
           </Modal.Footer>
         </Modal>
       </Box>
+      {modal && (
+        <div className={cx("modal active-modal")}>
+          <div
+            onClick={toggleModal}
+            className={cx("overlay")}
+            style={{ alignSelf: "flex-end" }}
+          >
+            <CloseIcon
+              //className={cx("sidenav__icon")}
+              style={{
+                width: "27px",
+                height: "27px",
+                color: "white",
+                margin: "12px 30px",
+                position: "absolute",
+                right: "0",
+                cursor: "pointer",
+              }}
+            />
+          </div>
+          <div
+            className={cx2("modal-navbar-content")}
+            style={{ width: "50%", marginTop: 30 }}
+          >
+            <div className={cx2("modal-header")}>Thông tin sinh viên</div>
+            <div className={cx2("modal-main")}>
+              <div
+                style={{ height: "250px", cursor: isEdit ? "pointer" : "" }}
+                onClick={() => {
+                  if (isEdit) imgRef.current.click();
+                }}
+              >
+                <img
+                  style={{ width: "100%", maxHeight: "250px" }}
+                  src={getStudentsImageSource(
+                    previewPortraitImg
+                      ? previewPortraitImg
+                      : modalViewStudent?.portrait_img
+                  )}
+                  alt="Ảnh thẻ sinh viên"
+                />
+                <input
+                  id="portrait_img"
+                  ref={imgRef}
+                  type="file"
+                  hidden
+                  accept=".png,.jpg,.jpeg"
+                  disabled={!isEdit}
+                  onChange={pickImgFileHandler}
+                />
+              </div>
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>MSSV:</div>
+                <input
+                  id="student_id"
+                  className={cx2("input-span", !isEdit && "input-span-focus")}
+                  value={modalData?.student_id}
+                  readOnly={!isEdit}
+                  onChange={changeHandler}
+                />
+              </div>
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>Họ và tên:</div>
+                <input
+                  id="fullname"
+                  className={cx2("input-span", !isEdit && "input-span-focus")}
+                  value={modalData?.fullname}
+                  readOnly={!isEdit}
+                  onChange={changeHandler}
+                />
+              </div>
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>CMND/CCCD:</div>
+                <input
+                  id="citizen_identification_number"
+                  className={cx2("input-span", !isEdit && "input-span-focus")}
+                  value={modalData?.citizen_identification_number}
+                  readOnly={!isEdit}
+                  onChange={changeHandler}
+                />
+              </div>
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>Giới tính:</div>
+                <FormControl>
+                  <RadioGroup
+                    row
+                    defaultValue="Nữ"
+                    value={modalData?.gender}
+                    onChange={changeHandler}
+                  >
+                    <FormControlLabel
+                      value="Nữ"
+                      control={
+                        <Radio
+                          id="gender"
+                          size="small"
+                          readOnly={!isEdit}
+                          sx={{ p: 0, ml: 1.5, mr: 0.5 }}
+                        />
+                      }
+                      label="Nữ"
+                    />
+                    <FormControlLabel
+                      value="Nam"
+                      control={
+                        <Radio
+                          id="gender"
+                          size="small"
+                          readOnly={!isEdit}
+                          sx={{ p: 0, ml: 5, mr: 0.5 }}
+                        />
+                      }
+                      label="Nam"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </div>
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>Ngày sinh:</div>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    slotProps={{
+                      textField: {
+                        inputProps: {
+                          style: { padding: 0 },
+                        },
+                        sx: {
+                          p: 0,
+                          width: 150,
+                        },
+                        variant: "standard",
+                      },
+                    }}
+                    value={dayjs(new Date(modalData?.date_of_birth))}
+                    format="DD/MM/YYYY"
+                    readOnly={!isEdit}
+                    onChange={(value) => {
+                      setModalData((prev) => ({
+                        ...prev,
+                        date_of_birth: value,
+                      }));
+                    }}
+                  />
+                </LocalizationProvider>
+              </div>
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>Nơi sinh:</div>
+                <input
+                  id="place_of_birth"
+                  className={cx2("input-span", !isEdit && "input-span-focus")}
+                  value={modalData?.place_of_birth}
+                  readOnly={!isEdit}
+                  onChange={changeHandler}
+                />
+              </div>
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>Tỉnh/TP:</div>
+                <input
+                  id="city_or_province"
+                  className={cx2("input-span", !isEdit && "input-span-focus")}
+                  value={modalData?.city_or_province}
+                  readOnly={!isEdit}
+                  onChange={changeHandler}
+                />
+              </div>
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>Quận/huyện:</div>
+                <input
+                  id="district"
+                  className={cx2("input-span", !isEdit && "input-span-focus")}
+                  value={modalData?.district}
+                  readOnly={!isEdit}
+                  onChange={changeHandler}
+                />
+              </div>
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>Địa chỉ thường trú:</div>
+                <input
+                  id="address"
+                  className={cx2("input-span", !isEdit && "input-span-focus")}
+                  value={modalData?.address}
+                  readOnly={!isEdit}
+                  onChange={changeHandler}
+                />
+              </div>
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>Quốc tịch:</div>
+                <input
+                  id="nationality"
+                  className={cx2("input-span", !isEdit && "input-span-focus")}
+                  value={modalData?.nationality}
+                  readOnly={!isEdit}
+                  onChange={changeHandler}
+                />
+              </div>
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>Lớp học phần:</div>
+                <input
+                  id="class"
+                  className={cx2("input-span", !isEdit && "input-span-focus")}
+                  value={modalData?.class}
+                  readOnly={!isEdit}
+                  onChange={changeHandler}
+                />
+              </div>
+              <div
+                style={{
+                  width: "80%",
+                  marginTop: 15,
+                  flexDirection: "row",
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <button
+                  className={cx2("button")}
+                  style={{
+                    backgroundColor: "lightpink",
+                  }}
+                  onClick={isEdit ? handleEditClick : toggleModal}
+                >
+                  {isEdit ? "Hủy" : "Đóng"}
+                </button>
+                <button
+                  className={cx2("button")}
+                  style={{
+                    backgroundColor: "lightgreen",
+                  }}
+                  onClick={isEdit ? handleEdit : handleEditClick}
+                >
+                  {isEdit ? "Lưu" : "Chỉnh sửa"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

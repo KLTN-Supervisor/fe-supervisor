@@ -12,7 +12,7 @@ export const StudentsSearch = ({ setSearch }) => {
       <OutlinedInput
         defaultValue=""
         fullWidth
-        placeholder="Username...."
+        placeholder="Tên sinh viên...."
         onKeyUp={handleSearch}
         startAdornment={
           <InputAdornment position="start">

@@ -11,21 +11,14 @@ const UploadInput = ({
   uploadHandler = () => {},
   acceptFile = ".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel",
   buttonName = "Upload",
-  uploadType = [],
 }) => {
   const filePickerRef = useRef();
-  const [uploadHandlerIndex, setUploadHandlerIndex] = useState(
-    uploadType.length > 0 ? 0 : -1
-  );
-
-  const [accept, setAccept] = useState("");
 
   const pickFilesHandler = (e) => {
     let pickedFiles;
 
-    if (e.target.files && e.target.files.length >= 1) {
+    if (e.target.files) {
       pickedFiles = Array.from(e.target.files);
-      console.log(pickedFiles);
       setFiles(pickedFiles);
       setFileIsValid(true);
     } else {
@@ -34,21 +27,10 @@ const UploadInput = ({
   };
 
   const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   useEffect(() => {
     if (!files || files.length === 0) filePickerRef.current.value = null;
   }, [files]);
-
-  // useEffect(() => {
-  //   setAccept(uploadType[uploadHandlerIndex].acceptFile);
-  // }, [uploadHandlerIndex]);
 
   return (
     <>
@@ -61,11 +43,7 @@ const UploadInput = ({
             </SvgIcon>
           }
           variant="contained"
-          onClick={
-            uploadType.length > 0
-              ? handleClick
-              : () => filePickerRef.current.click()
-          }
+          onClick={() => filePickerRef.current.click()}
         >
           {buttonName}
         </Button>
@@ -80,16 +58,12 @@ const UploadInput = ({
         />
         {files && files.length > 0 && (
           <>
-            {/* {files.map((file, i) => (
+            {files.map((file, i) => (
               <span>{file.name}</span>
-            ))} */}
+            ))}
 
             <Button
-              onClick={
-                uploadType.length > 0
-                  ? uploadType[uploadHandlerIndex].uploadHandler
-                  : uploadHandler
-              }
+              onClick={uploadHandler}
               // startIcon={
               //   <SvgIcon fontSize="small">
               //     <VerticalAlignTopOutlinedIcon />
@@ -127,30 +101,6 @@ const UploadInput = ({
           </>
         )}
       </Stack>
-      {uploadType.length > 0 && (
-        <Menu
-          id="basic-menu"
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-          MenuListProps={{
-            "aria-labelledby": "basic-button",
-          }}
-          sx={{ width: 400 }}
-        >
-          {uploadType.map((item, i) => (
-            <MenuItem
-              key={item.name}
-              onClick={() => {
-                setUploadHandlerIndex(i);
-                filePickerRef.current.click();
-              }}
-            >
-              {item.name}
-            </MenuItem>
-          ))}
-        </Menu>
-      )}
     </>
   );
 };

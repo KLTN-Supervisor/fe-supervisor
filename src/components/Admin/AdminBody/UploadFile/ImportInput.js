@@ -9,7 +9,7 @@ const ImportInput = ({
   setFileIsValid,
   removeFile = () => {},
   uploadHandler = () => {},
-  acceptFile = "",
+  acceptFile = ".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel",
   buttonName = "Import",
   uploadType = [],
 }) => {
@@ -41,6 +41,10 @@ const ImportInput = ({
     setAnchorEl(null);
   };
 
+  useEffect(() => {
+    if (!file) filePickerRef.current.value = null;
+  }, [file]);
+
   // useEffect(() => {
   //   setAccept(uploadType[uploadHandlerIndex].acceptFile);
   // }, [uploadHandlerIndex]);
@@ -69,7 +73,7 @@ const ImportInput = ({
           ref={filePickerRef}
           type="file"
           style={{ display: "none" }}
-          //accept={uploadType.length > 0 ? accept : acceptFile}
+          accept={uploadType.length > 0 ? accept : acceptFile}
           onChange={pickFileHandler}
         />
         {file && (

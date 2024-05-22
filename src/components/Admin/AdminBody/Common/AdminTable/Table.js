@@ -42,7 +42,7 @@ export const AdminTable = (props) => {
     selected = [],
     colsName = [],
     colsData = [],
-    renderModalBody = () => {},
+    onClickItem = () => {},
   } = props;
 
   const itemIds = useItemIds(data);
@@ -91,9 +91,8 @@ export const AdminTable = (props) => {
                   selected={selected}
                   colsData={colsData}
                   options={[
-                    { name: "More information", handleClick: "toggleModal" },
+                    { name: "Xem thông tin", handleClick: onClickItem },
                   ]}
-                  renderModalBody={renderModalBody}
                 />
               ))}
             </TableBody>
