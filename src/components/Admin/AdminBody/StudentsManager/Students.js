@@ -52,8 +52,6 @@ const StudentsManage = () => {
     updateStudent,
   } = useAdminServices();
 
-  const [visible, setVisible] = useState(false);
-
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -137,7 +135,6 @@ const StudentsManage = () => {
   };
 
   const changeHandler = (e) => {
-    console.log(e.target.id);
     setModalData((prev) => ({
       ...prev,
       [e.target.id]: e.target.value,
@@ -176,8 +173,7 @@ const StudentsManage = () => {
     getData();
   }, [page, rowsPerPage, search]);
 
-  const handleAddUser = async () => {
-    privateHttpRequest.clearError();
+  const handleCreateStudent = async () => {
     try {
       const response = await createUser(
         modalData,
@@ -185,7 +181,6 @@ const StudentsManage = () => {
       );
 
       if (response) {
-        setVisible(false);
         setModalData({
           email: "",
           fullname: "",
@@ -228,8 +223,8 @@ const StudentsManage = () => {
 
   const clearPortrailImg = () => {
     setPortraitImgFile(null);
-    setPreviewPortraitImg(null);
-    imgRef.current.value = null;
+    setPreviewPortraitImg("");
+    if (imgRef.current) imgRef.current.value = null;
   };
 
   useEffect(() => {
@@ -247,6 +242,8 @@ const StudentsManage = () => {
   const [modal, setModal] = useState(false);
   const [modalViewStudent, setModalViewStudent] = useState(null);
   const toggleModal = () => {
+    if (isEdit) setIsEdit(false);
+    if (isCreateNew) setIsCreateNew(false);
     setModal(!modal);
   };
 
@@ -356,8 +353,8 @@ const StudentsManage = () => {
                 />
               </Stack>
 
-              {/* <div>
-                {usersSelected.length > 0 && (
+              <div>
+                {/*{usersSelected.length > 0 && (
                   <>
                     <Button
                       onClick={handleUnBanUsers}
@@ -393,9 +390,14 @@ const StudentsManage = () => {
                       Ban
                     </Button>
                   </>
-                )}
+                )}*/}
                 <Button
-                  onClick={() => setVisible(true)}
+                  onClick={() => {
+                    clearModalData();
+                    clearPortrailImg();
+                    setIsCreateNew(true);
+                    toggleModal();
+                  }}
                   startIcon={
                     <SvgIcon fontSize="small">
                       <AddIcon />
@@ -404,9 +406,9 @@ const StudentsManage = () => {
                   variant="contained"
                   disabled={privateHttpRequest.isLoading}
                 >
-                  Add
+                  Thêm
                 </Button>
-              </div> */}
+              </div>
             </Stack>
             <StudentsSearch setSearch={setSearch} />
             {!privateHttpRequest.isLoading && (
@@ -435,151 +437,6 @@ const StudentsManage = () => {
             )}
           </Stack>
         </Container>
-        <Modal
-          show={visible}
-          onHide={() => setVisible(false)}
-          className={cx("add-employee-modal")}
-        >
-          <Modal.Header>
-            <div className={cx("title-modal")}>ADD STUDENT</div>
-            {privateHttpRequest.error && (
-              <>
-                <br />
-                <div className={cx("title-modal")}>
-                  {" "}
-                  <Alert severity="error">{privateHttpRequest.error}</Alert>
-                </div>
-              </>
-            )}
-          </Modal.Header>
-          <Modal.Body>
-            <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>First Name</div>
-                </div>
-                <input
-                  id="firstname"
-                  type="text"
-                  onChange={changeHandler}
-                  className={cx("col-lg-8 col-md-8")}
-                />
-              </div>
-            </div>
-            <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Email</div>
-                </div>
-                <input
-                  id="email"
-                  type="email"
-                  onChange={changeHandler}
-                  className={cx("col-lg-9 col-md-9")}
-                />
-              </div>
-            </div>
-            <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Fullname</div>
-                </div>
-                <input
-                  id="fullname"
-                  type="text"
-                  onChange={changeHandler}
-                  className={cx("col-lg-9 col-md-9")}
-                />
-              </div>
-            </div>
-            <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Password</div>
-                </div>
-                <input
-                  id="password"
-                  type="password"
-                  onChange={changeHandler}
-                  className={cx("col-lg-9 col-md-9")}
-                />
-              </div>
-            </div>
-            {/* <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Date of birth</div>
-                </div>
-                <input
-                  type="date"
-                  // onChange={(e) => setDateOfbirth(e.target.value)}
-                  className={cx("col-lg-9 col-md-9")}
-                />
-              </div>
-            </div>
-            <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Gender</div>
-                </div>
-                <span className={cx("gender")}>
-                  <input
-                    type="radio"
-                    id="male"
-                    name="gender"
-                    value="male"
-                    style={{ width: "auto", margin: "10px 10px 0px 20px" }}
-                    // onChange={(e) => setGender(e.target.value)}
-                  />
-                  <label for="male">Male</label>
-                  <input
-                    type="radio"
-                    id="female"
-                    name="gender"
-                    value="female"
-                    style={{ width: "auto", margin: "10px 10px 0px 20px" }}
-                    // onChange={(e) => setGender(e.target.value)}
-                  />
-                  <label for="female">Female</label>
-                </span>
-              </div>
-            </div> */}
-          </Modal.Body>
-          <Modal.Footer>
-            <div
-              style={{
-                width: "70%",
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <button
-                className={cx("modal-button")}
-                style={{
-                  backgroundColor: "#ff0000",
-                  border: "none",
-                  color: "white",
-                  borderRadius: "10px",
-                }}
-                onClick={() => setVisible(false)}
-              >
-                CLOSE
-              </button>
-              <button
-                className={cx("modal-button")}
-                style={{
-                  backgroundColor: "#1976d2",
-                  border: "none",
-                  color: "white",
-                  borderRadius: "10px",
-                }}
-                onClick={handleAddUser}
-              >
-                ADD
-              </button>
-            </div>
-          </Modal.Footer>
-        </Modal>
       </Box>
       {modal && (
         <div className={cx2("modal active-modal")}>
@@ -621,18 +478,17 @@ const StudentsManage = () => {
                 }}
               >
                 <div
-                  style={{ height: "250px", cursor: isEdit ? "pointer" : "" }}
+                  style={{
+                    height: "250px",
+                    cursor: isEdit || isCreateNew ? "pointer" : "",
+                  }}
                   onClick={() => {
-                    if (isEdit) imgRef.current.click();
+                    if (isEdit || isCreateNew) imgRef.current.click();
                   }}
                 >
                   <img
                     style={{ width: "100%", maxHeight: "250px" }}
-                    src={getStudentsImageSource(
-                      previewPortraitImg
-                        ? previewPortraitImg
-                        : modalViewStudent?.portrait_img
-                    )}
+                    src={getStudentsImageSource(previewPortraitImg)}
                     alt="Ảnh thẻ sinh viên"
                   />
                   <input
@@ -641,7 +497,7 @@ const StudentsManage = () => {
                     type="file"
                     hidden
                     accept=".png,.jpg,.jpeg"
-                    disabled={!isEdit}
+                    disabled={!isEdit && !isCreateNew}
                     onChange={pickImgFileHandler}
                   />
                 </div>
@@ -651,9 +507,12 @@ const StudentsManage = () => {
                   <div className={cx2("title")}>MSSV:</div>
                   <input
                     id="student_id"
-                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    className={cx2(
+                      "input-span",
+                      !isEdit || (isCreateNew && "input-span-focus")
+                    )}
                     value={modalData?.student_id}
-                    readOnly={!isEdit}
+                    readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
                 </div>
@@ -661,9 +520,12 @@ const StudentsManage = () => {
                   <div className={cx2("title")}>Họ và tên:</div>
                   <input
                     id="fullname"
-                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    className={cx2(
+                      "input-span",
+                      !isEdit || (isCreateNew && "input-span-focus")
+                    )}
                     value={modalData?.fullname}
-                    readOnly={!isEdit}
+                    readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
                 </div>
@@ -671,9 +533,12 @@ const StudentsManage = () => {
                   <div className={cx2("title")}>CMND/CCCD:</div>
                   <input
                     id="citizen_identification_number"
-                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    className={cx2(
+                      "input-span",
+                      !isEdit || (isCreateNew && "input-span-focus")
+                    )}
                     value={modalData?.citizen_identification_number}
-                    readOnly={!isEdit}
+                    readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
                 </div>
@@ -692,9 +557,11 @@ const StudentsManage = () => {
                           <Radio
                             id="gender"
                             size="small"
-                            readOnly={!isEdit}
+                            readOnly={!isEdit && !isCreateNew}
                             disabled={
-                              modalData?.gender === "Nam" && !isEdit
+                              modalData?.gender === "Nam" &&
+                              !isEdit &&
+                              !isCreateNew
                                 ? true
                                 : false
                             }
@@ -709,9 +576,11 @@ const StudentsManage = () => {
                           <Radio
                             id="gender"
                             size="small"
-                            readOnly={!isEdit}
+                            readOnly={!isEdit && !isCreateNew}
                             disabled={
-                              modalData?.gender === "Nữ" && !isEdit
+                              modalData?.gender === "Nữ" &&
+                              !isEdit &&
+                              !isCreateNew
                                 ? true
                                 : false
                             }
@@ -741,7 +610,7 @@ const StudentsManage = () => {
                       }}
                       value={dayjs(new Date(modalData?.date_of_birth))}
                       format="DD/MM/YYYY"
-                      readOnly={!isEdit}
+                      readOnly={!isEdit && !isCreateNew}
                       onChange={(value) => {
                         setModalData((prev) => ({
                           ...prev,
@@ -755,9 +624,12 @@ const StudentsManage = () => {
                   <div className={cx2("title")}>Nơi sinh:</div>
                   <input
                     id="place_of_birth"
-                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    className={cx2(
+                      "input-span",
+                      !isEdit || (isCreateNew && "input-span-focus")
+                    )}
                     value={modalData?.place_of_birth}
-                    readOnly={!isEdit}
+                    readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
                 </div>
@@ -765,9 +637,12 @@ const StudentsManage = () => {
                   <div className={cx2("title")}>Tỉnh/TP:</div>
                   <input
                     id="city_or_province"
-                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    className={cx2(
+                      "input-span",
+                      !isEdit || (isCreateNew && "input-span-focus")
+                    )}
                     value={modalData?.city_or_province}
-                    readOnly={!isEdit}
+                    readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
                 </div>
@@ -775,9 +650,12 @@ const StudentsManage = () => {
                   <div className={cx2("title")}>Quận/huyện:</div>
                   <input
                     id="district"
-                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    className={cx2(
+                      "input-span",
+                      !isEdit || (isCreateNew && "input-span-focus")
+                    )}
                     value={modalData?.district}
-                    readOnly={!isEdit}
+                    readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
                 </div>
@@ -785,9 +663,12 @@ const StudentsManage = () => {
                   <div className={cx2("title")}>Địa chỉ thường trú:</div>
                   <input
                     id="address"
-                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    className={cx2(
+                      "input-span",
+                      !isEdit || (isCreateNew && "input-span-focus")
+                    )}
                     value={modalData?.address}
-                    readOnly={!isEdit}
+                    readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
                 </div>
@@ -795,9 +676,12 @@ const StudentsManage = () => {
                   <div className={cx2("title")}>Quốc tịch:</div>
                   <input
                     id="nationality"
-                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    className={cx2(
+                      "input-span",
+                      !isEdit || (isCreateNew && "input-span-focus")
+                    )}
                     value={modalData?.nationality}
-                    readOnly={!isEdit}
+                    readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
                 </div>
@@ -805,9 +689,12 @@ const StudentsManage = () => {
                   <div className={cx2("title")}>Lớp học phần:</div>
                   <input
                     id="class"
-                    className={cx2("input-span", !isEdit && "input-span-focus")}
+                    className={cx2(
+                      "input-span",
+                      !isEdit || (isCreateNew && "input-span-focus")
+                    )}
                     value={modalData?.class}
-                    readOnly={!isEdit}
+                    readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
                 </div>
@@ -837,7 +724,7 @@ const StudentsManage = () => {
                     }}
                     onClick={isEdit ? handleUpdateStudent : handleEditClick}
                   >
-                    {isEdit ? "Lưu" : "Chỉnh sửa"}
+                    {isEdit || isCreateNew ? "Lưu" : "Chỉnh sửa"}
                   </button>
                 </div>
               </div>
