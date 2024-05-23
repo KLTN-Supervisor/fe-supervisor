@@ -124,6 +124,31 @@ const useExamScheduleServices = () => {
     }
   };
 
+  const getExamReport = async (date, room) => {
+    try {
+      const response = await privateRequest(
+        `/examSchedule/getExamReports?date=${date}&room=${room}`
+      );
+
+      return response.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const deleteExamReport = async (reportId) => {
+    try {
+      const response = await privateRequest(
+        `/examSchedule/deleteReport?reportId=${reportId}`,
+        "put"
+      );
+
+      return response.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   return {
     getYears,
     getTerms,
@@ -135,6 +160,8 @@ const useExamScheduleServices = () => {
     getSuspiciousStudents,
     attendanceStudent,
     noteReport,
+    getExamReport,
+    deleteExamReport,
   };
 };
 
