@@ -20,7 +20,8 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/Inbox";
+import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -32,7 +33,7 @@ const cx = classNames.bind(styles);
 
 function HomePage() {
   const location = useLocation();
-  const { getStudents, attendanceStudent, noteReport } =
+  const { getStudents, attendanceStudent, noteReport, getExamReport, deleteExamReport } =
     useExamScheduleServices();
   // Lưu giá trị vào localStorage khi trang được tải
   useEffect(() => {
@@ -73,8 +74,11 @@ function HomePage() {
       }
     }
   };
+
+  
   useEffect(() => {
     getStudentsExam();
+    getReportsExam()
   }, [time, room]);
   useEffect(() => {
     console.log(students);
@@ -163,6 +167,16 @@ function HomePage() {
 
   const [report, setReport] = useState([]);
   const [creatingReport, setCreatingReport] = useState(false);
+
+  const getReportsExam = async () => {
+    try {
+      const response = await getExamReport(time, room);
+      setReport(response);
+    } catch (err) {
+      console.log("get time error: ", err);
+    }
+  };
+
   const handleCreateReport = async () => {
     try {
       setCreatingReport(true);
@@ -203,8 +217,16 @@ function HomePage() {
     }
   };
 
-  function deleteReport(index) {
-    setReport((prev) => prev.filter((_, i) => i !== index));
+  const deleteReport = async (index, r) => {
+    try {
+      const response = await deleteExamReport(r._id);
+      if(response){
+        setReport((prev) => prev.filter((_, i) => i !== index));
+      }
+    } catch (err) {
+      console.log("get time error: ", err);
+    }
+    
   }
 
   const updateAttendance = async (studentId) => {
@@ -347,15 +369,21 @@ function HomePage() {
                           disablePadding
                           secondaryAction={
                             <IconButton edge="end" aria-label="delete">
-                              <DeleteIcon onClick={() => deleteReport(index)} />
+                              <DeleteIcon onClick={() => deleteReport(index, r)} />
                             </IconButton>
                           }
                         >
                           <ListItemButton>
-                            <ListItemIcon>
-                              <InboxIcon />
+                            <ListItemIcon sx={{ minWidth: '40px' }}>
+                             {r.report_type !== "REPORT" ? <WarningAmberRoundedIcon /> : <AssignmentOutlinedIcon/>}
                             </ListItemIcon>
-                            <ListItemText primary={r.reportType} />
+                            <ListItemText primary={(r.report_type === "REPORT" ? "Biên bản: " : "Sự cố: ") + r.note} primaryTypographyProps={{
+                              style: {
+                                overflow: 'hidden',
+                                whiteSpace: 'nowrap',
+                                textOverflow: 'ellipsis',
+                              },
+                            }}/>
                           </ListItemButton>
                         </ListItem>
                       ))
@@ -433,11 +461,10 @@ function HomePage() {
                     sx={{ height: "100%" }}
                   >
                     <MenuItem value="">
-                      <em>Chọn loại biên bản</em>
+                      <em>Chọn loại báo cáo</em>
                     </MenuItem>
-                    <MenuItem value="Absence">Vắng thi</MenuItem>
-                    <MenuItem value="Foul">Vi phạm qui chế thi</MenuItem>
-                    <MenuItem value="Other">Khác</MenuItem>
+                    <MenuItem value="REPORT">Biên bản</MenuItem>
+                    <MenuItem value="PROBLEM">Sự cố</MenuItem>
                   </Select>
                 </FormControl>
               </div>
@@ -527,7 +554,7 @@ function HomePage() {
                   onClick={handleCreateReport}
                   disabled={creatingReport}
                 >
-                  Lập biên bản
+                  Tạo báo cáo
                 </Button>
               </div>
             </div>
