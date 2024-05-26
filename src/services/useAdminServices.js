@@ -224,10 +224,49 @@ const useAdminServices = () => {
       const response = await privateRequest(
         `/admin/students/${id}`,
         "put",
-        formData,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
+        formData
+      );
+
+      return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const createNewStudent = async (formData) => {
+    try {
+      const response = await privateRequest(
+        "/admin/students/",
+        "post",
+        formData
+      );
+
+      return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const updateInspector = async (id, formData) => {
+    try {
+      const response = await privateRequest(
+        `/admin/inspectors/${id}`,
+        "put",
+        formData
+      );
+
+      return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const createNewInspector = async (formData) => {
+    try {
+      const response = await privateRequest(
+        "/admin/inspectors/",
+        "post",
+        formData
       );
 
       return response?.data;
@@ -252,6 +291,9 @@ const useAdminServices = () => {
     uploadExamSchedulesExcelFiles,
     getExamFilesUploaded,
     importExamFromFiles,
+    createNewStudent,
+    updateInspector,
+    createNewInspector,
   };
 };
 

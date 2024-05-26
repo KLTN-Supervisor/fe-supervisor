@@ -45,9 +45,7 @@ const StudentsManage = () => {
   const {
     uploadImportFile,
     getAdminStudents,
-    banUsers,
-    unBanUsers,
-    createUser,
+    createNewStudent,
     uploadImagesImportFile,
     updateStudent,
   } = useAdminServices();
@@ -74,6 +72,9 @@ const StudentsManage = () => {
     address: "",
     nationality: "",
     class: "",
+    school_year: "",
+    current_address: "",
+    education_program: "",
   });
 
   const clearModalData = () => {
@@ -89,6 +90,9 @@ const StudentsManage = () => {
       address: "",
       nationality: "",
       class: "",
+      school_year: "",
+      current_address: "",
+      education_program: "",
     });
   };
 
@@ -175,20 +179,49 @@ const StudentsManage = () => {
 
   const handleCreateStudent = async () => {
     try {
-      const response = await createUser(
-        modalData,
-        privateHttpRequest.privateRequest
+      const formData = new FormData();
+      formData.append("image", portraitImgFile);
+      formData.append("student_id", modalData?.student_id);
+      formData.append(
+        "citizen_identification_number",
+        modalData?.citizen_identification_number
       );
+      formData.append("gender", modalData?.gender === "Nam" ? true : false);
+      formData.append("date_of_birth", modalData?.date_of_birth);
+      formData.append("place_of_birth", modalData?.place_of_birth);
+      formData.append("city_or_province", modalData?.city_or_province);
+      formData.append("district", modalData?.district);
+      formData.append("address", modalData?.address);
+      formData.append("nationality", modalData?.nationality);
+      formData.append("class", modalData?.class);
+      formData.append("education_program", modalData?.education_program);
+      formData.append("school_year", modalData?.school_year);
+      formData.append("current_address", modalData?.current_address);
+
+      const fullname = modalData?.fullname; // Lấy fullname từ nguồn dữ liệu
+
+      if (fullname) {
+        const nameParts = fullname.split(" ");
+        const first_name = nameParts[nameParts.length - 1]; // Phần tử cuối cùng
+        const last_name = nameParts[0]; // Phần tử đầu tiên
+
+        // Xác định middle_name
+        let middle_name = "";
+        if (nameParts.length > 2) {
+          // Nếu có ít nhất ba phần tử
+          middle_name = nameParts.slice(1, nameParts.length - 1).join(" ");
+        }
+        formData.append("first_name", first_name);
+        formData.append("last_name", last_name);
+        formData.append("middle_name", middle_name);
+      }
+
+      const response = await createNewStudent(formData);
 
       if (response) {
-        setModalData({
-          email: "",
-          fullname: "",
-          username: "",
-          password: "",
-          admin: true,
-        });
-        getData();
+        setModalViewStudent(response.student);
+        if (isEdit) setIsEdit(false);
+        setIsCreateNew(false);
       }
     } catch (err) {
       console.error(err);
@@ -210,7 +243,7 @@ const StudentsManage = () => {
 
   const imgRef = useRef();
   const [portraitImgFile, setPortraitImgFile] = useState();
-  const [previewPortraitImg, setPreviewPortraitImg] = useState();
+  const [previewPortraitImg, setPreviewPortraitImg] = useState("");
 
   const pickImgFileHandler = (e) => {
     let pickedFile;
@@ -255,7 +288,12 @@ const StudentsManage = () => {
         fullname: modalViewStudent?.fullname,
         citizen_identification_number:
           modalViewStudent?.citizen_identification_number,
-        gender: modalViewStudent?.gender,
+        gender:
+          modalViewStudent?.gender === true
+            ? "Nam"
+            : modalViewStudent?.gender === false
+            ? "Nữ"
+            : modalViewStudent?.gender,
         date_of_birth: modalViewStudent?.date_of_birth,
         place_of_birth: modalViewStudent?.place_of_birth,
         city_or_province: modalViewStudent?.permanent_address.city_or_province,
@@ -263,6 +301,12 @@ const StudentsManage = () => {
         address: modalViewStudent?.permanent_address.address,
         nationality: modalViewStudent?.nationality,
         class: modalViewStudent?.class,
+        education_program: modalViewStudent?.education_program,
+        current_address: modalViewStudent?.current_address,
+        school_year:
+          modalViewStudent?.school_year.from +
+          " - " +
+          modalViewStudent?.school_year.to,
       });
     }
   }, [modalViewStudent]);
@@ -284,6 +328,9 @@ const StudentsManage = () => {
       formData.append("address", modalData?.address);
       formData.append("nationality", modalData?.nationality);
       formData.append("class", modalData?.class);
+      formData.append("education_program", modalData?.education_program);
+      formData.append("school_year", modalData?.school_year);
+      formData.append("current_address", modalData?.current_address);
 
       const fullname = modalData?.fullname; // Lấy fullname từ nguồn dữ liệu
 
@@ -306,7 +353,7 @@ const StudentsManage = () => {
       const response = await updateStudent(modalViewStudent._id, formData);
 
       if (response) {
-        console.log(response);
+        setIsEdit(false);
       }
     } catch (err) {
       console.error(err);
@@ -509,7 +556,7 @@ const StudentsManage = () => {
                     id="student_id"
                     className={cx2(
                       "input-span",
-                      !isEdit || (isCreateNew && "input-span-focus")
+                      !isEdit && !isCreateNew && "input-span-focus"
                     )}
                     value={modalData?.student_id}
                     readOnly={!isEdit && !isCreateNew}
@@ -522,7 +569,7 @@ const StudentsManage = () => {
                     id="fullname"
                     className={cx2(
                       "input-span",
-                      !isEdit || (isCreateNew && "input-span-focus")
+                      !isEdit && !isCreateNew && "input-span-focus"
                     )}
                     value={modalData?.fullname}
                     readOnly={!isEdit && !isCreateNew}
@@ -535,7 +582,7 @@ const StudentsManage = () => {
                     id="citizen_identification_number"
                     className={cx2(
                       "input-span",
-                      !isEdit || (isCreateNew && "input-span-focus")
+                      !isEdit && !isCreateNew && "input-span-focus"
                     )}
                     value={modalData?.citizen_identification_number}
                     readOnly={!isEdit && !isCreateNew}
@@ -543,8 +590,21 @@ const StudentsManage = () => {
                   />
                 </div>
                 <div className={cx2("info")}>
+                  <div className={cx2("title")}>Niên khóa:</div>
+                  <input
+                    id="school_year"
+                    className={cx2(
+                      "input-span",
+                      !isEdit && !isCreateNew && "input-span-focus"
+                    )}
+                    value={modalData?.school_year}
+                    readOnly={!isEdit && !isCreateNew}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
                   <div className={cx2("title")}>Giới tính:</div>
-                  <FormControl>
+                  <FormControl sx={{ width: "90.6%" }}>
                     <RadioGroup
                       row
                       defaultValue="Nữ"
@@ -603,7 +663,9 @@ const StudentsManage = () => {
                           },
                           sx: {
                             p: 0,
-                            width: 150,
+                            minwidth: 150,
+                            width: "25%",
+                            mr: 40.8,
                           },
                           variant: "standard",
                         },
@@ -626,7 +688,7 @@ const StudentsManage = () => {
                     id="place_of_birth"
                     className={cx2(
                       "input-span",
-                      !isEdit || (isCreateNew && "input-span-focus")
+                      !isEdit && !isCreateNew && "input-span-focus"
                     )}
                     value={modalData?.place_of_birth}
                     readOnly={!isEdit && !isCreateNew}
@@ -639,7 +701,7 @@ const StudentsManage = () => {
                     id="city_or_province"
                     className={cx2(
                       "input-span",
-                      !isEdit || (isCreateNew && "input-span-focus")
+                      !isEdit && !isCreateNew && "input-span-focus"
                     )}
                     value={modalData?.city_or_province}
                     readOnly={!isEdit && !isCreateNew}
@@ -652,7 +714,7 @@ const StudentsManage = () => {
                     id="district"
                     className={cx2(
                       "input-span",
-                      !isEdit || (isCreateNew && "input-span-focus")
+                      !isEdit && !isCreateNew && "input-span-focus"
                     )}
                     value={modalData?.district}
                     readOnly={!isEdit && !isCreateNew}
@@ -665,7 +727,7 @@ const StudentsManage = () => {
                     id="address"
                     className={cx2(
                       "input-span",
-                      !isEdit || (isCreateNew && "input-span-focus")
+                      !isEdit && !isCreateNew && "input-span-focus"
                     )}
                     value={modalData?.address}
                     readOnly={!isEdit && !isCreateNew}
@@ -678,9 +740,22 @@ const StudentsManage = () => {
                     id="nationality"
                     className={cx2(
                       "input-span",
-                      !isEdit || (isCreateNew && "input-span-focus")
+                      !isEdit && !isCreateNew && "input-span-focus"
                     )}
                     value={modalData?.nationality}
+                    readOnly={!isEdit && !isCreateNew}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Nơi ở hiện tại:</div>
+                  <input
+                    id="current_address"
+                    className={cx2(
+                      "input-span",
+                      !isEdit && !isCreateNew && "input-span-focus"
+                    )}
+                    value={modalData?.current_address}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
@@ -691,9 +766,22 @@ const StudentsManage = () => {
                     id="class"
                     className={cx2(
                       "input-span",
-                      !isEdit || (isCreateNew && "input-span-focus")
+                      !isEdit && !isCreateNew && "input-span-focus"
                     )}
                     value={modalData?.class}
+                    readOnly={!isEdit && !isCreateNew}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Chương trình học:</div>
+                  <input
+                    id="education_program"
+                    className={cx2(
+                      "input-span",
+                      !isEdit && !isCreateNew && "input-span-focus"
+                    )}
+                    value={modalData?.education_program}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
@@ -722,7 +810,13 @@ const StudentsManage = () => {
                     style={{
                       backgroundColor: "lightgreen",
                     }}
-                    onClick={isEdit ? handleUpdateStudent : handleEditClick}
+                    onClick={
+                      isEdit
+                        ? handleUpdateStudent
+                        : isCreateNew
+                        ? handleCreateStudent
+                        : handleEditClick
+                    }
                   >
                     {isEdit || isCreateNew ? "Lưu" : "Chỉnh sửa"}
                   </button>
