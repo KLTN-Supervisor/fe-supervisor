@@ -13,18 +13,6 @@ const useAdminServices = () => {
     }
   };
 
-  const getAdminPosts = async (page, limit, search = "") => {
-    try {
-      const response = await privateRequest(
-        `/admin/post?page=${page}&limit=${limit}&search=${search}`
-      );
-
-      return response?.data;
-    } catch (err) {
-      throw err;
-    }
-  };
-
   const getAdminUsers = async (page, limit, search = "") => {
     try {
       const response = await privateRequest(
@@ -357,10 +345,10 @@ const useAdminServices = () => {
     }
   };
 
-  const getReports = async (year, term) => {
+  const getReports = async (year, term, page, limit) => {
     try {
       const response = await privateRequest(
-        `/admin/examSchedules/reports?year=${year}&term=${term}`
+        `/admin/examSchedules/reports?year=${year}&term=${term}&page=${page}&limit=${limit}`
       );
 
       return response.data;

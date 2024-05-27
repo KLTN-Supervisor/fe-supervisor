@@ -41,6 +41,7 @@ export const ReportTable = (props) => {
     rowsPerPage = -1,
     setUsersSelected,
     selected = [],
+    handleOnClick = () => {},
   } = props;
 
   const users = data;
@@ -62,23 +63,11 @@ export const ReportTable = (props) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedAll}
-                    indeterminate={selectedSome}
-                    onChange={(event) => {
-                      if (event.target.checked) {
-                        onSelectAll?.();
-                      } else {
-                        onDeselectAll?.();
-                      }
-                    }}
-                  />
-                </TableCell>
                 <TableCell>Phòng</TableCell>
+                <TableCell>Loại sự cố</TableCell>
                 <TableCell>Mô tả sự cố</TableCell>
-                <TableCell>Thanh tra gác thi</TableCell>
-                <TableCell>Thời gian</TableCell>
+                <TableCell>Ca thi</TableCell>
+                <TableCell>Ngày thi</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -89,6 +78,7 @@ export const ReportTable = (props) => {
                   onDeselectOne={onDeselectOne}
                   onSelectOne={onSelectOne}
                   selected={selected}
+                  handleOnClick={handleOnClick}
                 />
               ))}
             </TableBody>

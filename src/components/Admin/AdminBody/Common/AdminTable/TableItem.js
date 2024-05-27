@@ -41,7 +41,6 @@ const AdminTableItem = (props) => {
   };
 
   const isSelected = selected.includes(item._id);
-  const createdAt = format(parseISO(item.created_at), "dd/MM/yyyy");
 
   return (
     <>

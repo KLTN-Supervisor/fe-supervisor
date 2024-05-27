@@ -24,71 +24,69 @@ import classNames from "classnames/bind";
 import styles from "./ReportModal.module.scss";
 import useAdminServices from "../../../../services/useAdminServices";
 import usePrivateHttpClient from "../../../../hooks/http-hook/private-http-hook";
+import styles2 from "../../../Supervisor/StudentCard/StudentCard.module.scss";
+import CloseIcon from "@mui/icons-material/Close";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { getStudentsImageSource } from "../../../../untils/getImageSource";
+import { formatHour, formatDate } from "../../../../untils/format-date";
 
 const cx = classNames.bind(styles);
+const cx2 = classNames.bind(styles2);
 // const now = new Date();
 
 const UsersManage = () => {
   const privateHttpRequest = usePrivateHttpClient();
-  const { getAdminUsers, createUser, getYears, getTerms } = useAdminServices();
-
-  const [visible, setVisible] = useState(false);
+  const { getYears, getTerms, getReports } = useAdminServices();
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const [search, setSearch] = useState("");
   const [data, setData] = useState([]);
+  const [totalRecords, setTotalRecords] = useState(0);
 
   const [usersSelected, setUsersSelected] = useState([]);
-  const [modalData, setModalData] = useState({
-    email: "",
-    fullname: "",
-    username: "",
-    password: "",
-    admin: true,
-  });
 
-  const changeHandler = (e) => {
-    setModalData((prev) => ({
-      ...prev,
-      [e.target.id]: e.target.value,
-    }));
-  };
+  const [modal, setModal] = useState(false);
+  const [modalData, setModalData] = useState(null);
 
-  const getData = useCallback(async () => {
-    const response = await getAdminUsers(page, rowsPerPage, search);
-    if (response) {
-      if (page === 1) setData(response.accounts);
-      else setData((prev) => [...prev, ...response.accounts]);
-    }
-  }, [page, rowsPerPage, search]);
+  const [imageIndex, setImageIndex] = useState(0);
+  const [isFirstImage, setIsFirstImage] = useState(true);
+  const [isLastImage, setIsLastImage] = useState(false);
 
-  useEffect(() => {
-    getData();
-  }, [page, rowsPerPage, search]);
+  function showNextImage() {
+    if (modalData)
+      setImageIndex((index) => {
+        if (index === modalData.images.length - 2) {
+          setIsLastImage(true);
+          setIsFirstImage(false);
+          return modalData.images.length - 1;
+        } else {
+          setIsLastImage(false);
+          setIsFirstImage(false);
+          return index + 1;
+        }
+      });
+  }
 
-  // useEffect(() => {}, [data]);
+  function showPrevImage() {
+    setImageIndex((index) => {
+      if (index === 1) {
+        setIsLastImage(false);
+        setIsFirstImage(true);
 
-  const handleAddUser = async () => {
-    privateHttpRequest.clearError();
-    try {
-      const response = await createUser(modalData);
+        return 0;
+      } else {
+        setIsLastImage(false);
+        setIsFirstImage(false);
 
-      if (response) {
-        setVisible(false);
-        setModalData({
-          email: "",
-          fullname: "",
-          username: "",
-          password: "",
-          admin: true,
-        });
-        getData();
+        return index - 1;
       }
-    } catch (err) {
-      console.error(err);
-    }
+    });
+  }
+
+  const toggleModal = () => {
+    setModal(!modal);
   };
 
   const handlePageChange = useCallback((event, value) => {
@@ -126,7 +124,7 @@ const UsersManage = () => {
     }
   };
 
-  const getTermsExam = async () => {
+  const getTermsExam = useCallback(async () => {
     if (!studentsLoading) {
       setStudentsLoading(true);
       try {
@@ -139,7 +137,23 @@ const UsersManage = () => {
         console.log("get terms error: ", err);
       }
     }
-  };
+  }, [year]);
+
+  const getData = useCallback(async () => {
+    try {
+      const response = await getReports(year, term, page, rowsPerPage);
+      if (response) {
+        setData(response.reports);
+        setTotalRecords(response.total_records);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }, [year, term, page, rowsPerPage]);
+
+  useEffect(() => {
+    if (year !== "" && term !== "") getData();
+  }, [year, term, page, rowsPerPage]);
 
   useEffect(() => {
     getYearExam();
@@ -293,7 +307,7 @@ const UsersManage = () => {
             </div>
             {!privateHttpRequest.isLoading && (
               <ReportTable
-                count={data.length}
+                count={totalRecords}
                 data={data}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
@@ -301,156 +315,175 @@ const UsersManage = () => {
                 rowsPerPage={rowsPerPage}
                 setUsersSelected={setUsersSelected}
                 selected={usersSelected}
+                handleOnClick={(item) => {
+                  setModalData(item);
+                  setModal(true);
+                }}
               />
             )}
           </Stack>
         </Container>
-        <Modal
-          show={visible}
-          onHide={() => setVisible(false)}
-          className={cx("add-employee-modal")}
-        >
-          <Modal.Header>
-            <div className={cx("title-modal")}>ADD USER</div>
-            {privateHttpRequest.error && (
-              <>
-                <br />
-                <div className={cx("title-modal")}>
-                  {" "}
-                  <Alert severity="error">{privateHttpRequest.error}</Alert>
-                </div>
-              </>
-            )}
-          </Modal.Header>
-          <Modal.Body>
-            <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Username</div>
-                </div>
-                <input
-                  id="username"
-                  type="text"
-                  onChange={changeHandler}
-                  className={cx("col-lg-8 col-md-8")}
-                />
-              </div>
-            </div>
-            <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Email</div>
-                </div>
-                <input
-                  id="email"
-                  type="email"
-                  onChange={changeHandler}
-                  className={cx("col-lg-9 col-md-9")}
-                />
-              </div>
-            </div>
-            <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Fullname</div>
-                </div>
-                <input
-                  id="fullname"
-                  type="text"
-                  onChange={changeHandler}
-                  className={cx("col-lg-9 col-md-9")}
-                />
-              </div>
-            </div>
-            <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Password</div>
-                </div>
-                <input
-                  id="password"
-                  type="password"
-                  onChange={changeHandler}
-                  className={cx("col-lg-9 col-md-9")}
-                />
-              </div>
-            </div>
-            {/* <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Date of birth</div>
-                </div>
-                <input
-                  type="date"
-                  // onChange={(e) => setDateOfbirth(e.target.value)}
-                  className={cx("col-lg-9 col-md-9")}
-                />
-              </div>
-            </div>
-            <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Gender</div>
-                </div>
-                <span className={cx("gender")}>
-                  <input
-                    type="radio"
-                    id="male"
-                    name="gender"
-                    value="male"
-                    style={{ width: "auto", margin: "10px 10px 0px 20px" }}
-                    // onChange={(e) => setGender(e.target.value)}
-                  />
-                  <label for="male">Male</label>
-                  <input
-                    type="radio"
-                    id="female"
-                    name="gender"
-                    value="female"
-                    style={{ width: "auto", margin: "10px 10px 0px 20px" }}
-                    // onChange={(e) => setGender(e.target.value)}
-                  />
-                  <label for="female">Female</label>
+      </Box>
+      {modal && (
+        <div className={cx2("modal active-modal")}>
+          <div
+            onClick={toggleModal}
+            className={cx2("overlay")}
+            style={{ alignSelf: "flex-end" }}
+          >
+            <CloseIcon
+              //className={cx("sidenav__icon")}
+              style={{
+                width: "27px",
+                height: "27px",
+                color: "white",
+                margin: "12px 30px",
+                position: "absolute",
+                right: "0",
+                cursor: "pointer",
+              }}
+            />
+          </div>
+          <div
+            className={cx2("modal-navbar-content")}
+            style={{ width: "80%", marginTop: 30 }}
+          >
+            <div className={cx2("modal-header")}>Chi tiết</div>
+            <div
+              className={cx2("modal-main")}
+              style={{ display: "flex" }} //padding: "20px 0 30px 0px"
+            >
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>Phòng:</div>
+                <span id="inspector_id" className={cx2("input-span")}>
+                  {modalData?.time.room.room_name}
                 </span>
               </div>
-            </div> */}
-          </Modal.Body>
-          <Modal.Footer>
-            <div
-              style={{
-                width: "70%",
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <button
-                className={cx("modal-button")}
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>Mã môn thi:</div>
+                <span id="inspector_id" className={cx2("input-span")}>
+                  {modalData?.time.subject.subject_id}
+                </span>
+              </div>
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>Ghi chú:</div>
+                <span id="inspector_id" className={cx2("input-span")}>
+                  {modalData?.note}
+                </span>
+              </div>
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>Loại báo cáo:</div>
+                <span id="inspector_id" className={cx2("input-span")}>
+                  {modalData?.report_type}
+                </span>
+              </div>
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>Ca thi:</div>
+                <span id="inspector_id" className={cx2("input-span")}>
+                  {formatHour(modalData?.time.start_time)}
+                </span>
+              </div>
+              <div className={cx2("info")}>
+                <div className={cx2("title")}>Ngày thi:</div>
+                <span id="inspector_id" className={cx2("input-span")}>
+                  {formatDate(modalData?.time.start_time)}
+                </span>
+              </div>
+              <div
+                className={cx("image")}
                 style={{
-                  backgroundColor: "#ff0000",
-                  border: "none",
-                  color: "white",
-                  borderRadius: "10px",
+                  minHeight: "300px",
+                  width: "100%",
+                  display: "flex",
+                  overflow: "hidden",
                 }}
-                onClick={() => setVisible(false)}
               >
-                CLOSE
-              </button>
-              <button
-                className={cx("modal-button")}
-                style={{
-                  backgroundColor: "#1976d2",
-                  border: "none",
-                  color: "white",
-                  borderRadius: "10px",
-                }}
-                onClick={handleAddUser}
-              >
-                ADD
-              </button>
+                {modalData.images.map((image, index) => (
+                  <div
+                    className={cx("img-slider")}
+                    style={{
+                      width: "100%",
+
+                      transform: `translateX(-${100 * imageIndex}%)`,
+                      transition: "transform 0.2s",
+                      display: "flex",
+                      flexShrink: "0",
+                      flexGrow: "0",
+                      borderRadius: "0px 0px 10px 10px",
+                    }}
+                    aria-hidden={imageIndex !== index}
+                  >
+                    <img
+                      style={{
+                        width: "100%",
+                        objectFit: "contain",
+                        height: "auto",
+                        display: "block",
+                        flexShrink: "0",
+                        flexGrow: "0",
+                      }}
+                      src={getStudentsImageSource(image)}
+                      alt={"Ảnh đính kèm"}
+                    />
+
+                    {isFirstImage === true ||
+                    modalData.images.length === 1 ? null : (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <button
+                          onClick={showPrevImage}
+                          className={cx("img-slider-btn")}
+                          style={{ left: 10 }}
+                          aria-label="View Previous Image"
+                        >
+                          <ArrowBackIosNewIcon
+                            style={{
+                              width: "16px",
+                              height: "16px",
+                              marginBottom: "2px",
+                            }}
+                            aria-hidden
+                          />
+                        </button>
+                      </div>
+                    )}
+                    {isLastImage === true ? null : (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <button
+                          onClick={showNextImage}
+                          className={cx("img-slider-btn")}
+                          style={{ right: 10 }}
+                          aria-label="View Next Image"
+                        >
+                          <ArrowForwardIosIcon
+                            style={{
+                              width: "16px",
+                              height: "16px",
+                              marginBottom: "2px",
+                            }}
+                            aria-hidden
+                          />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-          </Modal.Footer>
-        </Modal>
-      </Box>
+          </div>
+        </div>
+      )}
     </>
   );
 };
