@@ -10,7 +10,7 @@ import ListSubheader from "@mui/material/ListSubheader";
 import List from "@mui/material/List";
 import Floor from "../../../../components/Supervisor/Floor";
 import { useLocation } from "react-router-dom";
-import useExamScheduleServices from "../../../../services/useExamScheduleServices";
+import useAdminServices from "../../../../services/useAdminServices";
 import LoadingCard from "../../../../components/LoadingCard";
 import { formatHour } from "../../../../untils/format-date";
 import { Alert, Snackbar, CircularProgress } from "@mui/material";
@@ -19,7 +19,7 @@ const cx = classNames.bind(styles);
 function ScheduleDetailPage() {
   const location = useLocation();
   const { building, date } = location.state;
-  const { getTimes, getRooms, getStudents } = useExamScheduleServices();
+  const { getTimes, getRooms, getStudents } = useAdminServices();
   const [loadMore, setLoadMore] = useState(false);
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [times, setTimes] = useState([]);
@@ -134,7 +134,11 @@ function ScheduleDetailPage() {
                 component="nav"
                 aria-labelledby="nested-list-subheader"
                 subheader={
-                  <ListSubheader sx={{ bgcolor: "#efefef" }} component="div" id="nested-list-subheader">
+                  <ListSubheader
+                    sx={{ bgcolor: "#efefef" }}
+                    component="div"
+                    id="nested-list-subheader"
+                  >
                     Danh sách tầng
                   </ListSubheader>
                 }

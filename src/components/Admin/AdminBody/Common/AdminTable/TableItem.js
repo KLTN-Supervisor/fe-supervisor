@@ -28,6 +28,7 @@ const AdminTableItem = (props) => {
     selected = [],
     colsData = [],
     options = [],
+    hasCheckBox = true,
   } = props;
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -50,18 +51,20 @@ const AdminTableItem = (props) => {
         selected={isSelected}
         onClick={handleClick}
       >
-        <TableCell padding="checkbox">
-          <Checkbox
-            checked={isSelected}
-            onChange={(event) => {
-              if (event.target.checked) {
-                onSelectOne?.(item._id);
-              } else {
-                onDeselectOne?.(item._id);
-              }
-            }}
-          />
-        </TableCell>
+        {hasCheckBox && (
+          <TableCell padding="checkbox">
+            <Checkbox
+              checked={isSelected}
+              onChange={(event) => {
+                if (event.target.checked) {
+                  onSelectOne?.(item._id);
+                } else {
+                  onDeselectOne?.(item._id);
+                }
+              }}
+            />
+          </TableCell>
+        )}
         {/* <TableCell>
           <Stack alignItems="center" direction="row" spacing={2}>
             <Avatar src={user.profile_picture}>

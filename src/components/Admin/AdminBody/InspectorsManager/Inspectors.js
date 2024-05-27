@@ -409,6 +409,7 @@ const InspectorsManage = () => {
                   setModalViewStudent(item);
                   toggleModal();
                 }}
+                hasCheckBox={false}
               />
             )}
           </Stack>

@@ -480,6 +480,7 @@ const StudentsManage = () => {
                   setModalViewStudent(item);
                   toggleModal();
                 }}
+                hasCheckBox={false}
               />
             )}
           </Stack>

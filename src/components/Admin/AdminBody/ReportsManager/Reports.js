@@ -24,16 +24,13 @@ import classNames from "classnames/bind";
 import styles from "./ReportModal.module.scss";
 import useAdminServices from "../../../../services/useAdminServices";
 import usePrivateHttpClient from "../../../../hooks/http-hook/private-http-hook";
-import ImportInput from "../UploadFile/ImportInput";
-import useExamScheduleServices from "../../../../services/useExamScheduleServices";
 
 const cx = classNames.bind(styles);
 // const now = new Date();
 
 const UsersManage = () => {
   const privateHttpRequest = usePrivateHttpClient();
-  const { uploadImportFile, getAdminUsers, unBanUsers, banUsers, createUser } =
-    useAdminServices();
+  const { getAdminUsers, createUser, getYears, getTerms } = useAdminServices();
 
   const [visible, setVisible] = useState(false);
 
@@ -51,27 +48,6 @@ const UsersManage = () => {
     password: "",
     admin: true,
   });
-
-  const [file, setFile] = useState();
-  const [fileIsValid, setFileIsValid] = useState();
-
-  const removeFile = () => {
-    setFile(null);
-    setFileIsValid(false);
-  };
-
-  const uploadFileHandler = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const response = await uploadImportFile(formData);
-      if (response) {
-        removeFile();
-      }
-    } catch (err) {
-      console.log("upload file: ", err);
-    }
-  };
 
   const changeHandler = (e) => {
     setModalData((prev) => ({
@@ -93,41 +69,6 @@ const UsersManage = () => {
   }, [page, rowsPerPage, search]);
 
   // useEffect(() => {}, [data]);
-
-  const handleBanUsers = async () => {
-    const selectedIds = [...usersSelected]; // Sao chép usersSelected vào một mảng tạm thời
-    setUsersSelected([]);
-
-    setData((prev) => []);
-
-    try {
-      const banPromises = selectedIds.map((id) => banUsers(id));
-
-      const responses = await Promise.all(banPromises);
-
-      if (responses) await getData();
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleUnBanUsers = async () => {
-    const selectedIds = [...usersSelected]; // Sao chép usersSelected vào một mảng tạm thời
-
-    setUsersSelected([]);
-
-    setData((prev) => []);
-
-    try {
-      const unBanPromises = selectedIds.map((id) => unBanUsers(id));
-
-      const responses = await Promise.all(unBanPromises);
-
-      if (responses) await getData();
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const handleAddUser = async () => {
     privateHttpRequest.clearError();
@@ -161,8 +102,6 @@ const UsersManage = () => {
   const [year, setYear] = useState("");
   const [years, setYears] = useState([]);
   const [studentsLoading, setStudentsLoading] = useState(false);
-  const { getYears, getTerms, getDate, getBuildings } =
-    useExamScheduleServices();
   const handleYearChange = (event) => {
     setYear(event.target.value);
   };
@@ -171,6 +110,44 @@ const UsersManage = () => {
   const handleTermChange = (event) => {
     setTerm(event.target.value);
   };
+
+  const getYearExam = async () => {
+    if (!studentsLoading) {
+      setStudentsLoading(true);
+      try {
+        const response = await getYears();
+
+        setYears(response);
+        setStudentsLoading(false);
+      } catch (err) {
+        setStudentsLoading(false);
+        console.log("get year error: ", err);
+      }
+    }
+  };
+
+  const getTermsExam = async () => {
+    if (!studentsLoading) {
+      setStudentsLoading(true);
+      try {
+        const response = await getTerms(year);
+
+        setTerms(response);
+        setStudentsLoading(false);
+      } catch (err) {
+        setStudentsLoading(false);
+        console.log("get terms error: ", err);
+      }
+    }
+  };
+
+  useEffect(() => {
+    getYearExam();
+  }, []);
+
+  useEffect(() => {
+    getTermsExam();
+  }, [year]);
 
   return (
     <>

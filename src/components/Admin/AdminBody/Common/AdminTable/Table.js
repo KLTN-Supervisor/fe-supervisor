@@ -38,11 +38,12 @@ export const AdminTable = (props) => {
     onRowsPerPageChange = () => {},
     page = 0,
     rowsPerPage = -1,
-    setItemsSelected,
+    setItemsSelected = () => {},
     selected = [],
     colsName = [],
     colsData = [],
     onClickItem = () => {},
+    hasCheckBox = true,
   } = props;
 
   const itemIds = useItemIds(data);
@@ -63,19 +64,21 @@ export const AdminTable = (props) => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selectedAll}
-                    indeterminate={selectedSome}
-                    onChange={(event) => {
-                      if (event.target.checked) {
-                        handleSelectAll?.();
-                      } else {
-                        handleDeselectAll?.();
-                      }
-                    }}
-                  />
-                </TableCell>
+                {hasCheckBox && (
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={selectedAll}
+                      indeterminate={selectedSome}
+                      onChange={(event) => {
+                        if (event.target.checked) {
+                          handleSelectAll?.();
+                        } else {
+                          handleDeselectAll?.();
+                        }
+                      }}
+                    />
+                  </TableCell>
+                )}
                 {colsName.map((header) => (
                   <TableCell key={header}>{header}</TableCell>
                 ))}
@@ -93,6 +96,7 @@ export const AdminTable = (props) => {
                   options={[
                     { name: "Xem thông tin", handleClick: onClickItem },
                   ]}
+                  hasCheckBox={hasCheckBox}
                 />
               ))}
             </TableBody>

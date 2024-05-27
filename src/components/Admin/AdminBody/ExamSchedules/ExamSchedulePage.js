@@ -43,6 +43,10 @@ function ExamSchedules() {
     uploadExamSchedulesExcelFiles,
     getExamFilesUploaded,
     importExamFromFiles,
+    getYears,
+    getTerms,
+    getDate,
+    getBuildings,
   } = useAdminServices();
 
   const [visible, setVisible] = useState(false);
@@ -51,8 +55,6 @@ function ExamSchedules() {
   const [year, setYear] = useState("");
   const [years, setYears] = useState([]);
   const [studentsLoading, setStudentsLoading] = useState(false);
-  const { getYears, getTerms, getDate, getBuildings } =
-    useExamScheduleServices();
   const handleYearChange = (event) => {
     setYear(event.target.value);
   };
