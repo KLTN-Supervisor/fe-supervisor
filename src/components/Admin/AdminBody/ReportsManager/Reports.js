@@ -24,7 +24,6 @@ import classNames from "classnames/bind";
 import styles from "./ReportModal.module.scss";
 import useAdminServices from "../../../../services/useAdminServices";
 import usePrivateHttpClient from "../../../../hooks/http-hook/private-http-hook";
-import styles2 from "../../../Supervisor/StudentCard/StudentCard.module.scss";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
@@ -32,7 +31,6 @@ import { getStudentsImageSource } from "../../../../untils/getImageSource";
 import { formatHour, formatDate } from "../../../../untils/format-date";
 
 const cx = classNames.bind(styles);
-const cx2 = classNames.bind(styles2);
 // const now = new Date();
 
 const UsersManage = () => {
@@ -325,10 +323,10 @@ const UsersManage = () => {
         </Container>
       </Box>
       {modal && (
-        <div className={cx2("modal active-modal")}>
+        <div className={cx("modal active-modal")}>
           <div
             onClick={toggleModal}
-            className={cx2("overlay")}
+            className={cx("overlay")}
             style={{ alignSelf: "flex-end" }}
           >
             <CloseIcon
@@ -345,50 +343,15 @@ const UsersManage = () => {
             />
           </div>
           <div
-            className={cx2("modal-navbar-content")}
+            className={cx("modal-content")}
             style={{ width: "80%", marginTop: 30 }}
           >
-            <div className={cx2("modal-header")}>Chi tiết</div>
+            <div className={cx("modal-header")}>Chi tiết</div>
             <div
-              className={cx2("modal-main")}
+              className={cx("modal-main")}
               style={{ display: "flex" }} //padding: "20px 0 30px 0px"
             >
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>Phòng:</div>
-                <span id="inspector_id" className={cx2("input-span")}>
-                  {modalData?.time.room.room_name}
-                </span>
-              </div>
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>Mã môn thi:</div>
-                <span id="inspector_id" className={cx2("input-span")}>
-                  {modalData?.time.subject.subject_id}
-                </span>
-              </div>
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>Ghi chú:</div>
-                <span id="inspector_id" className={cx2("input-span")}>
-                  {modalData?.note}
-                </span>
-              </div>
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>Loại báo cáo:</div>
-                <span id="inspector_id" className={cx2("input-span")}>
-                  {modalData?.report_type}
-                </span>
-              </div>
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>Ca thi:</div>
-                <span id="inspector_id" className={cx2("input-span")}>
-                  {formatHour(modalData?.time.start_time)}
-                </span>
-              </div>
-              <div className={cx2("info")}>
-                <div className={cx2("title")}>Ngày thi:</div>
-                <span id="inspector_id" className={cx2("input-span")}>
-                  {formatDate(modalData?.time.start_time)}
-                </span>
-              </div>
+            <div className={cx("container")}>
               <div
                 className={cx("image")}
                 style={{
@@ -479,6 +442,49 @@ const UsersManage = () => {
                     )}
                   </div>
                 ))}
+              </div>
+              <div
+                  className={cx("post-caption")}
+                  style={{ position: "relative" }}
+                >
+                  <div className={cx("info")}>
+                    <div className={cx("title")}>Phòng:</div>
+                    <span id="inspector_id" className={cx("input-span")}>
+                      {modalData?.time.room.room_name}
+                    </span>
+                  </div>
+                  <div className={cx("info")}>
+                    <div className={cx("title")}>Mã môn thi:</div>
+                    <span id="inspector_id" className={cx("input-span")}>
+                      {modalData?.time.subject.subject_id}
+                    </span>
+                  </div>
+                  
+                  <div className={cx("info")}>
+                    <div className={cx("title")}>Loại báo cáo:</div>
+                    <span id="inspector_id" className={cx("input-span")}>
+                      {modalData?.report_type}
+                    </span>
+                  </div>
+                  <div className={cx("info")}>
+                    <div className={cx("title")}>Ca thi:</div>
+                    <span id="inspector_id" className={cx("input-span")}>
+                      {formatHour(modalData?.time.start_time)}
+                    </span>
+                  </div>
+                  <div className={cx("info")}>
+                    <div className={cx("title")}>Ngày thi:</div>
+                    <span id="inspector_id" className={cx("input-span")}>
+                      {formatDate(modalData?.time.start_time)}
+                    </span>
+                  </div>
+                  <div className={cx("info")} style={{flexDirection: "column"}}>
+                    <div className={cx("title")}>Ghi chú:</div>
+                    <textarea id="inspector_id">
+                      {modalData?.note}
+                    </textarea>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
