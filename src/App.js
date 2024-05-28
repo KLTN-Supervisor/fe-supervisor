@@ -4,17 +4,18 @@ import { Routes, Route } from "react-router-dom";
 import { publicRoutes, adminRoutes } from "./routes";
 //import { DefaultLayout } from './Layout';
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import * as faceapi from "face-api.js";
 
 function App() {
-  useEffect(() =>{
+  useEffect(() => {
     Promise.all([
       // THIS FOR FACE DETECT AND LOAD FROM YOU PUBLIC/MODELS DIRECTORY
       faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
       faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
       faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-    ])
-  })
+    ]);
+  });
   return (
     <div className="App">
       <Routes>
@@ -43,9 +44,9 @@ function App() {
             />
           );
         })}
-        <Route 
-          // element={<RequireAuth admin={true} />}
-          >
+        <Route
+        // element={<RequireAuth admin={true} />}
+        >
           {adminRoutes.map((route, index) => {
             const Pages = route.components || [];
 
