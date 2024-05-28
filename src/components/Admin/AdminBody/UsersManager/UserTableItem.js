@@ -21,7 +21,13 @@ import usePrivateHttpClient from "../../../../hooks/http-hook/private-http-hook"
 const cx = classNames.bind(styles);
 
 const UserTableItem = (props) => {
-  const { user, onDeselectOne, onSelectOne, selected = [] } = props;
+  const {
+    user,
+    onDeselectOne,
+    onSelectOne,
+    selected = [],
+    handleOnClick = () => {},
+  } = props;
 
   const { getUserReportsCount } = useAdminServices();
 
@@ -55,9 +61,22 @@ const UserTableItem = (props) => {
     }
   };
 
+  const userRole = {
+    USER: "User thường",
+    ADMIN: "Quản trị",
+    ACADEMIC_AFFAIRS_OFFICE: "PĐT",
+  };
+
   return (
     <>
-      <TableRow hover key={user._id} selected={isSelected}>
+      <TableRow
+        hover
+        key={user._id}
+        selected={isSelected}
+        onClick={() => {
+          handleOnClick(user);
+        }}
+      >
         <TableCell padding="checkbox">
           <Checkbox
             checked={isSelected}
@@ -78,8 +97,9 @@ const UserTableItem = (props) => {
             <Typography variant="subtitle2">{user.username}</Typography>
           </Stack>
         </TableCell>
-        <TableCell>{user.user_info.email}</TableCell>
+        <TableCell>{user.username}</TableCell>
         <TableCell>{user.full_name}</TableCell>
+        <TableCell>{userRole[user.role]}</TableCell>
         <TableCell>{createdAt}</TableCell>
         <TableCell style={{ color: user.banned ? "red" : "green" }}>
           {user.banned ? "BANNED" : "ACTIVE"}

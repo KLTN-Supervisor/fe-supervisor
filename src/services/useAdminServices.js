@@ -108,11 +108,27 @@ const useAdminServices = () => {
     }
   };
 
-  const createUser = async (data) => {
+  const createAccount = async (formData) => {
     try {
-      const response = await privateRequest(`/admin/users`, "post", data, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const response = await privateRequest(
+        "/admin/accounts/",
+        "post",
+        formData
+      );
+
+      return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const updateAccount = async (formData) => {
+    try {
+      const response = await privateRequest(
+        "/admin/accounts/",
+        "put",
+        formData
+      );
 
       return response?.data;
     } catch (err) {
@@ -363,7 +379,8 @@ const useAdminServices = () => {
     getAdminStudents,
     banUsers,
     unBanUsers,
-    createUser,
+    createAccount,
+    updateAccount,
     getUserReportsCount,
     getQuickOverview,
     getTopAuthors,

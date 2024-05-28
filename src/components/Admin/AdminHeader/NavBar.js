@@ -10,7 +10,7 @@ const cx = classNames.bind(styles);
 
 const NavBarAdmin = ({ handleDrawerToggle }) => {
   return (
-    <AppBar position="sticky">
+    <AppBar position="sticky" sx={{ zIndex: 1 }}>
       <Toolbar className={cx("toolbar")}>
         <Typography variant="h6" className={cx("logo")}>
           Administrator

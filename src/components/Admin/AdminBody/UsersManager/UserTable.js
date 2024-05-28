@@ -41,6 +41,7 @@ export const UserTable = (props) => {
     rowsPerPage = -1,
     setUsersSelected,
     selected = [],
+    handleOnClick = () => {},
   } = props;
 
   const users = data;
@@ -75,11 +76,12 @@ export const UserTable = (props) => {
                     }}
                   />
                 </TableCell>
-                <TableCell>Username</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Fullname</TableCell>
-                <TableCell>Signed Up</TableCell>
-                <TableCell>Status</TableCell>
+                <TableCell>Avatar</TableCell>
+                <TableCell>Tên đăng nhập</TableCell>
+                <TableCell>Tên</TableCell>
+                <TableCell>Quyền</TableCell>
+                <TableCell>Thời gian tạo</TableCell>
+                <TableCell>Trạng thái</TableCell>
                 {/* <TableCell>Reports</TableCell> */}
               </TableRow>
             </TableHead>
@@ -91,6 +93,7 @@ export const UserTable = (props) => {
                   onDeselectOne={onDeselectOne}
                   onSelectOne={onSelectOne}
                   selected={selected}
+                  handleOnClick={handleOnClick}
                 />
               ))}
             </TableBody>

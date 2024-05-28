@@ -9,6 +9,9 @@ import {
   Box,
   Button,
   Container,
+  FormControl,
+  MenuItem,
+  Select,
   Stack,
   SvgIcon,
   Typography,
@@ -20,17 +23,28 @@ import { UserTable } from "./UserTable";
 import Modal from "react-bootstrap/Modal";
 import classNames from "classnames/bind";
 import styles from "./UserModal.module.scss";
+import styles2 from "../../../Supervisor/StudentCard/StudentCard.module.scss";
 import useAdminServices from "../../../../services/useAdminServices";
 import usePrivateHttpClient from "../../../../hooks/http-hook/private-http-hook";
 import ImportInput from "../UploadFile/ImportInput";
+import CloseIcon from "@mui/icons-material/Close";
+import { getStudentsImageSource } from "../../../../untils/getImageSource";
+import { formatHour, formatDate } from "../../../../untils/format-date";
 
 const cx = classNames.bind(styles);
+const cx2 = classNames.bind(styles2);
 // const now = new Date();
 
 const UsersManage = () => {
   const privateHttpRequest = usePrivateHttpClient();
-  const { uploadImportFile, getAdminUsers, unBanUsers, banUsers, createUser } =
-    useAdminServices();
+  const {
+    uploadImportFile,
+    getAdminUsers,
+    unBanUsers,
+    banUsers,
+    createAccount,
+    updateAccount,
+  } = useAdminServices();
 
   const [visible, setVisible] = useState(false);
 
@@ -39,15 +53,91 @@ const UsersManage = () => {
 
   const [search, setSearch] = useState("");
   const [data, setData] = useState([]);
+  const [totalRecords, setTotalRecords] = useState(0);
 
   const [usersSelected, setUsersSelected] = useState([]);
+
+  const [isEdit, setIsEdit] = useState(false);
+  const [isCreateNew, setIsCreateNew] = useState(false);
+
+  const imgRef = useRef();
+  const [portraitImgFile, setPortraitImgFile] = useState();
+  const [previewPortraitImg, setPreviewPortraitImg] = useState("");
+
+  useEffect(() => {
+    if (!portraitImgFile) return;
+
+    const fileReader = new FileReader();
+    fileReader.onload = () => {
+      setPreviewPortraitImg(fileReader.result);
+    };
+    fileReader.readAsDataURL(portraitImgFile);
+  }, [portraitImgFile]);
+
+  const pickImgFileHandler = (e) => {
+    let pickedFile;
+
+    if (e.target.files) {
+      pickedFile = e.target.files[0];
+      setPortraitImgFile(pickedFile);
+    }
+  };
+
+  const clearPortrailImg = () => {
+    setPortraitImgFile(null);
+    setPreviewPortraitImg("");
+    if (imgRef.current) imgRef.current.value = null;
+  };
+
+  const [modal, setModal] = useState(false);
+  const [modalViewStudent, setModalViewStudent] = useState(null);
   const [modalData, setModalData] = useState({
-    email: "",
     fullname: "",
     username: "",
     password: "",
-    admin: true,
+    role: "",
+    banned: "",
+    online: "",
+    last_online: "",
   });
+
+  useEffect(() => {
+    if (!isCreateNew) {
+      setPreviewPortraitImg(modalViewStudent?.avatar);
+      setModalData({
+        fullname: modalViewStudent?.full_name,
+        username: modalViewStudent?.username,
+        password: "",
+        role: modalViewStudent?.role,
+        banned: modalViewStudent?.banned,
+        online: modalViewStudent?.online,
+        last_online: modalViewStudent?.last_online,
+      });
+    }
+  }, [modalViewStudent]);
+
+  const clearModalData = () => {
+    setModalData({
+      fullname: "",
+      username: "",
+      password: "",
+      role: "",
+      banned: "",
+      online: "",
+      last_online: "",
+    });
+  };
+
+  const toggleModal = () => {
+    if (isEdit) setIsEdit(false);
+    if (isCreateNew) setIsCreateNew(false);
+    setModal(!modal);
+  };
+
+  const handleEditClick = () => {
+    if (isEdit) clearPortrailImg();
+    setIsEdit(!isEdit);
+  };
 
   const [file, setFile] = useState();
   const [fileIsValid, setFileIsValid] = useState();
@@ -71,10 +161,16 @@ const UsersManage = () => {
   };
 
   const changeHandler = (e) => {
-    setModalData((prev) => ({
-      ...prev,
-      [e.target.id]: e.target.value,
-    }));
+    if (e.target?.name && e.target?.name === "role") {
+      setModalData((prev) => ({
+        ...prev,
+        [e.target.name]: e.target.value,
+      }));
+    } else
+      setModalData((prev) => ({
+        ...prev,
+        [e.target.id]: e.target.value,
+      }));
   };
 
   const getData = useCallback(async () => {
@@ -82,14 +178,13 @@ const UsersManage = () => {
     if (response) {
       if (page === 1) setData(response.accounts);
       else setData((prev) => [...prev, ...response.accounts]);
+      setTotalRecords(response.total_accounts);
     }
   }, [page, rowsPerPage, search]);
 
   useEffect(() => {
     getData();
   }, [page, rowsPerPage, search]);
-
-  // useEffect(() => {}, [data]);
 
   const handleBanUsers = async () => {
     const selectedIds = [...usersSelected]; // Sao chép usersSelected vào một mảng tạm thời
@@ -126,21 +221,43 @@ const UsersManage = () => {
     }
   };
 
-  const handleAddUser = async () => {
-    privateHttpRequest.clearError();
+  const handleCreateAccount = async () => {
     try {
-      const response = await createUser(modalData);
+      const formData = new FormData();
+      formData.append("avatar", portraitImgFile);
+      formData.append("username", modalData?.username);
+      formData.append("password", modalData?.password);
+      formData.append("fullname", modalData?.fullname);
+      formData.append("role", modalData?.role);
+
+      const response = await createAccount(formData);
 
       if (response) {
-        setVisible(false);
-        setModalData({
-          email: "",
-          fullname: "",
-          username: "",
-          password: "",
-          admin: true,
-        });
-        getData();
+        setModalViewStudent(response.account);
+        if (isEdit) setIsEdit(false);
+        setIsCreateNew(false);
+        setData((prev) => [response.account, ...prev]);
+        setTotalRecords((prev) => prev + 1);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleUpdateAccount = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("avatar", portraitImgFile);
+      formData.append("username", modalData?.username);
+      formData.append("password", modalData?.password);
+      formData.append("fullname", modalData?.fullname);
+      formData.append("role", modalData?.role);
+
+      const response = await updateAccount(formData);
+
+      if (response) {
+        if (isEdit) setIsEdit(false);
+        setIsCreateNew(false);
       }
     } catch (err) {
       console.error(err);
@@ -154,6 +271,12 @@ const UsersManage = () => {
   const handleRowsPerPageChange = useCallback((event) => {
     setRowsPerPage(event.target.value);
   }, []);
+
+  const userRole = {
+    USER: "User thường",
+    ADMIN: "Quản trị",
+    ACADEMIC_AFFAIRS_OFFICE: "PĐT",
+  };
 
   return (
     <>
@@ -173,7 +296,7 @@ const UsersManage = () => {
               spacing={4}
             >
               <Stack spacing={1}>
-                <Typography variant="h4">Users</Typography>
+                <Typography variant="h4">Tài khoản</Typography>
                 {/* <ImportInput
                   file={file}
                   fileIsValid={fileIsValid}
@@ -222,7 +345,11 @@ const UsersManage = () => {
                   </>
                 )}
                 <Button
-                  onClick={() => setVisible(true)}
+                  onClick={() => {
+                    clearModalData();
+                    toggleModal();
+                    setIsCreateNew(true);
+                  }}
                   startIcon={
                     <SvgIcon fontSize="small">
                       <AddIcon />
@@ -238,7 +365,7 @@ const UsersManage = () => {
             <UserSearch setSearch={setSearch} />
             {!privateHttpRequest.isLoading && (
               <UserTable
-                count={data.length}
+                count={totalRecords}
                 data={data}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
@@ -246,156 +373,247 @@ const UsersManage = () => {
                 rowsPerPage={rowsPerPage}
                 setUsersSelected={setUsersSelected}
                 selected={usersSelected}
+                handleOnClick={(item) => {
+                  setModalViewStudent(item);
+                  setModal(true);
+                }}
               />
             )}
           </Stack>
         </Container>
-        <Modal
-          show={visible}
-          onHide={() => setVisible(false)}
-          className={cx("add-employee-modal")}
-        >
-          <Modal.Header>
-            <div className={cx("title-modal")}>ADD USER</div>
-            {privateHttpRequest.error && (
-              <>
-                <br />
-                <div className={cx("title-modal")}>
-                  {" "}
-                  <Alert severity="error">{privateHttpRequest.error}</Alert>
-                </div>
-              </>
-            )}
-          </Modal.Header>
-          <Modal.Body>
-            <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Username</div>
-                </div>
-                <input
-                  id="username"
-                  type="text"
-                  onChange={changeHandler}
-                  className={cx("col-lg-8 col-md-8")}
-                />
-              </div>
-            </div>
-            <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Email</div>
-                </div>
-                <input
-                  id="email"
-                  type="email"
-                  onChange={changeHandler}
-                  className={cx("col-lg-9 col-md-9")}
-                />
-              </div>
-            </div>
-            <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Fullname</div>
-                </div>
-                <input
-                  id="fullname"
-                  type="text"
-                  onChange={changeHandler}
-                  className={cx("col-lg-9 col-md-9")}
-                />
-              </div>
-            </div>
-            <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Password</div>
-                </div>
-                <input
-                  id="password"
-                  type="password"
-                  onChange={changeHandler}
-                  className={cx("col-lg-9 col-md-9")}
-                />
-              </div>
-            </div>
-            {/* <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Date of birth</div>
-                </div>
-                <input
-                  type="date"
-                  // onChange={(e) => setDateOfbirth(e.target.value)}
-                  className={cx("col-lg-9 col-md-9")}
-                />
-              </div>
-            </div>
-            <div className={cx("row align-items-center", "modal-content-item")}>
-              <div>
-                <div className={cx("col-lg-3 col-md-3", "heading-modal")}>
-                  <div>Gender</div>
-                </div>
-                <span className={cx("gender")}>
-                  <input
-                    type="radio"
-                    id="male"
-                    name="gender"
-                    value="male"
-                    style={{ width: "auto", margin: "10px 10px 0px 20px" }}
-                    // onChange={(e) => setGender(e.target.value)}
-                  />
-                  <label for="male">Male</label>
-                  <input
-                    type="radio"
-                    id="female"
-                    name="gender"
-                    value="female"
-                    style={{ width: "auto", margin: "10px 10px 0px 20px" }}
-                    // onChange={(e) => setGender(e.target.value)}
-                  />
-                  <label for="female">Female</label>
-                </span>
-              </div>
-            </div> */}
-          </Modal.Body>
-          <Modal.Footer>
-            <div
-              style={{
-                width: "70%",
-                display: "flex",
-                justifyContent: "space-between",
-              }}
-            >
-              <button
-                className={cx("modal-button")}
-                style={{
-                  backgroundColor: "#ff0000",
-                  border: "none",
-                  color: "white",
-                  borderRadius: "10px",
-                }}
-                onClick={() => setVisible(false)}
-              >
-                CLOSE
-              </button>
-              <button
-                className={cx("modal-button")}
-                style={{
-                  backgroundColor: "#1976d2",
-                  border: "none",
-                  color: "white",
-                  borderRadius: "10px",
-                }}
-                onClick={handleAddUser}
-              >
-                ADD
-              </button>
-            </div>
-          </Modal.Footer>
-        </Modal>
       </Box>
+      {modal && (
+        <div className={cx2("modal active-modal")}>
+          <div
+            onClick={toggleModal}
+            className={cx2("overlay")}
+            style={{ alignSelf: "flex-end" }}
+          >
+            <CloseIcon
+              //className={cx("sidenav__icon")}
+              style={{
+                width: "27px",
+                height: "27px",
+                color: "white",
+                margin: "12px 30px",
+                position: "absolute",
+                right: "0",
+                cursor: "pointer",
+              }}
+            />
+          </div>
+          <div
+            className={cx2("modal-navbar-content")}
+            style={{ width: "80%", marginTop: 30 }}
+          >
+            <div className={cx2("modal-header")}>Thông tin tài khoản</div>
+            <div
+              className={cx2("modal-main")}
+              style={{ display: "flex", padding: "20px 0 30px 0px" }}
+            >
+              <div
+                style={{
+                  flex: 0.2,
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <div
+                  style={{
+                    height: "250px",
+                    cursor: isEdit || isCreateNew ? "pointer" : "",
+                  }}
+                  onClick={() => {
+                    if (isEdit || isCreateNew) imgRef.current.click();
+                  }}
+                >
+                  <img
+                    style={{ width: "100%", maxHeight: "250px" }}
+                    src={getStudentsImageSource(previewPortraitImg)}
+                    alt="Ảnh thẻ sinh viên"
+                  />
+                  <input
+                    id="avatar"
+                    ref={imgRef}
+                    type="file"
+                    hidden
+                    accept=".png,.jpg,.jpeg"
+                    disabled={!isEdit && !isCreateNew}
+                    onChange={pickImgFileHandler}
+                  />
+                </div>
+              </div>
+              <div className={cx2("modal-info")}>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Tên đăng nhập:</div>
+                  <input
+                    id="username"
+                    className={cx2(
+                      "input-span",
+                      !isEdit && !isCreateNew && "input-span-focus"
+                    )}
+                    value={modalData?.username}
+                    readOnly={!isEdit && !isCreateNew}
+                    onChange={changeHandler}
+                  />
+                </div>
+                {isCreateNew && (
+                  <div className={cx2("info")}>
+                    <div className={cx2("title")}>Mật khẩu:</div>
+                    <input
+                      id="password"
+                      className={cx2(
+                        "input-span",
+                        !isEdit && !isCreateNew && "input-span-focus"
+                      )}
+                      value={modalData?.password}
+                      readOnly={!isEdit && !isCreateNew}
+                      onChange={changeHandler}
+                    />
+                  </div>
+                )}
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Tên người dùng:</div>
+                  <input
+                    id="fullname"
+                    className={cx2(
+                      "input-span",
+                      !isEdit && !isCreateNew && "input-span-focus"
+                    )}
+                    value={modalData?.fullname}
+                    readOnly={!isEdit && !isCreateNew}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Quyền tài khoản:</div>
+                  <FormControl
+                    variant="standard"
+                    className={cx("form__select")}
+                    sx={{
+                      width: 0.843,
+                      border: "1px solid rgba(0, 85, 141, 0.5)",
+                      padding: "0px 16px",
+                      borderRadius: "10px",
+                      height: 28,
+                    }}
+                  >
+                    <Select
+                      id="role"
+                      name="role"
+                      value={modalData?.role}
+                      onChange={changeHandler}
+                      displayEmpty
+                      disableUnderline
+                      inputProps={{ "aria-label": "Without label" }}
+                      sx={{ height: "100%" }}
+                      readOnly={!isEdit && !isCreateNew}
+                    >
+                      <MenuItem value="">
+                        <em>Chọn quyền</em>
+                      </MenuItem>
+                      {Object.entries(userRole)?.length > 0 &&
+                        Object.entries(userRole).map(([key, value]) => (
+                          <MenuItem key={key} value={String(key)}>
+                            {value}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                </div>
+                {!isCreateNew && (
+                  <>
+                    {" "}
+                    <div className={cx2("info")}>
+                      <div className={cx2("title")}>Trạng thái:</div>
+                      <input
+                        id="banned"
+                        className={cx2(
+                          "input-span",
+                          !isEdit && !isCreateNew && "input-span-focus"
+                        )}
+                        value={modalData?.banned ? "Bị khóa" : "Bình thường"}
+                        readOnly={!isEdit && !isCreateNew}
+                        onChange={changeHandler}
+                      />
+                    </div>
+                    <div className={cx2("info")}>
+                      <div className={cx2("title")}>Tình trạng:</div>
+                      <input
+                        id="online"
+                        className={cx2(
+                          "input-span",
+                          !isEdit && !isCreateNew && "input-span-focus"
+                        )}
+                        value={
+                          modalData?.online ? "Đang hoạt động" : "Ngoại tuyến"
+                        }
+                        readOnly={!isEdit && !isCreateNew}
+                        onChange={changeHandler}
+                      />
+                    </div>
+                    <div className={cx2("info")}>
+                      <div className={cx2("title")}>Lần đăng nhập cuối:</div>
+                      <input
+                        id="last_online"
+                        className={cx2(
+                          "input-span",
+                          !isEdit && !isCreateNew && "input-span-focus"
+                        )}
+                        value={
+                          formatHour(modalData?.last_online) +
+                          " " +
+                          formatDate(modalData?.last_online)
+                        }
+                        readOnly={!isEdit && !isCreateNew}
+                        onChange={changeHandler}
+                      />
+                    </div>
+                  </>
+                )}
+
+                <div
+                  style={{
+                    width: "80%",
+                    marginTop: 15,
+                    flexDirection: "row",
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <button
+                    className={cx2("button")}
+                    style={{
+                      backgroundColor: "lightpink",
+                    }}
+                    onClick={isEdit ? handleEditClick : toggleModal}
+                  >
+                    {isEdit ? "Hủy" : "Đóng"}
+                  </button>
+                  <button
+                    className={cx2("button")}
+                    style={{
+                      backgroundColor: "lightgreen",
+                    }}
+                    onClick={
+                      isEdit
+                        ? handleUpdateAccount
+                        : isCreateNew
+                        ? handleCreateAccount
+                        : handleEditClick
+                    }
+                  >
+                    {isEdit || isCreateNew ? "Lưu" : "Chỉnh sửa"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };

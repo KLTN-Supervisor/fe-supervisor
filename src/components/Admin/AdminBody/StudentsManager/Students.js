@@ -55,7 +55,7 @@ const StudentsManage = () => {
 
   const [search, setSearch] = useState("");
   const [data, setData] = useState([]);
-  const [totalRecord, setTotalRecord] = useState(0);
+  const [totalRecords, setTotalRecords] = useState(0);
 
   const [usersSelected, setUsersSelected] = useState([]);
 
@@ -169,7 +169,7 @@ const StudentsManage = () => {
           };
         })
       );
-      setTotalRecord(response.total_students);
+      setTotalRecords(response.total_students);
     }
   }, [page, rowsPerPage, search]);
 
@@ -222,6 +222,20 @@ const StudentsManage = () => {
         setModalViewStudent(response.student);
         if (isEdit) setIsEdit(false);
         setIsCreateNew(false);
+        setData((prev) => [
+          {
+            ...response.student,
+            gender: response.student.gender ? "Nam" : "Nữ",
+            fullname: `${response.student.last_name} ${response.student.middle_name} ${response.student.first_name}`,
+            student_type:
+              response.student.student_type === "FORMAL"
+                ? "Chính quy"
+                : "Không xác định",
+            learning_status: learningStatus[response.student.learning_status],
+          },
+          ...prev,
+        ]);
+        setTotalRecords((prev) => prev + 1);
       }
     } catch (err) {
       console.error(err);
@@ -460,7 +474,7 @@ const StudentsManage = () => {
             <StudentsSearch setSearch={setSearch} />
             {!privateHttpRequest.isLoading && (
               <AdminTable
-                count={totalRecord}
+                count={totalRecords}
                 data={data}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}

@@ -12,7 +12,7 @@ export const UserSearch = ({ setSearch }) => {
       <OutlinedInput
         defaultValue=""
         fullWidth
-        placeholder="Username...."
+        placeholder="Tên đăng nhập, tên...."
         onKeyUp={handleSearch}
         startAdornment={
           <InputAdornment position="start">
