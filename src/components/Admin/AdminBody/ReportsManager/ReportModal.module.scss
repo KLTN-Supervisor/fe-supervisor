@@ -74,3 +74,165 @@
 //     background-color: rgb(103, 103, 103);
 // }
 
+//Modal
+.active-modal {
+    overflow-y: hidden;
+  }
+  .modal .btn-modal {
+    padding: 10px 20px;
+    display: block;
+    margin: 100px auto 0;
+    font-size: 18px;
+  }
+  
+  .modal,
+  .overlay {
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+    z-index: 3;
+  }
+  
+  .overlay {
+    background: rgba(4, 3, 3, 0.8);
+  
+    .sidenav__icon {
+      transform: scale(1.05);
+    }
+}
+.modal-content {
+    border: #353535 solid 0.5px;
+    position: absolute;
+    z-index: 3;
+    top: 45%;
+    left: 50%;
+    width: 70%;
+    height: 80%;
+    transform: translate(-50%, -50%);
+    line-height: 1.4;
+    background: "white";
+    border-radius: 10px;
+    max-width: 1200px;
+    min-width: 300px;
+    .modal-header {
+        color: white;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-bottom: #303030 solid 1px;
+        background-color: #00558d;
+        border-radius: 10px 10px 0px 0px;
+        font-size: 16px;
+        font-weight: 600;
+        padding: 10px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+          sans-serif;
+        .header-next {
+          font-size: 14px;
+          color: #0095f6;
+        }
+        .header-next:hover {
+          color: white;
+          cursor: pointer;
+        }
+      }
+    .modal-main {
+      width: 100%;
+      height: 100%;
+      border-radius: 0px 0px 10px 10px;
+      display: flex;
+      background-color: white;
+      .container {
+        border-radius: 0px 10px 10px 10px;
+        display: flex;
+        background-color: #f3f3f3;
+        width: 100%;
+        .image {
+          display: flex;
+          overflow: hidden;
+          flex: 0.75;
+          max-width: 900px;
+          max-height: 750px;
+          .img-slider {
+            object-fit: none;
+            display: block;
+            flex-shrink: 0;
+            flex-grow: 0;
+          }
+          .img-slider-btn {
+            margin-right: 10px;
+            all: unset;
+            width: 16px;
+            height: 16px;
+            display: block;
+            position: absolute;
+            background-color: #464646;
+            color: white;
+            border-radius: 50%;
+            padding: 8px;
+            cursor: pointer;
+            transition: background-color 100ms ease-in-out;
+          }
+          .img-slider-btn:hover {
+            background-color: #606060;
+            transform: scale(1.05);
+          }
+        }
+        .post-caption {
+          flex: 0.25;
+          padding: 10px;
+          max-width: 480px;
+          min-width: 280px;
+          background-color: #fff;
+          border-radius: 0px 0px 10px 0px;
+          
+          .info {
+            display: flex;
+            margin-top: 10px;
+            .title {
+              display: inline-block;
+              word-wrap: break-word;
+              width: 40%;
+              font-weight: 600;
+              text-align: end;
+              margin-right: 30px;
+              font-family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,Helvetica, Arial, sans-serif';
+            }
+            .span {
+              max-width: 60%;
+              word-wrap: break-word;
+              font-family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,Helvetica, Arial, sans-serif';
+            }
+          }
+          .info > textarea {
+            width: calc(100% - 20px);
+            margin-top: 10px;
+            background-color: #f3f3f3;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            resize: none;
+            height: 180px;
+            overflow: auto;
+            font-size: 16px;
+            color: black;
+            font-weight: 450;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+              Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+              sans-serif;
+          }
+          .post-text > textarea:focus {
+            outline: none;
+          }
+        }
+      }
+    }
+}
+  
+
