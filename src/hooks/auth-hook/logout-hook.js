@@ -17,10 +17,10 @@ const useLogout = () => {
     setPersistLogin(false);
     dispatch(setPosts([]));
     try {
-      const response = await publicRequest("/auth/logout");
+      const response = await publicRequest("/accounts/logout");
       if (response?.data?.message || response.status === 204) {
         console.log(response?.data?.message);
-        navigate("/accounts/login");
+        navigate("/login");
       }
     } catch (err) {
       console.log(err);

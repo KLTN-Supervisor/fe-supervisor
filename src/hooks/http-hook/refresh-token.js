@@ -1,7 +1,6 @@
 import { useCallback } from "react";
 import useAuth from "../auth-hook/auth-hook";
 import useHttpClient from "./public-http-hook";
-import { axiosPublic } from "./public-axios";
 
 const useRefreshToken = () => {
   const { setAuth } = useAuth();
@@ -9,16 +8,16 @@ const useRefreshToken = () => {
   const { publicRequest } = useHttpClient();
 
   const refresh = async () => {
-    const response = await publicRequest("/auth/refresh");
+    const response = await publicRequest("/accounts/refresh");
 
     setAuth((prev) => {
       return {
         ...prev,
-        accessToken: response.data.accessToken,
+        accessToken: response.data.access_token,
       };
     });
 
-    return response.data.accessToken;
+    return response.data.access_token;
   };
   return refresh;
 };

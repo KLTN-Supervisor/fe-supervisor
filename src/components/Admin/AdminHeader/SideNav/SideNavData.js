@@ -27,6 +27,11 @@ const SideNavAdminData = ({ handleDrawerClose }) => {
     //   icon: <DashboardIcon />,
     // },
     {
+      label: "Báo cáo",
+      link: "report",
+      icon: <ReportGmailerrorredOutlinedIcon />,
+    },
+    {
       label: "Tài khoản",
       link: "users",
       icon: <PermIdentityIcon />,
@@ -34,11 +39,6 @@ const SideNavAdminData = ({ handleDrawerClose }) => {
     { label: "Sinh viên", link: "students", icon: <ArticleIcon /> },
     { label: "Thanh tra", link: "inspectors", icon: <PermIdentityIcon /> },
     { label: "Lịch thi", link: "exam-schedules", icon: <ArticleIcon /> },
-    {
-      label: "Báo cáo",
-      link: "report",
-      icon: <ReportGmailerrorredOutlinedIcon />,
-    },
     {
       label: "Logout",
       link: "logout",

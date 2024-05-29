@@ -16,6 +16,7 @@ import useHttpClient from "../../hooks/http-hook/public-http-hook";
 import useAuth from "../../hooks/auth-hook/auth-hook";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LinearProgress } from "@mui/material";
+import useAccountServices from "../../services/useAccountServices";
 const cx = classNames.bind(styles);
 
 const AuthPage = () => {
@@ -25,7 +26,9 @@ const AuthPage = () => {
   const location = useLocation();
   const from = "/";
 
-  const { isLoading, error, clearError, publicRequest } = useHttpClient();
+  const { login } = useAccountServices();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -90,126 +93,142 @@ const AuthPage = () => {
     validateInput(e);
   };
   const handleSubmit = async (e) => {
-    // e.preventDefault();
-
-    // if (inputError.usernameError || !formData.username) {
-    //   setFormValid("Username is empty!");
-    //   return;
-    // }
-    // if (inputError.passwordError || !formData.password) {
-    //   setFormValid("Password is empty!");
-    //   return;
-    // }
-
-    // setFormValid(null);
-
-    // try {
-    //   const response = await login(formData, publicRequest);
-    //   const accessToken = response?.accessToken;
-    //   if (accessToken) {
-    //     setAuth({ accessToken });
-    //     setPersistLogin();
-    //     navigate(from, { replace: true });
-    //     clearError();
-    //   } else setFormValid("Login fail, please try again later!");
-    // } catch (err) {}
+    e.preventDefault();
+    if (inputError.usernameError || !formData.username) {
+      setFormValid("Username is empty!");
+      return;
+    }
+    if (inputError.passwordError || !formData.password) {
+      setFormValid("Password is empty!");
+      return;
+    }
+    setFormValid(null);
+    try {
+      const response = await login(formData.username, formData.password);
+      if (response) {
+        console.log(response);
+        const accessToken = response?.access_token;
+        if (accessToken) {
+          setAuth({ accessToken: accessToken, role: response.role });
+          setPersistLogin();
+          response.role === "ADMIN" ||
+          response.role === "ACADEMIC_AFFAIRS_OFFICE"
+            ? navigate("/administrator/report", { replace: true })
+            : navigate("/", { replace: true });
+          setError(null);
+        } else setFormValid("Đăng nhập không thành công, hãy thử lại sau!");
+      }
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
-    <div style={{display: 'flex', justifyContent: 'center', alignItems:'center', height:'90vh'}}>
     <div
-      className={cx("main")}
-      style={{ filter: isLoading ? "brightness(90%)" : "brightness(100%)" }}
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "90vh",
+      }}
     >
-      {isLoading && <LinearProgress />}
-      <Paper elevation={0} square className={cx("center-screen")}>
-        <div className={cx("logo--container")}>
-          <div
-            aria-disabled="false"
-            role="button"
-            tabIndex={0}
-            className={cx("cursor")}
-          >
-            <i
-              data-visualcompletion="css-img"
-              role="img"
-              aria-label="Instagram"
-              className={cx("logo--main")}
-            ></i>
+      <div
+        className={cx("main")}
+        style={{ filter: isLoading ? "brightness(90%)" : "brightness(100%)" }}
+      >
+        {isLoading && <LinearProgress />}
+        <Paper elevation={0} square className={cx("center-screen")}>
+          <div className={cx("logo--container")}>
+            <div
+              aria-disabled="false"
+              role="button"
+              tabIndex={0}
+              className={cx("cursor")}
+            >
+              <i
+                data-visualcompletion="css-img"
+                role="img"
+                aria-label="Instagram"
+                className={cx("logo--main")}
+              ></i>
+            </div>
           </div>
-        </div>
-        <div className={cx("form--container")}>
-          <form className={cx("form--main")}>
-            <div className={cx("form--separate")}>
-              <div className={cx("input--margin")}>
-                <div className={cx("input--container")}>
-                  <TextField
-                    error={inputError.usernameError}
-                    id="username"
-                    label="Username"
-                    variant="filled"
-                    fullWidth={true}
-                    size="small"
-                    onChange={changeHandler}
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
-
-              <div className={cx("input--margin")}>
-                <div className={cx("input--container")}>
-                  <FormControl
-                    error={inputError.passwordError}
-                    size="small"
-                    fullWidth={true}
-                    variant="filled"
-                  >
-                    <InputLabel htmlFor="password">Password</InputLabel>
-                    <FilledInput
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      endAdornment={
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={handleClickShowPassword}
-                            onMouseDown={handleMouseDownPassword}
-                            edge="end"
-                          >
-                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                          </IconButton>
-                        </InputAdornment>
-                      }
+          <div className={cx("form--container")}>
+            <form className={cx("form--main")}>
+              <div className={cx("form--separate")}>
+                <div className={cx("input--margin")}>
+                  <div className={cx("input--container")}>
+                    <TextField
+                      error={inputError.usernameError}
+                      id="username"
+                      label="Tên đăng nhập"
+                      variant="filled"
+                      fullWidth={true}
+                      size="small"
                       onChange={changeHandler}
                       disabled={isLoading}
                     />
-                  </FormControl>
+                  </div>
+                </div>
+
+                <div className={cx("input--margin")}>
+                  <div className={cx("input--container")}>
+                    <FormControl
+                      error={inputError.passwordError}
+                      size="small"
+                      fullWidth={true}
+                      variant="filled"
+                    >
+                      <InputLabel htmlFor="password">Mật khẩu</InputLabel>
+                      <FilledInput
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        endAdornment={
+                          <InputAdornment position="end">
+                            <IconButton
+                              aria-label="toggle password visibility"
+                              onClick={handleClickShowPassword}
+                              onMouseDown={handleMouseDownPassword}
+                              edge="end"
+                            >
+                              {showPassword ? (
+                                <VisibilityOff />
+                              ) : (
+                                <Visibility />
+                              )}
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                        onChange={changeHandler}
+                        disabled={isLoading}
+                      />
+                    </FormControl>
+                  </div>
+                </div>
+                <div className={cx("button--container")}>
+                  <Button
+                    onClick={handleSubmit}
+                    fullWidth
+                    size="small"
+                    variant="contained"
+                    sx={{ bgcolor: "#03a9f4" }}
+                    disabled={isLoading}
+                  >
+                    <div className={cx("button--text")}>Đăng nhập</div>
+                  </Button>
+                </div>
+                <div className={cx("input--margin")}>
+                  {formValid && !error ? (
+                    <Alert severity="error">{formValid}</Alert>
+                  ) : (
+                    error && <Alert severity="error">{error}</Alert>
+                  )}
                 </div>
               </div>
-              <div className={cx("button--container")}>
-                <Button
-                  onClick={handleSubmit}
-                  fullWidth
-                  size="small"
-                  variant="contained"
-                  sx={{ bgcolor: "#03a9f4" }}
-                  disabled={isLoading}
-                >
-                  <div className={cx("button--text")}>Login</div>
-                </Button>
-              </div>
-              <div className={cx("input--margin")}>
-                {formValid && !error ? (
-                  <Alert severity="error">{formValid}</Alert>
-                ) : (
-                  error && <Alert severity="error">{error}</Alert>
-                )}
-              </div>
-            </div>
-          </form>
-        </div>
-      </Paper>
-    </div>
+            </form>
+          </div>
+        </Paper>
+      </div>
     </div>
   );
 };

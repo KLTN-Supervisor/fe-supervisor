@@ -1,4 +1,4 @@
-import AuthPage from "../pages/AuthPage";
+import AuthPage, { UnauthorizedPage, Error404Page } from "../pages/AuthPage";
 import HomePage from "../pages/Supervisor/HomePage";
 import ScheduleTodayPage from "../pages/Supervisor/ScheduleTodayPage";
 import ExamSchedulePage from "../pages/Supervisor/ExamSchedulePage";
@@ -16,13 +16,18 @@ import AdminReportPage from "../components/Admin/AdminBody/ReportsManager/Report
 // public Routes
 const publicRoutes = [
   { path: "/login", component: AuthPage },
+  { path: "/unauthorized", component: UnauthorizedPage },
+  { path: "/error-404", component: Error404Page },
+];
+// Private Routes
+const privateRoutes = [
   { path: "/searchExamSchedule", component: ExamSchedulePage },
   { path: "/searchExamSchedule/schedule", component: SchedulePage },
   { path: "/searchStudent", component: StudentSearchingPage },
   { path: "/attendance", component: HomePage },
   { path: "/", component: ScheduleTodayPage },
 ];
-// Private Routes
+
 const adminRoutes = [
   {
     path: "/administrator/*",
@@ -39,4 +44,4 @@ const adminRoutes = [
   },
 ];
 
-export { publicRoutes, adminRoutes };
+export { publicRoutes, privateRoutes, adminRoutes };

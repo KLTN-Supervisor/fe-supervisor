@@ -1,7 +1,7 @@
 import { Fragment, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
-
-import { publicRoutes, adminRoutes } from "./routes";
+import { RequireAuth, PersistLogin } from "./components/Auth";
+import { publicRoutes, privateRoutes, adminRoutes } from "./routes";
 //import { DefaultLayout } from './Layout';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -44,8 +44,37 @@ function App() {
             />
           );
         })}
+        <Route element={<PersistLogin />}>
+          <Route element={<RequireAuth roles={["USER", "ADMIN"]} />}>
+            {privateRoutes.map((route, index) => {
+              const Page = route.component;
+
+              //   let Layout;
+
+              //   if (route.layout) {
+              //       Layout = route.layout;
+              //   } else if (route.layout === null) {
+              //       Layout = Fragment;
+              //   }
+
+              return (
+                <Route
+                  key={index}
+                  path={route.path}
+                  element={
+                    //   <AuthWrapper>
+                    //   <Layout>
+                    <Page />
+                    //   </Layout>
+                    //   </AuthWrapper>
+                  }
+                />
+              );
+            })}
+          </Route>
+        </Route>
         <Route
-        // element={<RequireAuth admin={true} />}
+          element={<RequireAuth roles={["ADMIN", "ACADEMIC_AFFAIRS_OFFICE"]} />}
         >
           {adminRoutes.map((route, index) => {
             const Pages = route.components || [];
