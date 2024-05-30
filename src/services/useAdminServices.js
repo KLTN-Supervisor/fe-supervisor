@@ -25,6 +25,16 @@ const useAdminServices = () => {
     }
   };
 
+  const trainStudentImages = async () => {
+    try {
+      const response = await privateRequest("/admin/students/train");
+
+      return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   const getAdminStudents = async (page, limit, search = "") => {
     try {
       const response = await privateRequest(
@@ -401,6 +411,7 @@ const useAdminServices = () => {
     getRooms,
     getStudents,
     getReports,
+    trainStudentImages,
   };
 };
 

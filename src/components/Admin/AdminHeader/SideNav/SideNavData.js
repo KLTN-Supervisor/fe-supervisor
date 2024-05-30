@@ -15,11 +15,13 @@ import ReportGmailerrorredOutlinedIcon from "@mui/icons-material/ReportGmailerro
 import LogoutIcon from "@mui/icons-material/Logout";
 import { NavLink } from "react-router-dom";
 import useLogout from "../../../../hooks/auth-hook/logout-hook";
+import useAuth from "../../../../hooks/auth-hook/auth-hook";
 
 const cx = classNames.bind(styles);
 
 const SideNavAdminData = ({ handleDrawerClose }) => {
   const { logout } = useLogout();
+  const { auth } = useAuth();
   const listItemData = [
     // {
     //   label: "Dashboard",
@@ -39,34 +41,51 @@ const SideNavAdminData = ({ handleDrawerClose }) => {
     { label: "Sinh viên", link: "students", icon: <ArticleIcon /> },
     { label: "Thanh tra", link: "inspectors", icon: <PermIdentityIcon /> },
     { label: "Lịch thi", link: "exam-schedules", icon: <ArticleIcon /> },
-    {
-      label: "Logout",
-      link: "logout",
-      handleOnClick: logout,
-      icon: <LogoutIcon />,
-    },
+  ];
+
+  const pdtListItemData = [
+    { label: "Lịch thi", link: "exam-schedules", icon: <ArticleIcon /> },
   ];
 
   return (
     <List>
-      {listItemData.map((item, i) => (
-        <Button
-          size="small"
-          className={cx("nav-button")}
-          onClick={handleDrawerClose}
-          key={i}
-        >
-          <ListItem
-            component={NavLink}
-            to={item?.link}
-            className={cx("nav-links")}
-            onClick={item?.handleOnClick}
-          >
-            <ListItemIcon>{item.icon}</ListItemIcon>
-            <ListItemText>{item.label}</ListItemText>
-          </ListItem>
-        </Button>
-      ))}
+      {auth?.role === "ADMIN"
+        ? listItemData.map((item, i) => (
+            <Button
+              size="small"
+              className={cx("nav-button")}
+              onClick={handleDrawerClose}
+              key={i}
+            >
+              <ListItem
+                component={NavLink}
+                to={item?.link}
+                className={cx("nav-links")}
+                onClick={item?.handleOnClick}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText>{item.label}</ListItemText>
+              </ListItem>
+            </Button>
+          ))
+        : pdtListItemData.map((item, i) => (
+            <Button
+              size="small"
+              className={cx("nav-button")}
+              onClick={handleDrawerClose}
+              key={i}
+            >
+              <ListItem
+                component={NavLink}
+                to={item?.link}
+                className={cx("nav-links")}
+                onClick={item?.handleOnClick}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText>{item.label}</ListItemText>
+              </ListItem>
+            </Button>
+          ))}
     </List>
   );
 };

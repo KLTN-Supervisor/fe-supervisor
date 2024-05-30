@@ -16,8 +16,10 @@ import useAdminServices from "../../../../services/useAdminServices";
 import UploadInput from "../UploadFile/UploadInput";
 import {
   Box,
+  Button,
   Card,
   Checkbox,
+  SvgIcon,
   Table,
   TableBody,
   TableCell,
@@ -28,6 +30,8 @@ import Modal from "react-bootstrap/Modal";
 import { Scrollbar } from "../UsersManager/ScrollBar";
 import { format, parseISO } from "date-fns";
 import { useSelection } from "../../../../hooks/use-selection";
+import DownloadIcon from "@mui/icons-material/Download";
+import useAuth from "../../../../hooks/auth-hook/auth-hook";
 
 const cx = classNames.bind(styles);
 
@@ -48,6 +52,8 @@ function ExamSchedules() {
     getDate,
     getBuildings,
   } = useAdminServices();
+
+  const { auth } = useAuth();
 
   const [visible, setVisible] = useState(false);
 
@@ -247,22 +253,33 @@ function ExamSchedules() {
             removeFile={removeFile}
             uploadHandler={uploadImportExamSchedulesFileHandler}
           /> */}
-            <UploadInput
-              files={files}
-              fileIsValid={filesIsValid}
-              setFiles={setFiles}
-              setFileIsValid={setFilesIsValid}
-              removeFile={removeFiles}
-              uploadHandler={uploadExamSchedulesFilesHandler}
-            />
-            <button
-              onClick={() => {
-                getUploadedFiles();
-                setVisible(true);
-              }}
-            >
-              Đổ dữ liệu
-            </button>
+            {auth?.role === "ACADEMIC_AFFAIRS_OFFICE" ? (
+              <UploadInput
+                files={files}
+                fileIsValid={filesIsValid}
+                setFiles={setFiles}
+                setFileIsValid={setFilesIsValid}
+                removeFile={removeFiles}
+                uploadHandler={uploadExamSchedulesFilesHandler}
+                buttonName="Tải lên file"
+              />
+            ) : auth?.role === "ADMIN" ? (
+              <Button
+                color="success"
+                startIcon={
+                  <SvgIcon fontSize="small">
+                    <DownloadIcon />
+                  </SvgIcon>
+                }
+                variant="contained"
+                onClick={() => {
+                  getUploadedFiles();
+                  setVisible(true);
+                }}
+              >
+                Đổ dữ liệu
+              </Button>
+            ) : null}
           </div>
           <h1>Tra cứu lịch thi</h1>
           <div className={cx("page_content")}>

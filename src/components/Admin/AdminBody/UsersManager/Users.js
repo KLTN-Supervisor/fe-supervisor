@@ -30,6 +30,7 @@ import ImportInput from "../UploadFile/ImportInput";
 import CloseIcon from "@mui/icons-material/Close";
 import { getStudentsImageSource } from "../../../../untils/getImageSource";
 import { formatHour, formatDate } from "../../../../untils/format-date";
+import { toast } from "react-toastify";
 
 const cx = classNames.bind(styles);
 const cx2 = classNames.bind(styles2);
@@ -231,6 +232,16 @@ const UsersManage = () => {
       formData.append("role", modalData?.role);
 
       const response = await createAccount(formData);
+
+      toast.promise(createAccount(formData), {
+        pending: "Đang tạo...",
+        error: {
+          render({ data }) {
+            // When the promise reject, data will contains the error
+            return `${data.message}`;
+          },
+        },
+      });
 
       if (response) {
         setModalViewStudent(response.account);

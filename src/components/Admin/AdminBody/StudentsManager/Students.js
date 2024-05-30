@@ -17,6 +17,7 @@ import {
   SvgIcon,
   Typography,
 } from "@mui/material";
+import Backdrop from "@mui/material/Backdrop";
 import { StudentsSearch } from "./StudentsSearch";
 import { AdminTable } from "../Common/AdminTable/Table";
 // import { applyPagination } from "../../../../shared/util/apply-pagination";
@@ -35,6 +36,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import UploadInput from "../UploadFile/UploadInput";
 import CloseIcon from "@mui/icons-material/Close";
+import { toast } from "react-toastify";
 
 const cx = classNames.bind(styles);
 const cx2 = classNames.bind(styles2);
@@ -48,6 +50,7 @@ const StudentsManage = () => {
     createNewStudent,
     uploadImagesImportFile,
     updateStudent,
+    trainStudentImages,
   } = useAdminServices();
 
   const [page, setPage] = useState(1);
@@ -116,7 +119,15 @@ const StudentsManage = () => {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const response = await uploadImportFile(formData);
+      const response = await toast.promise(() => uploadImportFile(formData), {
+        pending: "Đang import...",
+        success: "Đã import xong 👌",
+        error: {
+          render: ({ data }) => {
+            return `${data.message}`;
+          },
+        },
+      });
       if (response) {
         removeFile();
       }
@@ -128,10 +139,21 @@ const StudentsManage = () => {
   const uploadImportImagesFileHandler = async () => {
     try {
       const formData = new FormData();
-      formData.append("file", file);
-      const response = await uploadImagesImportFile(formData);
+      formData.append("file", files[0]);
+      const response = await toast.promise(
+        () => uploadImagesImportFile(formData),
+        {
+          pending: "Đang tải...",
+          success: "Đã tải xong 👌",
+          error: {
+            render: ({ data }) => {
+              return `${data.message}`;
+            },
+          },
+        }
+      );
       if (response) {
-        removeFile();
+        removeArchiveFiles();
       }
     } catch (err) {
       console.log("upload file: ", err);
@@ -374,6 +396,16 @@ const StudentsManage = () => {
     }
   };
 
+  const trainData = async () => {
+    try {
+      toast.promise(trainStudentImages, {
+        pending: "Đang train dữ liệu...",
+        success: "Đã train xong 👌",
+        error: "Có lỗi xảy ra 🤯",
+      });
+    } catch (err) {}
+  };
+
   return (
     <>
       <Box
@@ -452,23 +484,32 @@ const StudentsManage = () => {
                     </Button>
                   </>
                 )}*/}
-                <Button
-                  onClick={() => {
-                    clearModalData();
-                    clearPortrailImg();
-                    setIsCreateNew(true);
-                    toggleModal();
-                  }}
-                  startIcon={
-                    <SvgIcon fontSize="small">
-                      <AddIcon />
-                    </SvgIcon>
-                  }
-                  variant="contained"
-                  disabled={privateHttpRequest.isLoading}
-                >
-                  Thêm
-                </Button>
+                <Stack spacing={1}>
+                  <Button
+                    onClick={() => {
+                      clearModalData();
+                      clearPortrailImg();
+                      setIsCreateNew(true);
+                      toggleModal();
+                    }}
+                    startIcon={
+                      <SvgIcon fontSize="small">
+                        <AddIcon />
+                      </SvgIcon>
+                    }
+                    variant="contained"
+                    disabled={privateHttpRequest.isLoading}
+                  >
+                    Thêm
+                  </Button>
+                  <Button
+                    onClick={trainData}
+                    variant="contained"
+                    disabled={privateHttpRequest.isLoading}
+                  >
+                    Train ảnh
+                  </Button>
+                </Stack>
               </div>
             </Stack>
             <StudentsSearch setSearch={setSearch} />
