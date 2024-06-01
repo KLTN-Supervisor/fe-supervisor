@@ -111,9 +111,10 @@ const AuthPage = () => {
         if (accessToken) {
           setAuth({ accessToken: accessToken, role: response.role });
           setPersistLogin();
-          response.role === "ADMIN" ||
-          response.role === "ACADEMIC_AFFAIRS_OFFICE"
+          response.role === "ADMIN"
             ? navigate("/administrator/report", { replace: true })
+            : response.role === "ACADEMIC_AFFAIRS_OFFICE"
+            ? navigate("/administrator/exam-schedules", { replace: true })
             : navigate("/", { replace: true });
           setError(null);
         } else setFormValid("Đăng nhập không thành công, hãy thử lại sau!");

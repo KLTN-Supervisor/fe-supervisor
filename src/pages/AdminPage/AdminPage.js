@@ -5,6 +5,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Box } from "@mui/material";
 import NavBarAdmin from "../../components/Admin/AdminHeader/NavBar";
 import SideNavAdmin from "../../components/Admin/AdminHeader/SideNav/SideNav";
+import useAuth from "../../hooks/auth-hook/auth-hook";
 
 const cx = classNames.bind(styles);
 
@@ -12,6 +13,8 @@ const AdminPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location?.pathname || "/administrator";
+
+  const { auth } = useAuth();
 
   // useEffect(() => {
   //   const confirmationMessage =
