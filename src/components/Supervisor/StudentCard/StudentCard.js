@@ -32,16 +32,9 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
     const [modalAttendance, setModalAttendance] = useState(false);
 
     const toggleModalAttendance = async () => {
-      if (document.body.style.overflow !== "hidden") {
-        document.body.style.overflow = "hidden";
-        document.title = "Trang chủ";
-      } else {
-        document.body.style.overflow = "auto";
-        document.title = currentTitle;
-      }
-      
       if(!modalAttendance){
         setModalAttendance(!modalAttendance);
+        setState(0);
         isLoadCanvasRef.current = true;
         await startVideo();
         videoRef?.current &&
@@ -52,7 +45,6 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
         setIsDropping(false);
         setModalAttendance(!modalAttendance);
       }
-      
     };
 
     const [state, setState] = useState(0);
@@ -153,22 +145,23 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
       // DRAW YOU FACE IN WEBCAM
       canvasRef.current.innerHTML = faceapi.createCanvas(videoRef.current);
       faceapi.matchDimensions(canvasRef.current, {
-        width: videoRef.current && videoRef.current.offsetWidth,
+        width: videoRef.current ? videoRef.current.offsetWidth : 0,
         height: 480,
       });
 
       const resized = faceapi.resizeResults(detections, {
-        width: videoRef.current && videoRef.current.offsetWidth,
+        width: videoRef.current ? videoRef.current.offsetWidth : 0,
         height: 480,
       });
 
       for (const detection of resized) {
         const box = detection.detection.box;
-        const context = canvasRef.current.getContext('2d');
+        // const context = canvasRef.current.getContext('2d');
+        const studentName = await faceMatcher
+        .findBestMatch(detection.descriptor)
+        .toString();
         const drawBox = new faceapi.draw.DrawBox(box, {
-          label: await faceMatcher
-            .findBestMatch(detection.descriptor)
-            .toString(),
+          label: student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label ? studentName : "unknown",
         });
         
         console.log(isAttendance);
@@ -185,14 +178,17 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
               faceMatcher.findBestMatch(detection.descriptor)._label,
           });
           setSnackBarOpen(true);
-          await clear();
-          imageRef.current = null;
-          setIsDropping(false);
-          setModalAttendance(false);
-          document.body.style.overflow = "hidden";
+          videoRef.current.pause();
+          // Sau 3 giây tắt video
+          setTimeout(async () => {
+            await clear();
+            imageRef.current = null;
+            setIsDropping(false);
+            setModalAttendance(false);
+            setModal(false);
+          }, 3000);
         }
-
-        drawBox.draw(context);
+        drawBox.draw(canvasRef.current);
       }
       
       
@@ -231,6 +227,16 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
     event.preventDefault();
     setIsDragging(false);
     const file = event.target.files[0];
+    if (notValidFile(file)){
+      setSnackBarNotif({
+        severity: "error",
+        message:
+          "Chọn file không đúng định dạng" ,
+      });
+      setSnackBarOpen(true);
+      setIsDropping(false);
+      return;
+    } 
     const image = await faceapi.bufferToImage(file);
     console.log(image);
     if (imageRef.current) {
@@ -244,22 +250,28 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
       canvasImageRef.current.innerHTML = faceapi.createCanvas(imageRef.current);
       faceapi.matchDimensions(canvasImageRef.current, {
         width: imageRef.current && imageRef.current.offsetWidth,
-        height: 480,
+        height: 420,
       });
 
       const resized = faceapi.resizeResults(detections, {
         width: imageRef.current && imageRef.current.offsetWidth,
-        height: 480,
+        height: 420,
       });
 
       for (const detection of resized) {
         const box = detection.detection.box;
         console.log("faceMatcher ne", faceMatcher);
+        const studentName = await faceMatcher
+        .findBestMatch(detection.descriptor)
+        .toString();
         const drawBox = new faceapi.draw.DrawBox(box, {
-          label:
-            faceMatcher &&
-            faceMatcher.findBestMatch(detection.descriptor).toString(),
+          label: student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label ? studentName : "unknown",
         });
+        // const drawBox = new faceapi.draw.DrawBox(box, {
+        //   label:
+        //     faceMatcher &&
+        //     faceMatcher.findBestMatch(detection.descriptor).toString(),
+        // });
         if ( !isAttendance && student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label  
           && faceMatcher.findBestMatch(detection.descriptor)._label != "unknown"
         ) {
@@ -272,7 +284,10 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
               faceMatcher.findBestMatch(detection.descriptor)._label,
           });
           setSnackBarOpen(true);
-          toggleModalAttendance();
+          setTimeout(() => {
+            toggleModalAttendance();
+            setModal(false);
+          }, 3000);
         }
         drawBox.draw(canvasImageRef.current);
       }
@@ -303,6 +318,16 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
     setIsDropping(true);
 
     const file = event.target.files[0];
+    if (notValidFile(file)){
+      setSnackBarNotif({
+        severity: "error",
+        message:
+          "Chọn file không đúng định dạng" ,
+      });
+      setSnackBarOpen(true);
+      setIsDropping(false);
+      return;
+    } 
     const image = await faceapi.bufferToImage(file);
     console.log(image);
     if (imageRef.current) {
@@ -316,22 +341,28 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
       canvasImageRef.current.innerHTML = faceapi.createCanvas(imageRef.current);
       faceapi.matchDimensions(canvasImageRef.current, {
         width: imageRef.current && imageRef.current.offsetWidth,
-        height: 480,
+        height: 420,
       });
 
       const resized = faceapi.resizeResults(detections, {
         width: imageRef.current && imageRef.current.offsetWidth,
-        height: 480,
+        height: 420,
       });
 
       for (const detection of resized) {
         const box = detection.detection.box;
         console.log("faceMatcher ne", faceMatcher);
+        const studentName = await faceMatcher
+        .findBestMatch(detection.descriptor)
+        .toString();
         const drawBox = new faceapi.draw.DrawBox(box, {
-          label:
-            faceMatcher &&
-            faceMatcher.findBestMatch(detection.descriptor).toString(),
+          label: student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label ? studentName : "unknown",
         });
+        // const drawBox = new faceapi.draw.DrawBox(box, {
+        //   label:
+        //     faceMatcher &&
+        //     faceMatcher.findBestMatch(detection.descriptor).toString(),
+        // });
         if ( !isAttendance && student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label  
           && faceMatcher.findBestMatch(detection.descriptor)._label != "unknown"
         ) {
@@ -344,7 +375,11 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
               faceMatcher.findBestMatch(detection.descriptor)._label,
           });
           setSnackBarOpen(true);
-          toggleModalAttendance();
+          setTimeout(() => {
+            toggleModalAttendance();
+            setModal(false);
+          }, 3000);
+          
         }
         drawBox.draw(canvasImageRef.current);
       }
@@ -654,35 +689,16 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
             </>
           ) : (
             <div
-              style={{ width: "100%", height: "100%" }}
+              style={{ width: "100%", height: "90%" }}
               onDragOver={isDropping ? null : onDragOver}
               onDragLeave={isDropping ? null : onDragLeave}
               onDrop={isDropping ? null : onDrop}
             >
               {isDropping ? (
-                <div className={cx("content")}>
-                  <div className={cx("modal-input")}>
-                        <input
-                          type="file"
-                          accept="image/jpg,image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
-                          multiple
-                          ref={fileInputRef}
-                          onChange={onFileSelect}
-                          id="myFileInput"
-                          style={{ display: "none" }}
-                        />
-                        <label
-                          style={{marginBottom: 0}}
-                          role="button"
-                          onClick={selectFiles}
-                          className={cx("modal-upload")}
-                        >
-                          Select from device
-                        </label>
-                      </div>
+                <div className={cx("content")} style={{flexDirection: "column"}}>
                   <div
                     className={cx("main")}
-                    style={isDragging ? { backgroundColor: "black" } : null}
+                    style={isDragging ? { backgroundColor: "black", height: "80%" } : { height: "80%" }}
                   >
                     <div
                       className={cx("container")}
@@ -694,7 +710,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                       <div
                         className={cx("image")}
                         style={{
-                          minHeight: "400px",
+                          minHeight: "420px",
                           width: "100%",
                           display: "flex",
                           overflow: "hidden",
@@ -716,7 +732,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                             ref={imageRef}
                             style={{
                               objectFit: "contain",
-                              height: "480px",
+                              height: "420px",
                               display: "block",
                               flexShrink: "0",
                               flexGrow: "0",
@@ -734,6 +750,25 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                         
                       </div>
                     </div>
+                  </div>
+                  <div className={cx("modal-input")}>
+                    <input
+                      type="file"
+                      accept="image/jpg,image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+                      multiple
+                      ref={fileInputRef}
+                      onChange={onFileSelect}
+                      id="myFileInput"
+                      style={{ display: "none" }}
+                    />
+                    <label
+                      style={{marginBottom: 0}}
+                      role="button"
+                      onClick={selectFiles}
+                      className={cx("modal-upload")}
+                    >
+                      Select from device
+                    </label>
                   </div>
                 </div>
               ) : (

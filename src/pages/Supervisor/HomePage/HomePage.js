@@ -186,16 +186,13 @@ function HomePage() {
           message: "Vui lòng chọn loại biên bản",
         });
         setSnackBarOpen(true);
+      } else if(imageModals.length == 0){
+        setSnackBarNotif({
+          severity: "error",
+          message: reportType == "REPORT" ? "Vui lòng cung cấp ảnh cho biên bản" : "Vui lòng cung cấp ảnh cho sự cố",
+        });
+        setSnackBarOpen(true);
       } else {
-        const newReport = {
-          reportType: reportType,
-          note: note,
-          images: imageModals,
-          date: time,
-          room: room,
-        };
-        setReport((prev) => [...prev, newReport]);
-
         const formData = new FormData();
         formData.append("note", note);
         formData.append("reportType", reportType);
@@ -206,6 +203,16 @@ function HomePage() {
 
         const response = await noteReport(time, room, formData);
         if (response) {
+          const newReport = {
+            _id: response.new_report._id,
+            report_type: reportType,
+            note: note,
+            images: imageModals,
+            date: time,
+            room: room,
+          };
+          console.log(newReport)
+          setReport((prev) => [...prev, newReport]);
           toggleModalCreate();
         }
       }
@@ -366,10 +373,11 @@ function HomePage() {
                     {report.length > 0 ? (
                       report.map((r, index) => (
                         <ListItem
+                          key={r._id}
                           disablePadding
                           secondaryAction={
-                            <IconButton edge="end" aria-label="delete">
-                              <DeleteIcon onClick={() => deleteReport(index, r)} />
+                            <IconButton edge="end" aria-label="delete" onClick={() => deleteReport(index, r)} >
+                              <DeleteIcon />
                             </IconButton>
                           }
                         >
@@ -429,7 +437,7 @@ function HomePage() {
               }}
             />
           </div>
-          <div className={cx("modal-navbar-content")} style={{ width: "50%" }}>
+          <div className={cx("modal-navbar-content")} style={{ width: "80%" }}>
             <div className={cx("modal-header")}>Tạo báo cáo</div>
             <div className={cx("modal-main")}>
               <div

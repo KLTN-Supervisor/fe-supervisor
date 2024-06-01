@@ -443,3 +443,18 @@ html, body {
       }
     }
   }
+
+  @media (max-width: 527px){
+    .homepage {
+      .homepage__timeline {
+        .page_content{
+          .page_content__body{
+            .students{
+              justify-content: center;
+            }
+          }
+        }
+      }
+  
+    }
+  }
