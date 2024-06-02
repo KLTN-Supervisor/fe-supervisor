@@ -69,14 +69,7 @@ const UserTableItem = (props) => {
 
   return (
     <>
-      <TableRow
-        hover
-        key={user._id}
-        selected={isSelected}
-        onClick={() => {
-          handleOnClick(user);
-        }}
-      >
+      <TableRow hover key={user._id} selected={isSelected}>
         <TableCell padding="checkbox">
           <Checkbox
             checked={isSelected}
@@ -89,19 +82,51 @@ const UserTableItem = (props) => {
             }}
           />
         </TableCell>
-        <TableCell>
+        <TableCell
+          onClick={() => {
+            handleOnClick(user);
+          }}
+        >
           <Stack alignItems="center" direction="row" spacing={2}>
             <Avatar src={user.profile_picture}>
               {getInitials(user.username)}
             </Avatar>
-            <Typography variant="subtitle2">{user.username}</Typography>
           </Stack>
         </TableCell>
-        <TableCell>{user.username}</TableCell>
-        <TableCell>{user.full_name}</TableCell>
-        <TableCell>{userRole[user.role]}</TableCell>
-        <TableCell>{createdAt}</TableCell>
-        <TableCell style={{ color: user.banned ? "red" : "green" }}>
+        <TableCell
+          onClick={() => {
+            handleOnClick(user);
+          }}
+        >
+          {user.username}
+        </TableCell>
+        <TableCell
+          onClick={() => {
+            handleOnClick(user);
+          }}
+        >
+          {user.full_name}
+        </TableCell>
+        <TableCell
+          onClick={() => {
+            handleOnClick(user);
+          }}
+        >
+          {userRole[user.role]}
+        </TableCell>
+        <TableCell
+          onClick={() => {
+            handleOnClick(user);
+          }}
+        >
+          {createdAt}
+        </TableCell>
+        <TableCell
+          style={{ color: user.banned ? "red" : "green" }}
+          onClick={() => {
+            handleOnClick(user);
+          }}
+        >
           {user.banned ? "BANNED" : "ACTIVE"}
         </TableCell>
         {/* <TableCell

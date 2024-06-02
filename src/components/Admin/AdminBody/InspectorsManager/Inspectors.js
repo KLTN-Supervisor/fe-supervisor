@@ -388,30 +388,29 @@ const InspectorsManage = () => {
               </div>
             </Stack>
             <StudentsSearch setSearch={setSearch} />
-            {!privateHttpRequest.isLoading && (
-              <AdminTable
-                count={totalRecord}
-                data={data}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleRowsPerPageChange}
-                page={page}
-                rowsPerPage={rowsPerPage}
-                setItemsSelected={setUsersSelected}
-                selected={usersSelected}
-                colsName={["Mã thanh tra", "Tên", "Giới tính", "Tình trạng"]}
-                colsData={[
-                  "inspector_id",
-                  "fullname",
-                  "gender",
-                  "working_status",
-                ]}
-                onClickItem={(item) => {
-                  setModalViewStudent(item);
-                  toggleModal();
-                }}
-                hasCheckBox={false}
-              />
-            )}
+
+            <AdminTable
+              count={totalRecord}
+              data={data}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              setItemsSelected={setUsersSelected}
+              selected={usersSelected}
+              colsName={["Mã thanh tra", "Tên", "Giới tính", "Tình trạng"]}
+              colsData={[
+                "inspector_id",
+                "fullname",
+                "gender",
+                "working_status",
+              ]}
+              onClickItem={(item) => {
+                setModalViewStudent(item);
+                toggleModal();
+              }}
+              hasCheckBox={false}
+            />
           </Stack>
         </Container>
       </Box>

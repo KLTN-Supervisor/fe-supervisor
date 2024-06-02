@@ -95,18 +95,18 @@ const AuthPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (inputError.usernameError || !formData.username) {
-      setFormValid("Username is empty!");
+      setFormValid("Tên tài khoản không được để trống!");
       return;
     }
     if (inputError.passwordError || !formData.password) {
-      setFormValid("Password is empty!");
+      setFormValid("Mật khẩu không được để trống!");
       return;
     }
     setFormValid(null);
+    setIsLoading(true);
     try {
       const response = await login(formData.username, formData.password);
       if (response) {
-        console.log(response);
         const accessToken = response?.access_token;
         if (accessToken) {
           setAuth({ accessToken: accessToken, role: response.role });
@@ -118,9 +118,17 @@ const AuthPage = () => {
             : navigate("/", { replace: true });
           setError(null);
         } else setFormValid("Đăng nhập không thành công, hãy thử lại sau!");
+        setIsLoading(false);
       }
     } catch (err) {
       setError(err.message);
+      setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSubmit(e);
     }
   };
 
@@ -155,7 +163,7 @@ const AuthPage = () => {
             </div>
           </div>
           <div className={cx("form--container")}>
-            <form className={cx("form--main")}>
+            <form className={cx("form--main")} onKeyDown={handleKeyPress}>
               <div className={cx("form--separate")}>
                 <div className={cx("input--margin")}>
                   <div className={cx("input--container")}>

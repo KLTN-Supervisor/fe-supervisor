@@ -4,6 +4,7 @@ import {
   Box,
   Card,
   Checkbox,
+  CircularProgress,
   // Stack,
   Table,
   TableBody,
@@ -85,22 +86,29 @@ export const AdminTable = (props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.map((row) => (
-                <AdminTableItem
-                  key={row._id}
-                  item={row}
-                  onDeselectOne={handleDeselectOne}
-                  onSelectOne={handleSelectOne}
-                  selected={selected}
-                  colsData={colsData}
-                  options={[
-                    { name: "Xem thông tin", handleClick: onClickItem },
-                  ]}
-                  hasCheckBox={hasCheckBox}
-                />
-              ))}
+              {data.length > 0
+                ? data.map((row) => (
+                    <AdminTableItem
+                      key={row._id}
+                      item={row}
+                      onDeselectOne={handleDeselectOne}
+                      onSelectOne={handleSelectOne}
+                      selected={selected}
+                      colsData={colsData}
+                      options={[
+                        { name: "Xem thông tin", handleClick: onClickItem },
+                      ]}
+                      hasCheckBox={hasCheckBox}
+                    />
+                  ))
+                : null}
             </TableBody>
           </Table>
+          {data.length === 0 && (
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <CircularProgress />
+            </div>
+          )}
         </Box>
       </Scrollbar>
       <TablePagination

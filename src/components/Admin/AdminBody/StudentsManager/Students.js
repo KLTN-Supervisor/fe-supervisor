@@ -513,31 +513,30 @@ const StudentsManage = () => {
               </div>
             </Stack>
             <StudentsSearch setSearch={setSearch} />
-            {!privateHttpRequest.isLoading && (
-              <AdminTable
-                count={totalRecords}
-                data={data}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleRowsPerPageChange}
-                page={page}
-                rowsPerPage={rowsPerPage}
-                setItemsSelected={setUsersSelected}
-                selected={usersSelected}
-                colsName={["MSSV", "Họ tên", "Hệ", "Giới tính", "Tình trạng"]}
-                colsData={[
-                  "student_id",
-                  "fullname",
-                  "student_type",
-                  "gender",
-                  "learning_status",
-                ]}
-                onClickItem={(item) => {
-                  setModalViewStudent(item);
-                  toggleModal();
-                }}
-                hasCheckBox={false}
-              />
-            )}
+
+            <AdminTable
+              count={totalRecords}
+              data={data}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              setItemsSelected={setUsersSelected}
+              selected={usersSelected}
+              colsName={["MSSV", "Họ tên", "Hệ", "Giới tính", "Tình trạng"]}
+              colsData={[
+                "student_id",
+                "fullname",
+                "student_type",
+                "gender",
+                "learning_status",
+              ]}
+              onClickItem={(item) => {
+                setModalViewStudent(item);
+                toggleModal();
+              }}
+              hasCheckBox={false}
+            />
           </Stack>
         </Container>
       </Box>

@@ -231,9 +231,7 @@ const UsersManage = () => {
       formData.append("fullname", modalData?.fullname);
       formData.append("role", modalData?.role);
 
-      const response = await createAccount(formData);
-
-      toast.promise(createAccount(formData), {
+      const response = await toast.promise(() => createAccount(formData), {
         pending: "Đang tạo...",
         error: {
           render({ data }) {
@@ -241,6 +239,7 @@ const UsersManage = () => {
             return `${data.message}`;
           },
         },
+        success: "Tạo tài khoản mới thành công 👌",
       });
 
       if (response) {
