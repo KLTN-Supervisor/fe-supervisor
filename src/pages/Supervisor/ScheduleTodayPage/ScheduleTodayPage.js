@@ -163,6 +163,9 @@ function ExamSchedulePage() {
                   </ListItemIcon>
                   <ListItemText primary={`MSSV: ${student.student_id}`} />
                   <ListItemText primary={`Họ và tên: ${student.last_name} ${student.middle_name} ${student.first_name}`} />
+                  <ListItemText primary={student.schedules.map((schedule) => (
+                    `${schedule.room} (${schedule.time})`
+                  )).join(', ')} />
                 </ListItemButton>))
               ) : (
             <div
