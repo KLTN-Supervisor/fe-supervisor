@@ -43,7 +43,6 @@ const cx2 = classNames.bind(styles2);
 // const now = new Date();
 
 const StudentsManage = () => {
-  const privateHttpRequest = usePrivateHttpClient();
   const {
     uploadImportFile,
     getAdminStudents,
@@ -59,11 +58,14 @@ const StudentsManage = () => {
   const [search, setSearch] = useState("");
   const [data, setData] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [modifyDataLoading, setModifyDataLoading] = useState(false);
 
   const [usersSelected, setUsersSelected] = useState([]);
 
   const [isEdit, setIsEdit] = useState(false);
   const [modalData, setModalData] = useState({
+    _id: "",
     student_id: "",
     fullname: "",
     citizen_identification_number: "",
@@ -82,6 +84,7 @@ const StudentsManage = () => {
 
   const clearModalData = () => {
     setModalData({
+      _id: "",
       student_id: "",
       fullname: "",
       citizen_identification_number: "",
@@ -175,23 +178,29 @@ const StudentsManage = () => {
   };
 
   const getData = useCallback(async () => {
-    const response = await getAdminStudents(page, rowsPerPage, search);
-    if (response) {
-      setData(
-        response.students.map((student) => {
-          return {
-            ...student,
-            gender: student.gender ? "Nam" : "Nữ",
-            fullname: `${student.last_name} ${student.middle_name} ${student.first_name}`,
-            student_type:
-              student.student_type === "FORMAL"
-                ? "Chính quy"
-                : "Không xác định",
-            learning_status: learningStatus[student.learning_status],
-          };
-        })
-      );
-      setTotalRecords(response.total_students);
+    try {
+      setDataLoading(true);
+      const response = await getAdminStudents(page, rowsPerPage, search);
+      if (response) {
+        setData(
+          response.students.map((student) => {
+            return {
+              ...student,
+              gender: student.gender ? "Nam" : "Nữ",
+              fullname: `${student.last_name} ${student.middle_name} ${student.first_name}`,
+              student_type:
+                student.student_type === "FORMAL"
+                  ? "Chính quy"
+                  : "Không xác định",
+              learning_status: learningStatus[student.learning_status],
+            };
+          })
+        );
+        setTotalRecords(response.total_students);
+        setDataLoading(false);
+      }
+    } catch (err) {
+      setDataLoading(false);
     }
   }, [page, rowsPerPage, search]);
 
@@ -201,6 +210,7 @@ const StudentsManage = () => {
 
   const handleCreateStudent = async () => {
     try {
+      setModifyDataLoading(true);
       const formData = new FormData();
       formData.append("image", portraitImgFile);
       formData.append("student_id", modalData?.student_id);
@@ -241,7 +251,7 @@ const StudentsManage = () => {
       const response = await createNewStudent(formData);
 
       if (response) {
-        setModalViewStudent(response.student);
+        setViewItem(response.student);
         if (isEdit) setIsEdit(false);
         setIsCreateNew(false);
         setData((prev) => [
@@ -258,9 +268,11 @@ const StudentsManage = () => {
           ...prev,
         ]);
         setTotalRecords((prev) => prev + 1);
+        setModifyDataLoading(false);
       }
     } catch (err) {
       console.error(err);
+      setModifyDataLoading(false);
     }
   };
 
@@ -309,46 +321,43 @@ const StudentsManage = () => {
   const [isCreateNew, setIsCreateNew] = useState(false);
 
   const [modal, setModal] = useState(false);
-  const [modalViewStudent, setModalViewStudent] = useState(null);
   const toggleModal = () => {
     if (isEdit) setIsEdit(false);
     if (isCreateNew) setIsCreateNew(false);
     setModal(!modal);
   };
 
-  useEffect(() => {
+  const setViewItem = (item) => {
     if (!isCreateNew) {
-      setPreviewPortraitImg(modalViewStudent?.portrait_img);
+      setPreviewPortraitImg(item?.portrait_img);
       setModalData({
-        student_id: modalViewStudent?.student_id,
-        fullname: modalViewStudent?.fullname,
-        citizen_identification_number:
-          modalViewStudent?.citizen_identification_number,
+        _id: item?._id,
+        student_id: item?.student_id,
+        fullname: item?.fullname,
+        citizen_identification_number: item?.citizen_identification_number,
         gender:
-          modalViewStudent?.gender === true
+          item?.gender === true
             ? "Nam"
-            : modalViewStudent?.gender === false
+            : item?.gender === false
             ? "Nữ"
-            : modalViewStudent?.gender,
-        date_of_birth: modalViewStudent?.date_of_birth,
-        place_of_birth: modalViewStudent?.place_of_birth,
-        city_or_province: modalViewStudent?.permanent_address.city_or_province,
-        district: modalViewStudent?.permanent_address.district,
-        address: modalViewStudent?.permanent_address.address,
-        nationality: modalViewStudent?.nationality,
-        class: modalViewStudent?.class,
-        education_program: modalViewStudent?.education_program,
-        current_address: modalViewStudent?.current_address,
-        school_year:
-          modalViewStudent?.school_year.from +
-          " - " +
-          modalViewStudent?.school_year.to,
+            : item?.gender,
+        date_of_birth: item?.date_of_birth,
+        place_of_birth: item?.place_of_birth,
+        city_or_province: item?.permanent_address.city_or_province,
+        district: item?.permanent_address.district,
+        address: item?.permanent_address.address,
+        nationality: item?.nationality,
+        class: item?.class,
+        education_program: item?.education_program,
+        current_address: item?.current_address,
+        school_year: item?.school_year.from + " - " + item?.school_year.to,
       });
     }
-  }, [modalViewStudent]);
+  };
 
   const handleUpdateStudent = async () => {
     try {
+      setModifyDataLoading(true);
       const formData = new FormData();
       formData.append("image", portraitImgFile);
       formData.append("student_id", modalData?.student_id);
@@ -386,13 +395,35 @@ const StudentsManage = () => {
         formData.append("middle_name", middle_name);
       }
 
-      const response = await updateStudent(modalViewStudent._id, formData);
+      const response = await updateStudent(modalData._id, formData);
 
       if (response) {
+        // Cập nhật record trong setData
+        setData((prevData) => {
+          const updatedData = prevData.map((student) => {
+            if (student._id === response.student._id) {
+              return {
+                ...response.student,
+                gender: response.student.gender ? "Nam" : "Nữ",
+                fullname: `${response.student.last_name} ${response.student.middle_name} ${response.student.first_name}`,
+                student_type:
+                  response.student.student_type === "FORMAL"
+                    ? "Chính quy"
+                    : "Không xác định",
+                learning_status:
+                  learningStatus[response.student.learning_status],
+              };
+            }
+            return student;
+          });
+          return updatedData;
+        });
+        setModifyDataLoading(false);
         setIsEdit(false);
       }
     } catch (err) {
       console.error(err);
+      setModifyDataLoading(false);
     }
   };
 
@@ -498,14 +529,14 @@ const StudentsManage = () => {
                       </SvgIcon>
                     }
                     variant="contained"
-                    disabled={privateHttpRequest.isLoading}
+                    disabled={modifyDataLoading}
                   >
                     Thêm
                   </Button>
                   <Button
                     onClick={trainData}
                     variant="contained"
-                    disabled={privateHttpRequest.isLoading}
+                    disabled={modifyDataLoading}
                   >
                     Train ảnh
                   </Button>
@@ -515,6 +546,7 @@ const StudentsManage = () => {
             <StudentsSearch setSearch={setSearch} />
 
             <AdminTable
+              isLoading={dataLoading}
               count={totalRecords}
               data={data}
               onPageChange={handlePageChange}
@@ -532,7 +564,7 @@ const StudentsManage = () => {
                 "learning_status",
               ]}
               onClickItem={(item) => {
-                setModalViewStudent(item);
+                setViewItem(item);
                 toggleModal();
               }}
               hasCheckBox={false}
@@ -662,7 +694,6 @@ const StudentsManage = () => {
                   <FormControl sx={{ width: "90.6%" }}>
                     <RadioGroup
                       row
-                      defaultValue="Nữ"
                       value={modalData?.gender}
                       onChange={changeHandler}
                     >
@@ -857,6 +888,7 @@ const StudentsManage = () => {
                       backgroundColor: "lightpink",
                     }}
                     onClick={isEdit ? handleEditClick : toggleModal}
+                    disabled={modifyDataLoading}
                   >
                     {isEdit ? "Hủy" : "Đóng"}
                   </button>
@@ -872,6 +904,7 @@ const StudentsManage = () => {
                         ? handleCreateStudent
                         : handleEditClick
                     }
+                    disabled={modifyDataLoading}
                   >
                     {isEdit || isCreateNew ? "Lưu" : "Chỉnh sửa"}
                   </button>

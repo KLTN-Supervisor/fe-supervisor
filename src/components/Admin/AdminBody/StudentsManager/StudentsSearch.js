@@ -12,13 +12,13 @@ export const StudentsSearch = ({ setSearch }) => {
       <OutlinedInput
         defaultValue=""
         fullWidth
-        placeholder="Tên sinh viên...."
+        placeholder="Tên, mã sinh viên...."
         onKeyUp={handleSearch}
         startAdornment={
           <InputAdornment position="start">
             <SvgIcon
               color="action"
-              // fontSize="small"
+              //fontSize="small"
             >
               <SearchIcon />
             </SvgIcon>

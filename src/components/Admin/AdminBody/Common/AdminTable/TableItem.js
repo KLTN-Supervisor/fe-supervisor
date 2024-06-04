@@ -109,6 +109,7 @@ const AdminTableItem = (props) => {
         >
           {options.map((option, i) => (
             <MenuItem
+              key={i}
               onClick={() => {
                 handleClose();
                 option.handleClick(item);

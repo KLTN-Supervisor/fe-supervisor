@@ -33,6 +33,7 @@ const useItemIds = (items) => {
 
 export const AdminTable = (props) => {
   const {
+    isLoading,
     count = 0,
     data = [],
     onPageChange = () => {},
@@ -86,7 +87,7 @@ export const AdminTable = (props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.length > 0
+              {data.length > 0 && !isLoading
                 ? data.map((row) => (
                     <AdminTableItem
                       key={row._id}
@@ -104,9 +105,24 @@ export const AdminTable = (props) => {
                 : null}
             </TableBody>
           </Table>
-          {data.length === 0 && (
+          {isLoading && (
             <div style={{ display: "flex", justifyContent: "center" }}>
               <CircularProgress />
+            </div>
+          )}
+          {!isLoading && data.length === 0 && (
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <span
+                style={{
+                  fontSize: 20,
+                  fontWeight: 550,
+                  fontFamily: "inherit",
+                  marginTop: 20,
+                  marginBottom: 20,
+                }}
+              >
+                Chưa có dữ liệu!
+              </span>
             </div>
           )}
         </Box>

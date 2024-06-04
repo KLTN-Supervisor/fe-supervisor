@@ -8,10 +8,11 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import ArticleIcon from "@mui/icons-material/Article";
-import ReportGmailerrorredOutlinedIcon from "@mui/icons-material/ReportGmailerrorredOutlined";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import ReportGmailerrorredIcon from "@mui/icons-material/ReportGmailerrorred";
+import PortraitIcon from "@mui/icons-material/Portrait";
+import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { NavLink } from "react-router-dom";
 import useLogout from "../../../../hooks/auth-hook/logout-hook";
@@ -31,16 +32,16 @@ const SideNavAdminData = ({ handleDrawerClose }) => {
     {
       label: "Báo cáo",
       link: "report",
-      icon: <ReportGmailerrorredOutlinedIcon />,
+      icon: <ReportGmailerrorredIcon />,
     },
+    { label: "Lịch thi", link: "exam-schedules", icon: <ArticleIcon /> },
     {
       label: "Tài khoản",
       link: "users",
-      icon: <PermIdentityIcon />,
+      icon: <ManageAccountsIcon />,
     },
-    { label: "Sinh viên", link: "students", icon: <ArticleIcon /> },
-    { label: "Thanh tra", link: "inspectors", icon: <PermIdentityIcon /> },
-    { label: "Lịch thi", link: "exam-schedules", icon: <ArticleIcon /> },
+    { label: "Sinh viên", link: "students", icon: <PortraitIcon /> },
+    { label: "Thanh tra", link: "inspectors", icon: <SupervisorAccountIcon /> },
   ];
 
   const pdtListItemData = [
