@@ -35,7 +35,6 @@ html, body {
       .title{
         border-width: 0px 0px thin;
         border-bottom: rgba(0, 0, 0, 0.12) solid 0.5px;
-        margin: 30px 25px 0 15px;
         .text{
           margin: 0;
           display: inline-block;
@@ -77,10 +76,12 @@ html, body {
       }
     }
     .title{
-      width: 90%;
+      width: 95%;
+      display: flex;
+      align-items: center;
+      margin: 0;
       border-width: 0px 0px thin;
       border-bottom: rgba(0, 0, 0, 0.12) solid 0.5px;
-      margin: 50px 25px 0 15px;
       .text{
         margin: 0;
         display: inline-block;

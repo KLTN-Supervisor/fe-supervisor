@@ -110,15 +110,42 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
   };
 
   // OPEN YOU FACE WEBCAM
+  // const startVideo = () => {
+  //   navigator.mediaDevices
+  //     .getUserMedia({ video: true })
+  //     .then((currentStream) => {
+  //       videoRef.current.srcObject = currentStream;
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
   const startVideo = () => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true })
-      .then((currentStream) => {
-        videoRef.current.srcObject = currentStream;
-      })
-      .catch((err) => {
-        console.log(err);
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then((currentStream) => {
+          videoRef.current.srcObject = currentStream;
+        })
+        .catch((err) => {
+          console.error('Error accessing camera:', err);
+          setSnackBarNotif({
+            severity: "error",
+            message:
+              "Xảy ra lỗi khi sử dụng camera"
+          });
+          setSnackBarOpen(true);
+        });
+    } else {
+      console.error('Trình duyệt không hỗ trợ camera');
+      // Xử lý trường hợp trình duyệt không hỗ trợ API
+      setSnackBarNotif({
+        severity: "error",
+        message:
+          "Trình duyệt không hỗ trợ camera"
       });
+      setSnackBarOpen(true);
+    }
   };
   // LOAD MODELS FROM FACE API
 
@@ -142,16 +169,18 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
         .withFaceLandmarks()
         .withFaceDescriptors();
 
+      const screenWidth = window.screen.width;
+      console.log(screenWidth)
       // DRAW YOU FACE IN WEBCAM
       canvasRef.current.innerHTML = faceapi.createCanvas(videoRef.current);
       faceapi.matchDimensions(canvasRef.current, {
         width: videoRef.current ? videoRef.current.offsetWidth : 0,
-        height: 480,
+        height: screenWidth < 720 ? (screenWidth < 527 ? 225 : 300) : 480,
       });
 
       const resized = faceapi.resizeResults(detections, {
         width: videoRef.current ? videoRef.current.offsetWidth : 0,
-        height: 480,
+        height: screenWidth < 720 ? (screenWidth < 527 ? 225 : 300) : 480,
       });
 
       for (const detection of resized) {
@@ -678,6 +707,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                   ref={videoRef}
                   autoPlay
                   style={{ borderRadius: 10 }}
+                  className={cx("video")}
                 ></video>
               </div>
               <canvas

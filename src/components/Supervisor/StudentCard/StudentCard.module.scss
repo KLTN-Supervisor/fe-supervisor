@@ -299,9 +299,41 @@
   .student {
     width: 45%;
   }
+  .modal-navbar-content {
+    .modal-main {
+      flex-direction: column;
+      .modal-info {
+        flex: 1;
+        width: 100%;
+        .info {
+          .title {
+            width: 40%;
+          }
+        }
+      }
+      .appvide {
+        justify-content: baseline;
+        align-items: baseline;
+        .video{
+          width: 400px;
+          height: 300px;
+        }
+      }
+    }
+  }
 }
 @media (max-width: 527px) {
   .student {
     width: 200px;
+  }
+  .modal-navbar-content {
+    .modal-main {
+      .appvide {
+        .video{
+          width: 300px;
+          height: 225px;
+        }
+      }
+    }
   }
 }

@@ -133,12 +133,9 @@ function RoomingListPage() {
       </div>
       <div className={cx("studentPage__content")} ref={scrollRef}>
         <h1
-          style={{
-            fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                  Helvetica, Arial, sans-serif`,
-          }}
+          style={{fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`, fontWeight: 500, padding:"0px 20px 0px 20px"}}
         >
-          Tra cứu sinh viên
+          TRA CỨU SINH VIÊN
         </h1>
         <div className={cx("page_content")}>
           <div className={cx("page_content__header")}>
