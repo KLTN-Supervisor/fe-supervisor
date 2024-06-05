@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./HomePage.module.scss";
 import Sidenav from "../../../components/Sidenav";
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import LoadingCard from "../../../components/LoadingCard";
 import StudentCard from "../../../components/Supervisor/StudentCard";
 import { Alert, Snackbar, CircularProgress } from "@mui/material";
@@ -11,6 +11,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import CloseIcon from "@mui/icons-material/Close";
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import ImageListItemBar from "@mui/material/ImageListItemBar";
@@ -32,6 +33,7 @@ import ro from "date-fns/esm/locale/ro/index.js";
 const cx = classNames.bind(styles);
 
 function HomePage() {
+  const navigate = useNavigate();
   const location = useLocation();
   const { getStudents, attendanceStudent, noteReport, getExamReport, deleteExamReport } =
     useExamScheduleServices();
@@ -287,8 +289,14 @@ function HomePage() {
           >
             Báo cáo {report.length > 0 && `(${report.length})`}
           </div>
-          <div className={cx("title")}>
-            <h6 className={cx("text")}>{roomName}</h6>
+          <div style={{display: "flex", margin: "50px 25px 0 15px"}}>
+            <div>
+              <KeyboardBackspaceIcon style={{ marginRight: 20, width: 30, height: 30}} onClick={()=> navigate(-1)}/>
+            </div>
+            <div className={cx("title")}>
+              {/* <KeyboardBackspaceIcon style={{ marginRight: 20}}/> */}
+              <h6 className={cx("text")}>{roomName}</h6>
+            </div>
           </div>
           <div className={cx("page_content__body")}>
             <div className={cx("students")}>

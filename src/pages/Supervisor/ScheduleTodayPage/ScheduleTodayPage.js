@@ -129,9 +129,9 @@ function ExamSchedulePage() {
         <Sidenav />
       </div>
       <div className={cx("schedulePage__content")}>
-        <h1>Lich thi hom nay</h1>
+        <h1 style={{fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`, fontWeight: 500, padding:"0px 20px 0px 20px"}}>LỊCH THI HÔM NAY</h1>
         <List
-          sx={{ width: '90%',  bgcolor: '#ff6773', color:"white" }}
+          sx={{ width: '90%',  bgcolor: '#ff6773', color:"white", marginBottom: 2 }}
           component="nav"
           aria-labelledby="nested-list-subheader"
           subheader={
@@ -158,13 +158,13 @@ function ExamSchedulePage() {
               ) : students?.length > 0 ? (
                 students.map((student, i) => (
                 <ListItemButton key={student.student_id}>
-                  <ListItemIcon>
+                  <ListItemIcon style={ window.screen.width < 800 ? {display: "none"} : null}>
                     <WarningAmberRoundedIcon />
                   </ListItemIcon>
-                  <ListItemText primary={`MSSV: ${student.student_id}`} />
-                  <ListItemText primary={`Họ và tên: ${student.last_name} ${student.middle_name} ${student.first_name}`} />
-                  <ListItemText primary={student.schedules.map((schedule) => (
-                    `${schedule.room} (${schedule.time})`
+                  <ListItemText style={{wordWrap: "break-word"}} primary={`${student.student_id}`} />
+                  <ListItemText style={{wordWrap: "break-word"}} primary={`${student.last_name} ${student.middle_name} ${student.first_name}`} />
+                  <ListItemText style={{wordWrap: "break-word"}} primary={student.schedules.map((schedule) => (
+                    `${schedule.room} (${formatHour(schedule.time)})`
                   )).join(', ')} />
                 </ListItemButton>))
               ) : (
