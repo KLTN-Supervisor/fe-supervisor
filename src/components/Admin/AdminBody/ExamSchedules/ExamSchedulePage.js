@@ -32,6 +32,8 @@ import { format, parseISO } from "date-fns";
 import { useSelection } from "../../../../hooks/use-selection";
 import DownloadIcon from "@mui/icons-material/Download";
 import useAuth from "../../../../hooks/auth-hook/auth-hook";
+import { toast } from "react-toastify";
+import { formatHour } from "../../../../untils/format-date";
 
 const cx = classNames.bind(styles);
 
@@ -158,36 +160,15 @@ function ExamSchedules() {
     getBuildingsExam();
   }, [date]);
 
-  const [file, setFile] = useState();
-  const [fileIsValid, setFileIsValid] = useState();
-
   const [files, setFiles] = useState();
   const [filesIsValid, setFilesIsValid] = useState();
 
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
 
-  const removeFile = () => {
-    setFile(null);
-    setFileIsValid(false);
-  };
-
   const removeFiles = () => {
     setFiles(null);
     setFilesIsValid(false);
-  };
-
-  const uploadImportExamSchedulesFileHandler = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const response = await uploadImportFile(formData, "examSchedules");
-      if (response) {
-        removeFile();
-      }
-    } catch (err) {
-      console.log("upload file: ", err);
-    }
   };
 
   const uploadExamSchedulesFilesHandler = async () => {
@@ -231,7 +212,50 @@ function ExamSchedules() {
 
   const handleImportData = async () => {
     try {
-      const response = await importExamFromFiles(selectedFiles);
+      const response = await toast.promise(
+        () => importExamFromFiles(selectedFiles),
+        {
+          pending: "Đang đổ dữ liệu...",
+          error: {
+            render: ({ data }) => {
+              return `${data.message}`;
+            },
+          },
+          success: {
+            render: ({ data }) => {
+              if (data.new_records === 0)
+                return (
+                  <span>
+                    Không có lịch thi mới do toàn bộ bị trùng hoặc file rỗng!
+                  </span>
+                );
+              else if (data.duplicates.length === 0)
+                return (
+                  <span>
+                    Thành công!
+                    <br />
+                    Không có lịch thi bị trùng
+                  </span>
+                );
+              return (
+                <div>
+                  Thành công!
+                  <br />
+                  Các lịch thi bị trùng:
+                  <br />
+                  {data.duplicates.map((duplicate) => (
+                    <span>
+                      - Kỳ {duplicate.term} Năm: {duplicate.year.from}-
+                      {duplicate.year.to}, Ca {formatHour(duplicate.start_time)}
+                      Phòng: {duplicate.room.room_name} <br />
+                    </span>
+                  ))}
+                </div>
+              );
+            },
+          },
+        }
+      );
       if (response) {
         setVisible(false);
       }
