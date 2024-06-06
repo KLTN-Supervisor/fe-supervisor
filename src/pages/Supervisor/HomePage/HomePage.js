@@ -28,14 +28,14 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import useExamScheduleServices from "../../../services/useExamScheduleServices";
-import ro from "date-fns/esm/locale/ro/index.js";
+import { formatDate } from "../../../untils/format-date";
 
 const cx = classNames.bind(styles);
 
 function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { getStudents, attendanceStudent, noteReport, getExamReport, deleteExamReport } =
+  const { getStudents, attendanceStudent, noteReport, getExamReport, deleteExamReport, getRoomInfo } =
     useExamScheduleServices();
   // Lưu giá trị vào localStorage khi trang được tải
   useEffect(() => {
@@ -54,6 +54,7 @@ function HomePage() {
   };
 
   const [students, setStudents] = useState([]);
+  const [info, setInfo] = useState({});
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [isFetched, setIsFetched] = useState(false);
   const [snackBarOpen, setSnackBarOpen] = useState(false);
@@ -77,8 +78,23 @@ function HomePage() {
     }
   };
 
+  const getInfo = async () => {
+    if (!studentsLoading) {
+      setStudentsLoading(true);
+      try {
+        const response = await getRoomInfo(time, room);
+        setInfo(response);
+        setStudentsLoading(false);
+      } catch (err) {
+        setStudentsLoading(false);
+        console.log("get time error: ", err);
+      }
+    }
+  };
+
   
   useEffect(() => {
+    getInfo();
     getStudentsExam();
     getReportsExam()
   }, [time, room]);
@@ -266,6 +282,11 @@ function HomePage() {
     setStudents(updatedStudents);
   };
 
+  const printHandle = () => {
+    navigate(`/print?time=${time}&&room=${room}`);
+    // window.open(`/print?time=${time}&&room=${room}`);
+  };
+
   return (
     <div className={cx("homepage")}>
       <div className={cx("homepage__navWraper")}>
@@ -289,6 +310,23 @@ function HomePage() {
           >
             Báo cáo {report.length > 0 && `(${report.length})`}
           </div>
+          <div
+            onClick={printHandle}
+            style={{
+              position: "absolute",
+              right: "11%",
+              marginRight: 20,
+              top: "40px",
+              display: "inline-block",
+              backgroundColor: "#0095f6",
+              padding: "10px",
+              color: "white",
+              borderRadius: "10px",
+              cursor: "pointer",
+            }}
+          >
+            In danh sách
+          </div>
           <div style={{display: "flex", margin: "50px 25px 0 15px"}}>
             <div>
               <KeyboardBackspaceIcon style={{ marginRight: 20, width: 30, height: 30}} onClick={()=> navigate(-1)}/>
@@ -297,6 +335,15 @@ function HomePage() {
               {/* <KeyboardBackspaceIcon style={{ marginRight: 20}}/> */}
               <h6 className={cx("text")}>{roomName}</h6>
             </div>
+          </div>
+          <div style={{display: "flex", justifyContent:"center", marginTop: 20 }}>
+            <span style={{fontFamily: "Tahoma",
+                          fontSize: "14px",
+                          fontWeight: "bold",
+                          color: "#0051C6",
+            }}>
+              Môn thi: {info.subject_name}, Ngày thi: {formatDate(info.start_time)}, Số lượng: {info.quantity}
+            </span>
           </div>
           <div className={cx("page_content__body")}>
             <div className={cx("students")}>
