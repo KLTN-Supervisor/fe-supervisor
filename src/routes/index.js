@@ -4,6 +4,7 @@ import ScheduleTodayPage from "../pages/Supervisor/ScheduleTodayPage";
 import ExamSchedulePage from "../pages/Supervisor/ExamSchedulePage";
 import SchedulePage from "../pages/Supervisor/ScheduleDetailPage";
 import StudentSearchingPage from "../pages/Supervisor/StudentSearchingPage";
+import PrintPage from "../pages/Supervisor/PrintPage";
 import DashboardBody from "../components/Admin/AdminBody/Dashboard/Dashboard";
 import UsersManage from "../components/Admin/AdminBody/UsersManager/Users";
 import StudentsManage from "../components/Admin/AdminBody/StudentsManager/Students";
@@ -25,6 +26,7 @@ const privateRoutes = [
   { path: "/searchExamSchedule/schedule", component: SchedulePage },
   { path: "/searchStudent", component: StudentSearchingPage },
   { path: "/attendance", component: HomePage },
+  { path: "/print", component: PrintPage },
   { path: "/", component: ScheduleTodayPage },
 ];
 

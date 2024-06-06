@@ -3,20 +3,11 @@ import classNames from "classnames/bind";
 import styles from "./StudentSearchingPage.module.scss";
 import Sidenav from "../../../components/Sidenav";
 import SearchIcon from "@mui/icons-material/Search";
-import CloseIcon from "@mui/icons-material/Close";
-import EditIcon from "@mui/icons-material/Edit";
-import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import dayjs from "dayjs";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import StudentCard from "../../../components/Supervisor/StudentCard";
 import LoadingCard from "../../../components/LoadingCard";
-import { useNavigate } from "react-router-dom";
 import useStudentServices from "../../../services/useStudentServices";
 import { Alert, Snackbar, CircularProgress } from "@mui/material";
 
@@ -33,8 +24,6 @@ function RoomingListPage() {
     message: "This is success message!",
   }); //severity: success, error, info, warning
 
-  const [value, setValue] = useState(dayjs("2022-04-17T15:30"));
-  const [currentTitle, setCurrentTitle] = useState(document.title);
 
   const { getStudentsPaginated, searchStudents } = useStudentServices();
 
@@ -86,6 +75,37 @@ function RoomingListPage() {
         console.log("get students error: ", err);
       } finally {
         setStudentsLoading(false);
+      }
+    }
+  };
+
+  const handleEnter = async (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Ngăn chặn hành vi mặc định của phím Enter (như xuống dòng)
+      // console.log("Enter .....");
+      if (!studentsLoading && searchRef.current.value != "") {
+        setStudentsLoading(true);
+        try {
+          if (typeSearch == "") {
+            setSnackBarNotif({
+              severity: "error",
+              message: "Vui lòng chọn mục tìm kiếm",
+            });
+            setSnackBarOpen(true);
+          } else {
+            const response = await searchStudents(
+              0,
+              searchRef.current.value,
+              typeSearch
+            );
+            setStudents(response);
+            console.log(response);
+          }
+        } catch (err) {
+          console.log("get students error: ", err);
+        } finally {
+          setStudentsLoading(false);
+        }
       }
     }
   };
@@ -166,7 +186,7 @@ function RoomingListPage() {
               </Select>
             </FormControl>
             <div className={cx("search")}>
-              <input type="text" placeholder="Search" ref={searchRef} />
+              <input type="text" placeholder="Search" ref={searchRef} onKeyUp={handleEnter}/>
               <button
                 className={cx("search__button")}
                 style={{
