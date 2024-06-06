@@ -20,13 +20,13 @@ import useAccountServices from "../../services/useAccountServices";
 const cx = classNames.bind(styles);
 
 const AuthPage = () => {
-  const { auth, persist, setAuth, setPersistLogin } = useAuth();
+  const { auth, persist, setAuth, setUserLogin } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
   const from = "/";
 
-  const { login } = useAccountServices();
+  const { login, getLoginAccount } = useAccountServices();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -107,13 +107,12 @@ const AuthPage = () => {
     try {
       const response = await login(formData.username, formData.password);
       if (response) {
-        const accessToken = response?.access_token;
-        if (accessToken) {
-          setAuth({ accessToken: accessToken, role: response.role });
-          setPersistLogin();
-          response.role === "ADMIN"
+        const user = await getLoginAccount();
+        if (user) {
+          setUserLogin(user);
+          user.role === "ADMIN"
             ? navigate("/administrator/report", { replace: true })
-            : response.role === "ACADEMIC_AFFAIRS_OFFICE"
+            : user.role === "ACADEMIC_AFFAIRS_OFFICE"
             ? navigate("/administrator/exam-schedules", { replace: true })
             : navigate("/", { replace: true });
           setError(null);

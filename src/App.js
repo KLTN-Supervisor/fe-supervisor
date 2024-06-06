@@ -44,35 +44,35 @@ function App() {
             />
           );
         })}
-        <Route element={<PersistLogin />}>
-          <Route element={<RequireAuth roles={["USER", "ADMIN"]} />}>
-            {privateRoutes.map((route, index) => {
-              const Page = route.component;
+        {/* <Route element={<PersistLogin />}> */}
+        <Route element={<RequireAuth roles={["USER", "ADMIN"]} />}>
+          {privateRoutes.map((route, index) => {
+            const Page = route.component;
 
-              //   let Layout;
+            //   let Layout;
 
-              //   if (route.layout) {
-              //       Layout = route.layout;
-              //   } else if (route.layout === null) {
-              //       Layout = Fragment;
-              //   }
+            //   if (route.layout) {
+            //       Layout = route.layout;
+            //   } else if (route.layout === null) {
+            //       Layout = Fragment;
+            //   }
 
-              return (
-                <Route
-                  key={index}
-                  path={route.path}
-                  element={
-                    //   <AuthWrapper>
-                    //   <Layout>
-                    <Page />
-                    //   </Layout>
-                    //   </AuthWrapper>
-                  }
-                />
-              );
-            })}
-          </Route>
+            return (
+              <Route
+                key={index}
+                path={route.path}
+                element={
+                  //   <AuthWrapper>
+                  //   <Layout>
+                  <Page />
+                  //   </Layout>
+                  //   </AuthWrapper>
+                }
+              />
+            );
+          })}
         </Route>
+        {/* </Route> */}
         <Route
           element={<RequireAuth roles={["ADMIN", "ACADEMIC_AFFAIRS_OFFICE"]} />}
         >
