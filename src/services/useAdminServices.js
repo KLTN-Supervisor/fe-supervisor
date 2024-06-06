@@ -100,7 +100,7 @@ const useAdminServices = () => {
 
   const banUsers = async (id) => {
     try {
-      const response = await privateRequest(`/admin/user/ban/${id}`, "put");
+      const response = await privateRequest(`/admin/accounts/ban/${id}`, "put");
 
       return response?.data;
     } catch (err) {
@@ -110,7 +110,10 @@ const useAdminServices = () => {
 
   const unBanUsers = async (id) => {
     try {
-      const response = await privateRequest(`/admin/user/unban/${id}`, "put");
+      const response = await privateRequest(
+        `/admin/accounts/unban/${id}`,
+        "put"
+      );
 
       return response?.data;
     } catch (err) {

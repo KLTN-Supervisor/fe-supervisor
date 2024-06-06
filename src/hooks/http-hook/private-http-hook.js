@@ -31,9 +31,10 @@ const usePrivateHttpClient = () => {
         if (response.status >= 400) {
           // Xử lý lỗi khi status code trên 400
           const errorData = {
-            statusCode: response.status,
+            status: response.status,
             message: response.data.message,
           };
+
           throw errorData;
         }
 

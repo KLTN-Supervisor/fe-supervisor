@@ -8,6 +8,7 @@ import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   Container,
   FormControl,
   FormControlLabel,
@@ -159,7 +160,7 @@ const StudentsManage = () => {
         removeArchiveFiles();
       }
     } catch (err) {
-      console.log("upload file: ", err);
+      console.log("upload image: ", err);
     }
   };
 
@@ -197,8 +198,8 @@ const StudentsManage = () => {
           })
         );
         setTotalRecords(response.total_students);
-        setDataLoading(false);
       }
+      setDataLoading(false);
     } catch (err) {
       setDataLoading(false);
     }
@@ -251,9 +252,9 @@ const StudentsManage = () => {
       const response = await createNewStudent(formData);
 
       if (response) {
+        toast.success("Tạo mới thành công!");
         setViewItem(response.student);
-        if (isEdit) setIsEdit(false);
-        setIsCreateNew(false);
+
         setData((prev) => [
           {
             ...response.student,
@@ -268,10 +269,11 @@ const StudentsManage = () => {
           ...prev,
         ]);
         setTotalRecords((prev) => prev + 1);
-        setModifyDataLoading(false);
+        if (modal) toggleModal();
       }
+      setModifyDataLoading(false);
     } catch (err) {
-      console.error(err);
+      toast.error(err.message);
       setModifyDataLoading(false);
     }
   };
@@ -398,6 +400,7 @@ const StudentsManage = () => {
       const response = await updateStudent(modalData._id, formData);
 
       if (response) {
+        toast.success("Cập nhật thành công!");
         // Cập nhật record trong setData
         setData((prevData) => {
           const updatedData = prevData.map((student) => {
@@ -418,11 +421,11 @@ const StudentsManage = () => {
           });
           return updatedData;
         });
-        setModifyDataLoading(false);
-        setIsEdit(false);
+        if (modal) toggleModal();
       }
+      setModifyDataLoading(false);
     } catch (err) {
-      console.error(err);
+      toast.error(err.message);
       setModifyDataLoading(false);
     }
   };
@@ -555,11 +558,17 @@ const StudentsManage = () => {
               rowsPerPage={rowsPerPage}
               setItemsSelected={setUsersSelected}
               selected={usersSelected}
-              colsName={["MSSV", "Họ tên", "Hệ", "Giới tính", "Tình trạng"]}
+              colsName={[
+                "MSSV",
+                "Họ tên",
+                "Chương trình học",
+                "Giới tính",
+                "Tình trạng",
+              ]}
               colsData={[
                 "student_id",
                 "fullname",
-                "student_type",
+                "education_program",
                 "gender",
                 "learning_status",
               ]}
@@ -906,7 +915,13 @@ const StudentsManage = () => {
                     }
                     disabled={modifyDataLoading}
                   >
-                    {isEdit || isCreateNew ? "Lưu" : "Chỉnh sửa"}
+                    {modifyDataLoading ? (
+                      <CircularProgress size={25} sx={{ mt: 0.5 }} />
+                    ) : isEdit || isCreateNew ? (
+                      "Lưu"
+                    ) : (
+                      "Chỉnh sửa"
+                    )}
                   </button>
                 </div>
               </div>

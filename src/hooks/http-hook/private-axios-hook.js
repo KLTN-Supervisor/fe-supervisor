@@ -8,7 +8,7 @@ const axiosPrivate = axios.create({
 
   withCredentials: false,
   validateStatus: (status) => {
-    return status < 500; // Resolve only if the status code is less than 500
+    return status <= 500; // Resolve only if the status code is less than 500
   },
 });
 

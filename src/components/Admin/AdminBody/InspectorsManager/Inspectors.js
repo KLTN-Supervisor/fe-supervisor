@@ -8,6 +8,7 @@ import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   Container,
   FormControl,
   FormControlLabel,
@@ -34,6 +35,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import CloseIcon from "@mui/icons-material/Close";
+import { toast } from "react-toastify";
 
 const cx = classNames.bind(styles);
 const cx2 = classNames.bind(styles2);
@@ -51,13 +53,16 @@ const InspectorsManage = () => {
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalRecord, setTotalRecord] = useState(0);
+  const [totalRecords, setTotalRecords] = useState(0);
 
   const [search, setSearch] = useState("");
   const [data, setData] = useState([]);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [modifyDataLoading, setModifyDataLoading] = useState(false);
 
   const [usersSelected, setUsersSelected] = useState([]);
   const [modalData, setModalData] = useState({
+    _id: "",
     inspector_id: "",
     fullname: "",
     citizen_identification_number: "",
@@ -83,7 +88,18 @@ const InspectorsManage = () => {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const response = await uploadImportFile(formData, "inspectors");
+      const response = await toast.promise(
+        () => uploadImportFile(formData, "inspectors"),
+        {
+          pending: "Đang tải...",
+          success: "Đã tải xong 👌",
+          error: {
+            render: ({ data }) => {
+              return `${data.message}`;
+            },
+          },
+        }
+      );
       if (response) {
         removeFile();
       }
@@ -113,22 +129,28 @@ const InspectorsManage = () => {
   };
 
   const getData = useCallback(async () => {
-    const response = await getAdminInspectors(page, rowsPerPage, search);
-    if (response) {
-      setData(
-        response.inspectors.map((inspector) => {
-          return {
-            ...inspector,
-            gender: inspector.gender ? "Nam" : "Nữ",
-            fullname: `${inspector.last_name} ${inspector.middle_name} ${inspector.first_name}`,
-            working_status:
-              inspector.working_status === "WORKING"
-                ? "Còn làm việc"
-                : "Không xác định",
-          };
-        })
-      );
-      setTotalRecord(response.total_inspectors);
+    try {
+      setDataLoading(true);
+      const response = await getAdminInspectors(page, rowsPerPage, search);
+      if (response) {
+        setData(
+          response.inspectors.map((inspector) => {
+            return {
+              ...inspector,
+              gender: inspector.gender ? "Nam" : "Nữ",
+              fullname: `${inspector.last_name} ${inspector.middle_name} ${inspector.first_name}`,
+              working_status:
+                inspector.working_status === "WORKING"
+                  ? "Còn làm việc"
+                  : "Không xác định",
+            };
+          })
+        );
+        setTotalRecords(response.total_inspectors);
+        setDataLoading(false);
+      }
+    } catch (err) {
+      setDataLoading(false);
     }
   }, [page, rowsPerPage, search]);
 
@@ -148,6 +170,7 @@ const InspectorsManage = () => {
 
   const clearModalData = () => {
     setModalData({
+      _id: "",
       inspector_id: "",
       fullname: "",
       citizen_identification_number: "",
@@ -195,11 +218,35 @@ const InspectorsManage = () => {
   const [isCreateNew, setIsCreateNew] = useState(false);
 
   const [modal, setModal] = useState(false);
-  const [modalViewStudent, setModalViewStudent] = useState(null);
   const toggleModal = () => {
     if (isEdit) setIsEdit(false);
     if (isCreateNew) setIsCreateNew(false);
     setModal(!modal);
+  };
+
+  const setViewItem = (item) => {
+    if (!isCreateNew) {
+      setPreviewPortraitImg(item?.portrait_img);
+      setModalData({
+        _id: item?._id,
+        inspector_id: item?.inspector_id,
+        fullname: item?.fullname,
+        citizen_identification_number: item?.citizen_identification_number,
+        gender:
+          item?.gender === true
+            ? "Nam"
+            : item?.gender === false
+            ? "Nữ"
+            : item?.gender,
+        date_of_birth: item?.date_of_birth,
+        place_of_birth: item?.place_of_birth,
+        city_or_province: item?.permanent_address.city_or_province,
+        district: item?.permanent_address.district,
+        address: item?.permanent_address.address,
+        nationality: item?.nationality,
+        current_address: item?.current_address,
+      });
+    }
   };
 
   const handleEditClick = () => {
@@ -209,6 +256,7 @@ const InspectorsManage = () => {
 
   const handleCreateStudent = async () => {
     try {
+      setModifyDataLoading(true);
       const formData = new FormData();
       formData.append("image", portraitImgFile);
       formData.append("inspector_id", modalData?.inspector_id);
@@ -245,9 +293,8 @@ const InspectorsManage = () => {
       const response = await createNewInspector(formData);
 
       if (response) {
-        setModalViewStudent(response.inspector);
-        if (isEdit) setIsEdit(false);
-        setIsCreateNew(false);
+        toast.success("Tạo mới thành công!");
+
         setData((prev) => [
           {
             ...response.inspector,
@@ -260,15 +307,19 @@ const InspectorsManage = () => {
           },
           ...prev,
         ]);
-        setTotalRecord((prev) => prev + 1);
+        setTotalRecords((prev) => prev + 1);
+        if (modal) toggleModal();
       }
+      setModifyDataLoading(false);
     } catch (err) {
-      console.error(err);
+      toast.error(err.message);
+      setModifyDataLoading(false);
     }
   };
 
   const handleUpdateStudent = async () => {
     try {
+      setModifyDataLoading(true);
       const formData = new FormData();
       formData.append("image", portraitImgFile);
       formData.append("inspector_id", modalData?.inspector_id);
@@ -303,40 +354,36 @@ const InspectorsManage = () => {
         formData.append("middle_name", middle_name);
       }
 
-      const response = await updateInspector(modalViewStudent._id, formData);
+      const response = await updateInspector(modalData._id, formData);
 
       if (response) {
-        setIsEdit(false);
+        toast.success("Cập nhật thành công!");
+        // Cập nhật record trong setData
+        setData((prevData) => {
+          const updatedData = prevData.map((inspector) => {
+            if (inspector._id === response.inspector._id) {
+              return {
+                ...response.inspector,
+                gender: response.inspector.gender ? "Nam" : "Nữ",
+                fullname: `${response.inspector.last_name} ${response.inspector.middle_name} ${response.inspector.first_name}`,
+                working_status:
+                  response.inspector.working_status === "WORKING"
+                    ? "Còn làm việc"
+                    : "Không xác định",
+              };
+            }
+            return inspector;
+          });
+          return updatedData;
+        });
+        if (modal) toggleModal();
       }
+      setModifyDataLoading(false);
     } catch (err) {
-      console.error(err);
+      toast.error(err.message);
+      setModifyDataLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (!isCreateNew) {
-      setPreviewPortraitImg(modalViewStudent?.portrait_img);
-      setModalData({
-        inspector_id: modalViewStudent?.inspector_id,
-        fullname: modalViewStudent?.fullname,
-        citizen_identification_number:
-          modalViewStudent?.citizen_identification_number,
-        gender:
-          modalViewStudent?.gender === true
-            ? "Nam"
-            : modalViewStudent?.gender === false
-            ? "Nữ"
-            : modalViewStudent?.gender,
-        date_of_birth: modalViewStudent?.date_of_birth,
-        place_of_birth: modalViewStudent?.place_of_birth,
-        city_or_province: modalViewStudent?.permanent_address.city_or_province,
-        district: modalViewStudent?.permanent_address.district,
-        address: modalViewStudent?.permanent_address.address,
-        nationality: modalViewStudent?.nationality,
-        current_address: modalViewStudent?.current_address,
-      });
-    }
-  }, [modalViewStudent]);
 
   return (
     <>
@@ -390,7 +437,8 @@ const InspectorsManage = () => {
             <StudentsSearch setSearch={setSearch} />
 
             <AdminTable
-              count={totalRecord}
+              isLoading={dataLoading}
+              count={totalRecords}
               data={data}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
@@ -406,7 +454,7 @@ const InspectorsManage = () => {
                 "working_status",
               ]}
               onClickItem={(item) => {
-                setModalViewStudent(item);
+                setViewItem(item);
                 toggleModal();
               }}
               hasCheckBox={false}
@@ -691,6 +739,7 @@ const InspectorsManage = () => {
                       backgroundColor: "lightpink",
                     }}
                     onClick={isEdit ? handleEditClick : toggleModal}
+                    disabled={modifyDataLoading}
                   >
                     {isEdit ? "Hủy" : "Đóng"}
                   </button>
@@ -706,8 +755,15 @@ const InspectorsManage = () => {
                         ? handleCreateStudent
                         : handleEditClick
                     }
+                    disabled={modifyDataLoading}
                   >
-                    {isEdit || isCreateNew ? "Lưu" : "Chỉnh sửa"}
+                    {modifyDataLoading ? (
+                      <CircularProgress size={25} sx={{ mt: 0.5 }} />
+                    ) : isEdit || isCreateNew ? (
+                      "Lưu"
+                    ) : (
+                      "Chỉnh sửa"
+                    )}
                   </button>
                 </div>
               </div>

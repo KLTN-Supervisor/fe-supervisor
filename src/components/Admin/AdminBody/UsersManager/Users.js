@@ -55,6 +55,8 @@ const UsersManage = () => {
   const [search, setSearch] = useState("");
   const [data, setData] = useState([]);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [dataLoading, setDataLoading] = useState(true);
+  const [modifyDataLoading, setModifyDataLoading] = useState(false);
 
   const [usersSelected, setUsersSelected] = useState([]);
 
@@ -93,9 +95,11 @@ const UsersManage = () => {
   const [modal, setModal] = useState(false);
   const [modalViewStudent, setModalViewStudent] = useState(null);
   const [modalData, setModalData] = useState({
+    _id: "",
     fullname: "",
     username: "",
     password: "",
+    email: "",
     role: "",
     banned: "",
     online: "",
@@ -119,9 +123,11 @@ const UsersManage = () => {
 
   const clearModalData = () => {
     setModalData({
+      _id: "",
       fullname: "",
       username: "",
       password: "",
+      email: "",
       role: "",
       banned: "",
       online: "",
@@ -196,7 +202,15 @@ const UsersManage = () => {
     try {
       const banPromises = selectedIds.map((id) => banUsers(id));
 
-      const responses = await Promise.all(banPromises);
+      const responses = await toast.promise(Promise.all(banPromises), {
+        pending: "Đang ban...",
+        success: "Đã xong 👌",
+        error: {
+          render: ({ data }) => {
+            return `${data.message}`;
+          },
+        },
+      });
 
       if (responses) await getData();
     } catch (err) {
@@ -214,7 +228,15 @@ const UsersManage = () => {
     try {
       const unBanPromises = selectedIds.map((id) => unBanUsers(id));
 
-      const responses = await Promise.all(unBanPromises);
+      const responses = await toast.promise(Promise.all(unBanPromises), {
+        pending: "Đang gỡ ban...",
+        success: "Đã xong 👌",
+        error: {
+          render: ({ data }) => {
+            return `${data.message}`;
+          },
+        },
+      });
 
       if (responses) await getData();
     } catch (err) {
@@ -224,11 +246,13 @@ const UsersManage = () => {
 
   const handleCreateAccount = async () => {
     try {
+      setDataLoading(true);
       const formData = new FormData();
       formData.append("avatar", portraitImgFile);
       formData.append("username", modalData?.username);
       formData.append("password", modalData?.password);
       formData.append("fullname", modalData?.fullname);
+      formData.append("email", modalData?.email);
       formData.append("role", modalData?.role);
 
       const response = await toast.promise(() => createAccount(formData), {
@@ -248,19 +272,23 @@ const UsersManage = () => {
         setIsCreateNew(false);
         setData((prev) => [response.account, ...prev]);
         setTotalRecords((prev) => prev + 1);
+        setDataLoading(false);
       }
     } catch (err) {
       console.error(err);
+      setDataLoading(false);
     }
   };
 
   const handleUpdateAccount = async () => {
     try {
+      setDataLoading(true);
       const formData = new FormData();
       formData.append("avatar", portraitImgFile);
       formData.append("username", modalData?.username);
       formData.append("password", modalData?.password);
       formData.append("fullname", modalData?.fullname);
+      formData.append("email", modalData?.email);
       formData.append("role", modalData?.role);
 
       const response = await updateAccount(formData);
@@ -268,9 +296,11 @@ const UsersManage = () => {
       if (response) {
         if (isEdit) setIsEdit(false);
         setIsCreateNew(false);
+        setDataLoading(false);
       }
     } catch (err) {
       console.error(err);
+      setDataLoading(false);
     }
   };
 
@@ -494,6 +524,19 @@ const UsersManage = () => {
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
                     value={modalData?.fullname}
+                    readOnly={!isEdit && !isCreateNew}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Email:</div>
+                  <input
+                    id="email"
+                    className={cx2(
+                      "input-span",
+                      !isEdit && !isCreateNew && "input-span-focus"
+                    )}
+                    value={modalData?.email}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
