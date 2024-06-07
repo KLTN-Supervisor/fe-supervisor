@@ -19,6 +19,7 @@ const RequireAuth = ({ roles = ["USER"] }) => {
 
   const checkAuth = async () => {
     try {
+      console.log("dô auth trước: ", user);
       if (!user) {
         await logout();
       }
@@ -28,9 +29,7 @@ const RequireAuth = ({ roles = ["USER"] }) => {
   };
 
   useEffect(() => {
-    if (effectRan.current === true || process.env.NODE_ENV !== "development") {
-      checkAuth();
-    }
+    checkAuth();
 
     return () => {
       effectRan.current = true;
@@ -38,7 +37,7 @@ const RequireAuth = ({ roles = ["USER"] }) => {
   }, []);
 
   if (user) {
-    if (roles.includes(user?.role)) {
+    if (roles.includes(user.role)) {
       return <Outlet />;
     } else {
       return <Navigate to="/unauthorized" state={{ from: location }} replace />;

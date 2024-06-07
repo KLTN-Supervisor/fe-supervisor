@@ -107,7 +107,8 @@ const AuthPage = () => {
     try {
       const response = await login(formData.username, formData.password);
       if (response) {
-        const user = await getLoginAccount();
+        const userResponse = await getLoginAccount();
+        const user = userResponse.user;
         if (user) {
           setUserLogin(user);
           user.role === "ADMIN"

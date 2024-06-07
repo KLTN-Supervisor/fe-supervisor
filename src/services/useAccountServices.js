@@ -7,7 +7,7 @@ const useAccountServices = () => {
 
   const login = async (username, password) => {
     try {
-      const response = await publicRequest(
+      const response = await privateRequest(
         "/accounts/login",
         "post",
         { username: username, password: password },

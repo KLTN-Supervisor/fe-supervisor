@@ -16,6 +16,7 @@ function App() {
       faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
     ]);
   });
+
   return (
     <div className="App">
       <Routes>
@@ -44,54 +45,57 @@ function App() {
             />
           );
         })}
-        {/* <Route element={<PersistLogin />}> */}
-        <Route element={<RequireAuth roles={["USER", "ADMIN"]} />}>
-          {privateRoutes.map((route, index) => {
-            const Page = route.component;
+        <Route element={<PersistLogin />}>
+          <Route element={<RequireAuth roles={["USER", "ADMIN"]} />}>
+            {privateRoutes.map((route, index) => {
+              const Page = route.component;
 
-            //   let Layout;
+              //   let Layout;
 
-            //   if (route.layout) {
-            //       Layout = route.layout;
-            //   } else if (route.layout === null) {
-            //       Layout = Fragment;
-            //   }
+              //   if (route.layout) {
+              //       Layout = route.layout;
+              //   } else if (route.layout === null) {
+              //       Layout = Fragment;
+              //   }
 
-            return (
-              <Route
-                key={index}
-                path={route.path}
-                element={
-                  //   <AuthWrapper>
-                  //   <Layout>
-                  <Page />
-                  //   </Layout>
-                  //   </AuthWrapper>
-                }
-              />
-            );
-          })}
-        </Route>
-        {/* </Route> */}
-        <Route
-          element={<RequireAuth roles={["ADMIN", "ACADEMIC_AFFAIRS_OFFICE"]} />}
-        >
-          {adminRoutes.map((route, index) => {
-            const Pages = route.components || [];
+              return (
+                <Route
+                  key={index}
+                  path={route.path}
+                  element={
+                    //   <AuthWrapper>
+                    //   <Layout>
+                    <Page />
+                    //   </Layout>
+                    //   </AuthWrapper>
+                  }
+                />
+              );
+            })}
+          </Route>
 
-            const Layout = route.layout || Fragment;
-            return (
-              <Route key={index} path={route.path} element={<Layout />}>
-                {Pages.map((comp, compIndex) => (
-                  <Route
-                    key={compIndex}
-                    path={comp.path}
-                    element={<comp.component />}
-                  />
-                ))}
-              </Route>
-            );
-          })}
+          <Route
+            element={
+              <RequireAuth roles={["ADMIN", "ACADEMIC_AFFAIRS_OFFICE"]} />
+            }
+          >
+            {adminRoutes.map((route, index) => {
+              const Pages = route.components || [];
+
+              const Layout = route.layout || Fragment;
+              return (
+                <Route key={index} path={route.path} element={<Layout />}>
+                  {Pages.map((comp, compIndex) => (
+                    <Route
+                      key={compIndex}
+                      path={comp.path}
+                      element={<comp.component />}
+                    />
+                  ))}
+                </Route>
+              );
+            })}
+          </Route>
         </Route>
       </Routes>
       <ToastContainer

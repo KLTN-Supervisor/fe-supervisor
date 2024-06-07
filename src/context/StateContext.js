@@ -1,7 +1,5 @@
 import { createContext, useEffect, useReducer, useState } from "react";
 import StateReducer from "./StateReducer";
-import { setUser } from "./StateAction";
-import useAccountServices from "../services/useAccountServices";
 
 const INITIAL_STATE = {
   persist: JSON.parse(localStorage.getItem("persist") || false),
@@ -28,20 +26,6 @@ export const StateContext = createContext(INITIAL_STATE);
 export const StateContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(StateReducer, INITIAL_STATE);
   const [auth, setAuth] = useState({});
-  const { getLoginAccount } = useAccountServices();
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const user = await getLoginAccount();
-        if (user) dispatch(setUser(user));
-        else dispatch(setUser(null));
-      } catch (err) {
-        console.log("Chưa đăng nhập!");
-        dispatch(setUser(null));
-      }
-    })();
-  }, []);
 
   return (
     <StateContext.Provider
