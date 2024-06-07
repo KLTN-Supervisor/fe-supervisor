@@ -6,7 +6,7 @@ import useRefreshToken from "./refresh-token";
 const axiosPrivate = axios.create({
   baseURL: process.env.REACT_APP_BASE_URL,
 
-  withCredentials: false,
+  withCredentials: true,
   validateStatus: (status) => {
     return status <= 500; // Resolve only if the status code is less than 500
   },

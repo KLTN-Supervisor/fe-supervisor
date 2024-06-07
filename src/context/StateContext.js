@@ -37,6 +37,7 @@ export const StateContextProvider = ({ children }) => {
         if (user) dispatch(setUser(user));
         else dispatch(setUser(null));
       } catch (err) {
+        console.log("Chưa đăng nhập!");
         dispatch(setUser(null));
       }
     })();
