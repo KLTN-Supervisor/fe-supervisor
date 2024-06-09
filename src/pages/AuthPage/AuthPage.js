@@ -17,15 +17,17 @@ import useAuth from "../../hooks/auth-hook/auth-hook";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LinearProgress } from "@mui/material";
 import useAccountServices from "../../services/useAccountServices";
+import WelcomPage from "./WelcomPage";
 const cx = classNames.bind(styles);
 
 const AuthPage = () => {
-  const { auth, persist, setAuth, setUserLogin } = useAuth();
+  const { setUserLogin } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
   const from = "/";
 
+  const [onLoading, setOnLoading] = useState(true);
   const { login, getLoginAccount } = useAccountServices();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -132,7 +134,24 @@ const AuthPage = () => {
     }
   };
 
-  return (
+  useEffect(() => {
+    (async () => {
+      const userResponse = await getLoginAccount();
+      const user = userResponse.user;
+
+      if (user) {
+        setUserLogin(user);
+        user.role === "ADMIN"
+          ? navigate("/administrator/report", { replace: true })
+          : user.role === "ACADEMIC_AFFAIRS_OFFICE"
+          ? navigate("/administrator/exam-schedules", { replace: true })
+          : navigate("/", { replace: true });
+      }
+      setOnLoading(false);
+    })();
+  }, []);
+
+  return !onLoading ? (
     <div
       style={{
         display: "flex",
@@ -239,6 +258,8 @@ const AuthPage = () => {
         </Paper>
       </div>
     </div>
+  ) : (
+    <WelcomPage />
   );
 };
 
