@@ -3,15 +3,12 @@ import useAuth from "../../hooks/auth-hook/auth-hook";
 import { useEffect, useRef } from "react";
 import usePrivateHttpClient from "../../hooks/http-hook/private-http-hook";
 import useAccountServices from "../../services/useAccountServices";
-import useRefreshToken from "../../hooks/http-hook/refresh-token";
 import useLogout from "../../hooks/auth-hook/logout-hook";
 import { toast } from "react-toastify";
 
 const RequireAuth = ({ roles = ["USER"] }) => {
-  const { user, setUserLogin } = useAuth();
+  const { user } = useAuth();
   const location = useLocation();
-  const { privateRequest } = usePrivateHttpClient();
-  const { getLoginAccount } = useAccountServices();
 
   const { logout } = useLogout();
 
@@ -19,7 +16,7 @@ const RequireAuth = ({ roles = ["USER"] }) => {
 
   const checkAuth = async () => {
     try {
-      console.log("dô auth trước: ", user);
+      //console.log("dô auth trước: ", user);
       if (!user) {
         await logout();
       }

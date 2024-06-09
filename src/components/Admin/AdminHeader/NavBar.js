@@ -10,14 +10,14 @@ import useAuth from "../../../hooks/auth-hook/auth-hook";
 const cx = classNames.bind(styles);
 
 const NavBarAdmin = ({ handleDrawerToggle }) => {
-  const { auth } = useAuth();
+  const { user } = useAuth();
   return (
     <AppBar position="sticky" sx={{ zIndex: 1 }}>
       <Toolbar className={cx("toolbar")}>
         <Typography variant="h6" className={cx("logo")}>
-          {auth?.role === "ADMIN"
+          {user?.role === "ADMIN"
             ? "Quản trị"
-            : auth?.role === "ACADEMIC_AFFAIRS_OFFICE"
+            : user?.role === "ACADEMIC_AFFAIRS_OFFICE"
             ? "Phòng đào tạo"
             : null}
         </Typography>

@@ -18,14 +18,14 @@ const PersistLogin = () => {
   useEffect(() => {
     if (effectRan.current === true || process.env.NODE_ENV !== "development") {
       const getUserLogin = async () => {
-        console.log("dô persist trước: ");
+        //console.log("dô persist trước: ");
         try {
           const userResponse = await getLoginAccount();
           if (userResponse) setUserLogin(userResponse.user);
           else setUserLogin(null);
           setIsLoad(false);
         } catch (err) {
-          console.log("Chưa đăng nhập!");
+          //console.log("Chưa đăng nhập!");
           setUserLogin(null);
           setIsLoad(false);
         }
@@ -37,11 +37,6 @@ const PersistLogin = () => {
       effectRan.current = true;
     };
   }, []);
-
-  // useEffect(() => {
-  //   console.log(`loading: ${isLoad}`);
-  //   console.log(`aT: ${JSON.stringify(auth?.accessToken)}`);
-  // }, [isLoad]);
 
   return <>{isLoad ? <WelcomPage /> : <Outlet />}</>;
 };

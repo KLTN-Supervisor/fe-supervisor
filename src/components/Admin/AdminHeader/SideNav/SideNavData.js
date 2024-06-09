@@ -22,7 +22,7 @@ const cx = classNames.bind(styles);
 
 const SideNavAdminData = ({ handleDrawerClose }) => {
   const { logout } = useLogout();
-  const { auth } = useAuth();
+  const { user } = useAuth();
   const listItemData = [
     // {
     //   label: "Dashboard",
@@ -50,7 +50,7 @@ const SideNavAdminData = ({ handleDrawerClose }) => {
 
   return (
     <List>
-      {auth?.role === "ADMIN"
+      {user?.role === "ADMIN"
         ? listItemData.map((item, i) => (
             <Button
               size="small"

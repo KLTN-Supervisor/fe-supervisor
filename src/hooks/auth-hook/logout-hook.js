@@ -1,18 +1,19 @@
 import useAuth from "./auth-hook";
-import useHttpClient from "../http-hook/public-http-hook";
 import { useContext } from "react";
 import { StateContext } from "../../context/StateContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import usePrivateHttpClient from "../http-hook/private-http-hook";
 
 const useLogout = () => {
   const navigate = useNavigate();
   const { setUserLogin } = useAuth();
-  const { isLoading, error, clearError, publicRequest } = useHttpClient();
+  const { isLoading, error, clearError, privateRequest } =
+    usePrivateHttpClient();
 
   const logout = async () => {
     try {
-      const response = await publicRequest("/accounts/logout");
+      const response = await privateRequest("/accounts/logout");
       if (response.status === 204) {
         setUserLogin(null);
         toast.info(response.message);
