@@ -18,6 +18,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { LinearProgress } from "@mui/material";
 import useAccountServices from "../../services/useAccountServices";
 import WelcomPage from "./WelcomPage";
+import { toast } from "react-toastify";
 const cx = classNames.bind(styles);
 
 const AuthPage = () => {
@@ -136,16 +137,20 @@ const AuthPage = () => {
 
   useEffect(() => {
     (async () => {
-      const userResponse = await getLoginAccount();
-      const user = userResponse.user;
+      try {
+        const userResponse = await getLoginAccount();
+        const user = userResponse?.user;
 
-      if (user) {
-        setUserLogin(user);
-        user.role === "ADMIN"
-          ? navigate("/administrator/report", { replace: true })
-          : user.role === "ACADEMIC_AFFAIRS_OFFICE"
-          ? navigate("/administrator/exam-schedules", { replace: true })
-          : navigate("/", { replace: true });
+        if (user) {
+          setUserLogin(user);
+          user.role === "ADMIN"
+            ? navigate("/administrator/report", { replace: true })
+            : user.role === "ACADEMIC_AFFAIRS_OFFICE"
+            ? navigate("/administrator/exam-schedules", { replace: true })
+            : navigate("/", { replace: true });
+        }
+      } catch (err) {
+        console.log("login: ", err);
       }
       setOnLoading(false);
     })();
