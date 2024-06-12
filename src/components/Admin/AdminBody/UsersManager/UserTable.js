@@ -4,6 +4,7 @@ import {
   Box,
   Card,
   Checkbox,
+  CircularProgress,
   // Stack,
   Table,
   TableBody,
@@ -33,6 +34,7 @@ const useUserIds = (users) => {
 
 export const UserTable = (props) => {
   const {
+    isLoading,
     count = 0,
     data = [],
     onPageChange = () => {},
@@ -86,18 +88,40 @@ export const UserTable = (props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.map((user) => (
-                <UserTableItem
-                  key={user._id}
-                  user={user}
-                  onDeselectOne={onDeselectOne}
-                  onSelectOne={onSelectOne}
-                  selected={selected}
-                  handleOnClick={handleOnClick}
-                />
-              ))}
+              {data.length > 0 && !isLoading
+                ? users.map((user) => (
+                    <UserTableItem
+                      key={user._id}
+                      user={user}
+                      onDeselectOne={onDeselectOne}
+                      onSelectOne={onSelectOne}
+                      selected={selected}
+                      handleOnClick={handleOnClick}
+                    />
+                  ))
+                : null}
             </TableBody>
           </Table>
+          {isLoading && (
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <CircularProgress />
+            </div>
+          )}
+          {!isLoading && data.length === 0 && (
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <span
+                style={{
+                  fontSize: 20,
+                  fontWeight: 550,
+                  fontFamily: "inherit",
+                  marginTop: 20,
+                  marginBottom: 20,
+                }}
+              >
+                Chưa có dữ liệu!
+              </span>
+            </div>
+          )}
         </Box>
       </Scrollbar>
       <TablePagination

@@ -192,42 +192,10 @@ const useAdminServices = () => {
     }
   };
 
-  const lockPost = async (id) => {
-    try {
-      const response = await privateRequest(`/admin/post/lock/${id}`, "put");
-
-      return response?.data;
-    } catch (err) {
-      throw err;
-    }
-  };
-
-  const unlockPost = async (id) => {
-    try {
-      const response = await privateRequest(`/admin/post/unlock/${id}`, "put");
-
-      return response?.data;
-    } catch (err) {
-      throw err;
-    }
-  };
-
   const getUserReportsCount = async (userId) => {
     try {
       const response = await privateRequest(
         `/admin/users/${userId}/reports-count`
-      );
-
-      return response?.data;
-    } catch (err) {
-      throw err;
-    }
-  };
-
-  const getPostReportsCount = async (postId) => {
-    try {
-      const response = await privateRequest(
-        `/admin/posts/${postId}/reports-count`
       );
 
       return response?.data;
@@ -386,6 +354,19 @@ const useAdminServices = () => {
     }
   };
 
+  const resetAccountPassword = async (id) => {
+    try {
+      const response = await privateRequest(
+        `/admin/accounts/reset-password/${id}`,
+        "put"
+      );
+
+      return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   return {
     getAdminUsers,
     uploadImportFile,
@@ -415,6 +396,7 @@ const useAdminServices = () => {
     getStudents,
     getReports,
     trainStudentImages,
+    resetAccountPassword,
   };
 };
 

@@ -46,7 +46,7 @@ const UserTableItem = (props) => {
   };
 
   const isSelected = selected.includes(user._id);
-  const createdAt = format(parseISO(user.created_at), "dd/MM/yyyy");
+  const createdAt = format(parseISO(user.created_at), "hh:mm dd/MM/yyyy");
 
   const loadReportsCount = async () => {
     try {
@@ -148,7 +148,7 @@ const UserTableItem = (props) => {
           {user.reports_count}
         </TableCell> */}
       </TableRow>
-      <Menu
+      {/* <Menu
         id="basic-menu"
         anchorEl={anchorEl}
         open={open}
@@ -160,9 +160,9 @@ const UserTableItem = (props) => {
         {user.reports_count > 0 && (
           <MenuItem onClick={loadReportsCount}>View reports</MenuItem>
         )}
-      </Menu>
+      </Menu> */}
 
-      <Modal
+      {/* <Modal
         show={viewReports}
         onHide={() => setViewReports(false)}
         className={cx("add-employee-modal")}
@@ -193,7 +193,7 @@ const UserTableItem = (props) => {
             </div>
           ))}
         </Modal.Body>
-      </Modal>
+      </Modal> */}
     </>
   );
 };

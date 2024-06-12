@@ -45,9 +45,8 @@ const UsersManage = () => {
     banUsers,
     createAccount,
     updateAccount,
+    resetAccountPassword,
   } = useAdminServices();
-
-  const [visible, setVisible] = useState(false);
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -93,7 +92,6 @@ const UsersManage = () => {
   };
 
   const [modal, setModal] = useState(false);
-  const [modalViewStudent, setModalViewStudent] = useState(null);
   const [modalData, setModalData] = useState({
     _id: "",
     fullname: "",
@@ -105,21 +103,6 @@ const UsersManage = () => {
     online: "",
     last_online: "",
   });
-
-  useEffect(() => {
-    if (!isCreateNew) {
-      setPreviewPortraitImg(modalViewStudent?.avatar);
-      setModalData({
-        fullname: modalViewStudent?.full_name,
-        username: modalViewStudent?.username,
-        password: "",
-        role: modalViewStudent?.role,
-        banned: modalViewStudent?.banned,
-        online: modalViewStudent?.online,
-        last_online: modalViewStudent?.last_online,
-      });
-    }
-  }, [modalViewStudent]);
 
   const clearModalData = () => {
     setModalData({
@@ -135,6 +118,23 @@ const UsersManage = () => {
     });
   };
 
+  const setViewItem = (item) => {
+    if (!isCreateNew) {
+      setPreviewPortraitImg(item?.portrait_img);
+      setModalData({
+        _id: item?._id,
+        fullname: item?.full_name,
+        username: item?.username,
+        password: "",
+        email: item?.email,
+        role: item?.role,
+        banned: item?.banned,
+        online: item?.online,
+        last_online: item?.last_online,
+      });
+    }
+  };
+
   const toggleModal = () => {
     if (isEdit) setIsEdit(false);
     if (isCreateNew) setIsCreateNew(false);
@@ -144,27 +144,6 @@ const UsersManage = () => {
   const handleEditClick = () => {
     if (isEdit) clearPortrailImg();
     setIsEdit(!isEdit);
-  };
-
-  const [file, setFile] = useState();
-  const [fileIsValid, setFileIsValid] = useState();
-
-  const removeFile = () => {
-    setFile(null);
-    setFileIsValid(false);
-  };
-
-  const uploadFileHandler = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const response = await uploadImportFile(formData);
-      if (response) {
-        removeFile();
-      }
-    } catch (err) {
-      console.log("upload file: ", err);
-    }
   };
 
   const changeHandler = (e) => {
@@ -181,12 +160,17 @@ const UsersManage = () => {
   };
 
   const getData = useCallback(async () => {
-    const response = await getAdminUsers(page, rowsPerPage, search);
-    if (response) {
-      if (page === 1) setData(response.accounts);
-      else setData((prev) => [...prev, ...response.accounts]);
-      setTotalRecords(response.total_accounts);
+    try {
+      setDataLoading(true);
+      const response = await getAdminUsers(page, rowsPerPage, search);
+      if (response) {
+        setData(response.accounts);
+        setTotalRecords(response.total_accounts);
+      }
+    } catch (err) {
+      console.log(err);
     }
+    setDataLoading(false);
   }, [page, rowsPerPage, search]);
 
   useEffect(() => {
@@ -197,14 +181,12 @@ const UsersManage = () => {
     const selectedIds = [...usersSelected]; // Sao chép usersSelected vào một mảng tạm thời
     setUsersSelected([]);
 
-    setData((prev) => []);
-
     try {
       const banPromises = selectedIds.map((id) => banUsers(id));
 
       const responses = await toast.promise(Promise.all(banPromises), {
         pending: "Đang ban...",
-        success: "Đã xong 👌",
+        success: "Thành công",
         error: {
           render: ({ data }) => {
             return `${data.message}`;
@@ -212,7 +194,13 @@ const UsersManage = () => {
         },
       });
 
-      if (responses) await getData();
+      if (responses) {
+        setData((prevData) =>
+          prevData.map((user) =>
+            selectedIds.includes(user._id) ? { ...user, banned: true } : user
+          )
+        );
+      }
     } catch (err) {
       console.error(err);
     }
@@ -223,14 +211,12 @@ const UsersManage = () => {
 
     setUsersSelected([]);
 
-    setData((prev) => []);
-
     try {
       const unBanPromises = selectedIds.map((id) => unBanUsers(id));
 
       const responses = await toast.promise(Promise.all(unBanPromises), {
         pending: "Đang gỡ ban...",
-        success: "Đã xong 👌",
+        success: "Thành công",
         error: {
           render: ({ data }) => {
             return `${data.message}`;
@@ -238,7 +224,13 @@ const UsersManage = () => {
         },
       });
 
-      if (responses) await getData();
+      if (responses) {
+        setData((prevData) =>
+          prevData.map((user) =>
+            selectedIds.includes(user._id) ? { ...user, banned: false } : user
+          )
+        );
+      }
     } catch (err) {
       console.error(err);
     }
@@ -263,11 +255,10 @@ const UsersManage = () => {
             return `${data.message}`;
           },
         },
-        success: "Tạo tài khoản mới thành công 👌",
+        success: "Tạo tài khoản mới thành công",
       });
 
       if (response) {
-        setModalViewStudent(response.account);
         if (isEdit) setIsEdit(false);
         setIsCreateNew(false);
         setData((prev) => [response.account, ...prev]);
@@ -286,12 +277,20 @@ const UsersManage = () => {
       const formData = new FormData();
       formData.append("avatar", portraitImgFile);
       formData.append("username", modalData?.username);
-      formData.append("password", modalData?.password);
       formData.append("fullname", modalData?.fullname);
       formData.append("email", modalData?.email);
       formData.append("role", modalData?.role);
 
-      const response = await updateAccount(formData);
+      const response = await toast.promise(() => updateAccount(formData), {
+        pending: "Đang tạo...",
+        error: {
+          render({ data }) {
+            // When the promise reject, data will contains the error
+            return `${data.message}`;
+          },
+        },
+        success: "Cập nhật tài khoản thành công",
+      });
 
       if (response) {
         if (isEdit) setIsEdit(false);
@@ -403,22 +402,22 @@ const UsersManage = () => {
               </div>
             </Stack>
             <UserSearch setSearch={setSearch} />
-            {!privateHttpRequest.isLoading && (
-              <UserTable
-                count={totalRecords}
-                data={data}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleRowsPerPageChange}
-                page={page}
-                rowsPerPage={rowsPerPage}
-                setUsersSelected={setUsersSelected}
-                selected={usersSelected}
-                handleOnClick={(item) => {
-                  setModalViewStudent(item);
-                  setModal(true);
-                }}
-              />
-            )}
+
+            <UserTable
+              isLoading={dataLoading}
+              count={totalRecords}
+              data={data}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              setUsersSelected={setUsersSelected}
+              selected={usersSelected}
+              handleOnClick={(item) => {
+                setViewItem(item);
+                setModal(true);
+              }}
+            />
           </Stack>
         </Container>
       </Box>
@@ -579,50 +578,37 @@ const UsersManage = () => {
                 </div>
                 {!isCreateNew && (
                   <>
-                    {" "}
                     <div className={cx2("info")}>
                       <div className={cx2("title")}>Trạng thái:</div>
                       <input
                         id="banned"
-                        className={cx2(
-                          "input-span",
-                          !isEdit && !isCreateNew && "input-span-focus"
-                        )}
+                        className={cx2("input-span", "input-span-focus")}
                         value={modalData?.banned ? "Bị khóa" : "Bình thường"}
-                        readOnly={!isEdit && !isCreateNew}
-                        onChange={changeHandler}
+                        readOnly
                       />
                     </div>
                     <div className={cx2("info")}>
                       <div className={cx2("title")}>Tình trạng:</div>
                       <input
                         id="online"
-                        className={cx2(
-                          "input-span",
-                          !isEdit && !isCreateNew && "input-span-focus"
-                        )}
+                        className={cx2("input-span", "input-span-focus")}
                         value={
                           modalData?.online ? "Đang hoạt động" : "Ngoại tuyến"
                         }
-                        readOnly={!isEdit && !isCreateNew}
-                        onChange={changeHandler}
+                        readOnly
                       />
                     </div>
                     <div className={cx2("info")}>
                       <div className={cx2("title")}>Lần đăng nhập cuối:</div>
                       <input
                         id="last_online"
-                        className={cx2(
-                          "input-span",
-                          !isEdit && !isCreateNew && "input-span-focus"
-                        )}
+                        className={cx2("input-span", "input-span-focus")}
                         value={
                           formatHour(modalData?.last_online) +
                           " " +
                           formatDate(modalData?.last_online)
                         }
-                        readOnly={!isEdit && !isCreateNew}
-                        onChange={changeHandler}
+                        readOnly
                       />
                     </div>
                   </>
