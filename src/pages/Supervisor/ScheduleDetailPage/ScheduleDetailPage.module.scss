@@ -37,7 +37,6 @@ html, body {
         .title{
           border-width: 0px 0px thin;
           border-bottom: rgba(0, 0, 0, 0.12) solid 0.5px;
-          margin: 30px 25px 0 15px;
           .text{
             margin: 0;
             display: inline-block;
@@ -96,6 +95,21 @@ html, body {
             }
           }
         }
+      }
+  
+    }
+  }
+
+  @media (max-width: 720px) {
+    .schedulePage {
+      flex-direction: column;
+      .schedulePage__navWraper {
+        position: relative;
+        height: 0;
+      }
+      .schedulePage__content {
+        width: 100%;
+        margin-bottom: 30px;
       }
   
     }

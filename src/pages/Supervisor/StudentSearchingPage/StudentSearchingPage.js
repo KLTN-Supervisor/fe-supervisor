@@ -3,9 +3,6 @@ import classNames from "classnames/bind";
 import styles from "./StudentSearchingPage.module.scss";
 import Sidenav from "../../../components/Sidenav";
 import SearchIcon from "@mui/icons-material/Search";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
 import StudentCard from "../../../components/Supervisor/StudentCard";
 import LoadingCard from "../../../components/LoadingCard";
 import useStudentServices from "../../../services/useStudentServices";
@@ -14,10 +11,10 @@ import { Alert, Snackbar, CircularProgress } from "@mui/material";
 const cx = classNames.bind(styles);
 
 function RoomingListPage() {
-  const [typeSearch, setTypeSearch] = useState("");
   const searchRef = useRef();
-  const scrollRef = useRef();
+  const scrollRef = useRef(null);
   const [loadMore, setLoadMore] = useState(false);
+  const [loadDone, setLoadDone] = useState(false);
   const [snackBarOpen, setSnackBarOpen] = useState(false);
   const [snackBarNotif, setSnackBarNotif] = useState({
     severity: "success",
@@ -33,9 +30,6 @@ function RoomingListPage() {
 
   
 
-  const handleChange = (event) => {
-    setTypeSearch(event.target.value);
-  };
 
   const getStudents = async () => {
     if (!studentsLoading) {
@@ -55,24 +49,16 @@ function RoomingListPage() {
   const handleSearch = async () => {
     if (!studentsLoading && searchRef.current.value != "") {
       setStudentsLoading(true);
+      setLoadDone(false);
       try {
-        if (typeSearch == "") {
-          setSnackBarNotif({
-            severity: "error",
-            message: "Vui lòng chọn mục tìm kiếm",
-          });
-          setSnackBarOpen(true);
-        } else {
-          const response = await searchStudents(
-            0,
-            searchRef.current.value,
-            typeSearch
-          );
-          setStudents(response);
-          console.log(response);
-        }
+        const response = await searchStudents(
+          0,
+          searchRef.current.value,
+        );
+        setStudents(response);
       } catch (err) {
         console.log("get students error: ", err);
+        setStudents([]);
       } finally {
         setStudentsLoading(false);
       }
@@ -82,27 +68,18 @@ function RoomingListPage() {
   const handleEnter = async (event) => {
     if (event.key === "Enter") {
       event.preventDefault(); // Ngăn chặn hành vi mặc định của phím Enter (như xuống dòng)
-      // console.log("Enter .....");
       if (!studentsLoading && searchRef.current.value != "") {
         setStudentsLoading(true);
+        setLoadDone(false);
         try {
-          if (typeSearch == "") {
-            setSnackBarNotif({
-              severity: "error",
-              message: "Vui lòng chọn mục tìm kiếm",
-            });
-            setSnackBarOpen(true);
-          } else {
-            const response = await searchStudents(
-              0,
-              searchRef.current.value,
-              typeSearch
-            );
-            setStudents(response);
-            console.log(response);
-          }
+          const response = await searchStudents(
+            0,
+            searchRef.current.value,
+          );
+          setStudents(response);  
         } catch (err) {
           console.log("get students error: ", err);
+          setStudents([]);
         } finally {
           setStudentsLoading(false);
         }
@@ -110,20 +87,52 @@ function RoomingListPage() {
     }
   };
 
+
+  const addNewStudents = (newStudents) => {
+    setStudents((prev) => {
+      // Create a Set of student_id values from the previous state
+      const existingStudentIds = new Set(prev.map((student) => student.student_id));
+
+      // Filter out the new students with duplicate student_id values
+      const uniqueNewStudents = newStudents.filter(
+        (newStudent) => !existingStudentIds.has(newStudent.student_id)
+      );
+
+      // Combine the previous students and the unique new students
+      return [...prev, ...uniqueNewStudents];
+    });
+  };
+
   useEffect(() => {
     const handleScroll = async () => {
-      const scrollTop = scrollRef.current.scrollTop;
-      const scrollHeight = scrollRef.current.scrollHeight;
-      if (scrollTop === scrollHeight) {
-        console.log("Đã đạt đến cuoi trang" + students?.length);
+      const scrollHeight = document.body.scrollHeight;
+      const scrollPosition = window.scrollY;
+      const viewportHeight = window.innerHeight;
+    
+      if (
+        scrollPosition + viewportHeight + 0.81 >= scrollHeight &&
+        searchRef.current.value &&
+        !loadMore &&
+        !loadDone
+      ) {
+        setLoadMore(true);
         try {
-          setLoadMore(true);
-          const data = await searchStudents(
+          const response = await searchStudents(
             students?.length,
-            searchRef.current.value,
-            typeSearch
+            searchRef.current.value
           );
-          setStudents((prev) => [...prev, data]);
+    
+          if (response) {
+            if (response.length < 16) {
+              setLoadDone(true);
+              addNewStudents(response)
+            } else if (response.length > 0) {
+              addNewStudents(response)
+            } else{
+              setLoadDone(true);
+            }
+            
+          }
         } catch (error) {
           console.log("Lỗi:", error);
         } finally {
@@ -132,68 +141,38 @@ function RoomingListPage() {
       }
     };
 
-    if (scrollRef.current) {
-      scrollRef.current.addEventListener("scroll", handleScroll);
-    }
+    window.addEventListener('scroll', handleScroll);
+
+    // Clean up the event listener when the component is unmounted
     return () => {
-      if (scrollRef.current) {
-        scrollRef.current.removeEventListener("scroll", handleScroll);
-      }
+      window.removeEventListener('scroll', handleScroll);
     };
-  }, [students]);
+  }, [students, searchRef.current]);
 
   useEffect(() => {
     getStudents();
   }, []);
+
+
 
   return (
     <div className={cx("studentPage")}>
       <div className={cx("studentPage__navWraper")}>
         <Sidenav />
       </div>
-      <div className={cx("studentPage__content")} ref={scrollRef}>
-        <h1
-          style={{fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`, fontWeight: 500, padding:"0px 20px 0px 20px"}}
-        >
+      <div className={cx("studentPage__content")}>
+        <h1>
           TRA CỨU SINH VIÊN
         </h1>
         <div className={cx("page_content")}>
           <div className={cx("page_content__header")}>
-            <FormControl
-              variant="standard"
-              className={cx("form__select")}
-              sx={{
-                width: 0.2,
-                marginRight: "20px",
-                border: "1px solid rgba(0, 85, 141, 0.5)",
-                padding: "3px 16px",
-                borderRadius: "10px",
-              }}
-            >
-              <Select
-                value={typeSearch}
-                onChange={handleChange}
-                displayEmpty
-                disableUnderline
-                inputProps={{ "aria-label": "Without label" }}
-                sx={{ height: "100%" }}
-              >
-                <MenuItem value="">
-                  <em>Chọn mục tìm kiếm</em>
-                </MenuItem>
-                <MenuItem value="name">Họ tên</MenuItem>
-                <MenuItem value="id">MSSV</MenuItem>
-              </Select>
-            </FormControl>
             <div className={cx("search")}>
               <input type="text" placeholder="Search" ref={searchRef} onKeyUp={handleEnter}/>
               <button
                 className={cx("search__button")}
                 style={{
                   display: "flex",
-                  width: "auto",
                   padding: 10,
-                  borderRadius: 20,
                   marginLeft: 30,
                 }}
                 onClick={handleSearch}
@@ -202,12 +181,11 @@ function RoomingListPage() {
                   className={cx("search__icon")}
                   style={{ width: "24px", height: "24px", fontWeight: "900" }}
                 />
-                <span className={cx("span")}>Search</span>
               </button>
             </div>
           </div>
           <div className={cx("page_content__body")}>
-            <div className={cx("students")}>
+            <div className={cx("students")} > 
               {studentsLoading ? (
                 <LoadingCard />
               ) : students?.length > 0 ? (

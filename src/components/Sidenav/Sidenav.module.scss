@@ -128,6 +128,7 @@
   @media (max-width: 1064px) {
     .sidenav {
       width: 80px;
+      transition: width 0.2s ease; /* Hiệu ứng chuyển đổi mượt mà */
     }
     .sidenav__logo__icon{
       height: 120px;
@@ -159,3 +160,57 @@
     }
   
   }
+
+@media (max-width: 720px) {
+  .sidenav {
+    bottom: 0;
+    width: 100%;
+    flex-direction: row;
+    z-index: 2;
+    background-color: #00558d;
+    height: auto;
+    border-right: none;
+    border-top: white solid 1px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+  .sidenav__title{
+    display: none;
+  }
+  .sidenav__logo__icon{
+    display: none;
+  }
+  .sidenav__title {
+    display: none;
+  }
+  .sidenav__buttons {
+    padding-left: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+  }
+  .sidenav__button {
+    width: 60px !important;
+    margin: 0;
+  }
+  .sidenav__button .unread{
+    left: 20px;
+  }
+  .sidenav__button .span {
+    display: none;
+  }
+  .sidenav__more {
+    width: 80px;
+    position:static;
+  }
+}
+
+@media (max-width: 400px) {
+  .sidenav__buttons {
+    padding-left: 5px;
+  }
+  .sidenav__more {
+    width: 65px;
+  }
+}

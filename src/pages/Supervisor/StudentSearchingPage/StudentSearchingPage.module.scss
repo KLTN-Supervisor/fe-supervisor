@@ -11,11 +11,16 @@ html, body {
   
   .studentPage__navWraper {
     position: relative;
-    width:240px;
+    width: 240px;
+  }
+
+  .studentPage__content > h1 {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 500;
+    padding: 0px 20px 0px 20px;
   }
   
   .studentPage__content {
-    
     flex: 1;
     flex-direction: column;
     background-color: (244, 245, 247);
@@ -33,11 +38,9 @@ html, body {
       .page_content__header{
           display: flex;
           .search > input{
-            background-color: rgb(255, 255, 255);
             flex: 1;
-            padding: 3px 16px 3px 16px;
-            border-radius: 10px;
-            border: 1px solid rgba(0, 85, 141, 0.5);
+            border: none;
+            padding: 3px 16px 3px 0px;
             color: black;
             font-size: 15px;
             font-weight: 400;
@@ -49,38 +52,32 @@ html, body {
           .search{
             display: flex;
             flex: 1;
+            padding-left: 16px;
+            background-color: rgb(255, 255, 255);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 85, 141, 0.5);
             .search__button {
               display: flex;
-              flex-direction: row;
+              justify-content: center;
               align-items: center;
               color: black;
               background-color: transparent;
-              border: 1px solid rgba(0, 85, 141, 0.5);
+              border: none;
               padding: 7px;
-              border-radius: 15px;
+              border-radius: 0 10px 10px 0px;
               position: relative;
               // display: inline-block;
               .search__icon{
                   color: #00558d;
-              }
-              .span{
-                  color: #00558d;
-                  font-size: 14px;
-                  font-weight: 500;
               }
             }
               
             .search__button:hover {
               cursor: pointer;
               background-color: rgba(4, 149, 246, 0.103);
-              border: 1px solid rgba(0, 28, 46, 0.5);
               .sidenav__icon {
                 transform: scale(1.05);
               }
-            }
-            .search__button > span {
-              font-size: 15px;
-              font-weight: 300;
             }
           }
       }
@@ -108,21 +105,29 @@ html, body {
       }
       .studentPage__content {
         width: calc(100vw - 80px);
-        .page_content{
-          .page_content__header{
-            .search__button {
-              .span{
-                display: none;
-              }
-            }
-          }
-        }
       }
+    }
+  }
+  @media (max-width: 720px) {
+    .studentPage {
+      flex-direction: column;
+      .studentPage__navWraper {
+        position: relative;
+        height: 0px;
+      }
+      .studentPage__content {
+        width: 100%;
+        margin-bottom: 30px;
+      }
+  
     }
   }
 
   @media (max-width: 527px){
     .studentPage {
+      .studentPage__content > h1 {
+        font-size: 28px;
+      }
       .studentPage__content {
         .page_content{
           .page_content__header{

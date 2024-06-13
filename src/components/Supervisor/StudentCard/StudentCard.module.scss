@@ -1,8 +1,10 @@
 .student {
   border: rgba(1, 76, 125, 0.5) solid 1px;
   border-radius: 10px;
-  width: 20%;
-  height: 300px;
+  width: 21.4%;
+  overflow: hidden;
+  box-sizing: border-box;
+  max-height: 100%;
   padding: 0.5%;
   display: flex;
   flex-direction: column;
@@ -292,12 +294,12 @@
 
 @media (max-width: 1164px) {
   .student {
-    width: 28%;
+    width: 29.7%;
   }
 }
 @media (max-width: 720px) {
   .student {
-    width: 45%;
+    width: 46%;
   }
   .modal-navbar-content {
     .modal-main {
@@ -325,6 +327,7 @@
 @media (max-width: 527px) {
   .student {
     width: 200px;
+    height: 278px
   }
   .modal-navbar-content {
     .modal-main {

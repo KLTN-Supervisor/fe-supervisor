@@ -6,18 +6,19 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import StudentCard from "../../../components/Supervisor/StudentCard";
-import ApartmentIcon from "@mui/icons-material/Apartment";
 import ListSubheader from "@mui/material/ListSubheader";
 import List from "@mui/material/List";
 import Floor from "../../../components/Supervisor/Floor";
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import useExamScheduleServices from "../../../services/useExamScheduleServices";
 import LoadingCard from "../../../components/LoadingCard";
 import { formatHour } from "../../../untils/format-date";
-import { Alert, Snackbar, CircularProgress } from "@mui/material";
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import { CircularProgress } from "@mui/material";
 
 const cx = classNames.bind(styles);
 function ScheduleDetailPage() {
+  const navigate = useNavigate();
   const location = useLocation();
   const { building, date } = location.state;
   const { getTimes, getRooms, getStudents } = useExamScheduleServices();
@@ -35,6 +36,7 @@ function ScheduleDetailPage() {
   const [students, setStudents] = useState([]);
 
   useEffect(() => {
+
     const getTimesExam = async () => {
       if (!studentsLoading) {
         setStudentsLoading(true);
@@ -48,6 +50,7 @@ function ScheduleDetailPage() {
         }
       }
     };
+    document.title = `Lịch thi ${building?.building_name}`;
     getTimesExam();
   }, []);
 
@@ -96,9 +99,17 @@ function ScheduleDetailPage() {
       </div>
       <div className={cx("schedulePage__content")}>
         <div className={cx("page_content")} style={{ marginTop: 20 }}>
-          <div className={cx("title")}>
-            <h6 className={cx("text")}>{building?.building_name}</h6>
+          <div style={{display: "flex", margin: "10px 25px 20px 15px"}}>
+            <div>
+              <KeyboardBackspaceIcon style={{ marginRight: 20, width: 30, height: 30}} onClick={()=> navigate(-1)}/>
+            </div>
+            <div className={cx("title")}>
+              <h6 className={cx("text")}>{building?.building_name}</h6>
+            </div>
           </div>
+          {/* <div className={cx("title")}>
+            <h6 className={cx("text")}>{building?.building_name}</h6>
+          </div> */}
           <div className={cx("page_content__header")}>
             <FormControl
               variant="standard"

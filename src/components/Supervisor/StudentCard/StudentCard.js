@@ -32,7 +32,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
     const [modalAttendance, setModalAttendance] = useState(false);
 
     const toggleModalAttendance = async () => {
-      if(!modalAttendance){
+      if(!modalAttendance ){
         setModalAttendance(!modalAttendance);
         setState(0);
         isLoadCanvasRef.current = true;
@@ -40,7 +40,9 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
         videoRef?.current &&
           (intervalRef.current = setInterval(runFaceDetection, 2000));
       } else{
-        await clear();
+        if(videoRef){
+          await clear();
+        }
         imageRef.current = null;
         setIsDropping(false);
         setModalAttendance(!modalAttendance);
@@ -65,7 +67,9 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
   const clear = async () => {
     isLoadCanvasRef.current = false;
     // Stop the video stream
-    await stopVideoStream();
+    if(videoRef.current !== null){
+      await stopVideoStream();
+    }
     // Stop the interval if it's running
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -95,9 +99,10 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
   // STOP VIDEO STREAM FUNCTION
   const stopVideoStream = async () => {
     console.log("toi ch");
-    navigator.mediaDevices.addEventListener("removetrack", (event) => {
-      console.log(`${event.track.kind} track removed`);
-    });
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
+      navigator.mediaDevices.addEventListener("removetrack", (event) => {
+        console.log(`${event.track.kind} track removed`);
+      });
     console.log(videoRef.current && videoRef.current?.srcObject);
     if (videoRef.current && videoRef.current.srcObject) {
       const stream = videoRef.current?.srcObject;
@@ -121,7 +126,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
   //     });
   // };
   const startVideo = () => {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia ) {
       navigator.mediaDevices
         .getUserMedia({ video: true })
         .then((currentStream) => {
@@ -137,6 +142,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
           setSnackBarOpen(true);
         });
     } else {
+      videoRef.current = null;
       console.error('Trình duyệt không hỗ trợ camera');
       // Xử lý trường hợp trình duyệt không hỗ trợ API
       setSnackBarNotif({
@@ -426,14 +432,15 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
   return (
     <>
       <div className={cx("student")} onClick={toggleModal}>
-        <div style={{ height: "235px" }}>
+        <div>
           <img
-            style={{ width: "100%", maxHeight: "235px" }}
+            style={{ width: "100%",  objectFit: "contain" }}
             src={getStudentsImageSource(student.portrait_img)}
           />
         </div>
         <span
           style={{
+            marginTop: "5px",
             fontSize: "16px",
             fontWeight: 500,
             fontFamily:
@@ -656,7 +663,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                   setState(0);
                   await startVideo();
                   console.log(videoRef?.current);
-                  videoRef?.current &&
+                  videoRef?.current !== null &&
                     (intervalRef.current = setInterval(runFaceDetection, 2000));
                   
                 }}
@@ -683,7 +690,9 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                     : { marginLeft: "25px" }
                 }
                 onClick={async () => {
-                  await clear();
+                  if(videoRef.current !== null){
+                    await clear();
+                  }
                   imageRef.current = null;
                   setIsDropping(false);
                   setState(1);
@@ -706,6 +715,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                   crossOrigin="anonymous"
                   ref={videoRef}
                   autoPlay
+                  playsinline 
                   style={{ borderRadius: 10 }}
                   className={cx("video")}
                 ></video>

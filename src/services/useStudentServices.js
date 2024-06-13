@@ -15,10 +15,10 @@ const useStudentServices = () => {
       throw err;
     }
   };
-  const searchStudents = async (skip, search, type) => {
+  const searchStudents = async (skip, search) => {
     try {
       const response = await privateRequest(
-        `/students/search?search=${search}&type=${type}&skip=${skip}`
+        `/students/search?search=${search}&skip=${skip}`
       );
 
       return response.data;

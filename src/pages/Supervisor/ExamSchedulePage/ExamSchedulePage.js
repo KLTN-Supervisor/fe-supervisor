@@ -51,6 +51,7 @@ function ExamSchedulePage() {
         }
       }
     };
+    document.title = `Tra cứu phòng thi`;
     getYearExam();
   }, []);
 
