@@ -75,7 +75,7 @@ const useAdminServices = () => {
         `/admin/examSchedules/excel-import`,
         "post",
         {
-          chooseFiles: ids,
+          selectedFiles: ids,
         },
         {
           headers: { "Content-Type": "application/json" },
