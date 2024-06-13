@@ -94,6 +94,7 @@ function HomePage() {
 
   
   useEffect(() => {
+    document.title = currentTitle;
     getInfo();
     getStudentsExam();
     getReportsExam()
@@ -127,7 +128,7 @@ function HomePage() {
   //reports
   const [modal, setModal] = useState(false);
   const [modalCreate, setModalCreate] = useState(false);
-  const [currentTitle, setCurrentTitle] = useState(document.title);
+  const currentTitle = roomName;
 
   const [reportType, setReportType] = useState("");
   const handleChange = (event) => {
@@ -139,7 +140,7 @@ function HomePage() {
   const toggleModal = () => {
     if (document.body.style.overflow !== "hidden") {
       document.body.style.overflow = "hidden";
-      document.title = "Trang chủ";
+      document.title = "Báo cáo";
     } else {
       document.body.style.overflow = "auto";
       document.title = currentTitle;
@@ -148,13 +149,10 @@ function HomePage() {
   };
 
   const toggleModalCreate = () => {
-    if (document.body.style.overflow !== "hidden") {
-      document.body.style.overflow = "hidden";
-      document.title = "Trang chủ";
-    } else {
-      document.body.style.overflow = "auto";
+    if(modalCreate)
+      document.title = "Tạo báo cáo";
+    else
       document.title = currentTitle;
-    }
     setNote("");
     setReportType("");
     setImageModals([]);
@@ -232,6 +230,11 @@ function HomePage() {
           console.log(newReport)
           setReport((prev) => [...prev, newReport]);
           toggleModalCreate();
+          setSnackBarNotif({
+            severity: "success",
+            message: reportType == "REPORT" ? "Tạo biên bản thành công" : "Tạo sự cố thành công",
+          });
+          setSnackBarOpen(true);
         }
       }
     } catch (err) {
@@ -295,44 +298,30 @@ function HomePage() {
       <div className={cx("homepage__timeline")}>
         <div className={cx("page_content")} style={{ marginTop: 20 }}>
           <div
-            onClick={toggleModal}
             style={{
               position: "absolute",
               right: "5%",
               top: "40px",
-              display: "inline-block",
-              backgroundColor: "#0095f6",
+              display: "flex",
+            }}
+          >
+            <div onClick={printHandle} style={{backgroundColor: "#0095f6",
               padding: "10px",
               color: "white",
               borderRadius: "10px",
-              cursor: "pointer",
-            }}
-          >
-            Báo cáo {report.length > 0 && `(${report.length})`}
-          </div>
-          <div
-            onClick={printHandle}
-            style={{
-              position: "absolute",
-              right: "11%",
-              marginRight: 20,
-              top: "40px",
-              display: "inline-block",
-              backgroundColor: "#0095f6",
+              cursor: "pointer", marginRight: 10}}>In danh sách</div>
+
+            <div onClick={toggleModal} style={{backgroundColor: "#0095f6",
               padding: "10px",
               color: "white",
               borderRadius: "10px",
-              cursor: "pointer",
-            }}
-          >
-            In danh sách
+              cursor: "pointer",}}>Báo cáo {report.length > 0 && `(${report.length})`}</div>
           </div>
-          <div style={{display: "flex", margin: "50px 25px 0 15px"}}>
+          <div style={{display: "flex", margin: "20px 25px 20px 15px"}}>
             <div>
               <KeyboardBackspaceIcon style={{ marginRight: 20, width: 30, height: 30}} onClick={()=> navigate(-1)}/>
             </div>
             <div className={cx("title")}>
-              {/* <KeyboardBackspaceIcon style={{ marginRight: 20}}/> */}
               <h6 className={cx("text")}>{roomName}</h6>
             </div>
           </div>

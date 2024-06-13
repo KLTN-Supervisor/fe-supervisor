@@ -445,6 +445,24 @@ html, body {
     }
   }
 
+  @media (max-width: 720px){
+    .homepage {
+      flex-direction: column;
+      .homepage__navWraper {
+        position: relative;
+        height: 0;
+      }
+      .homepage__timeline {
+        width: 100%;
+        margin-bottom: 30px;
+        .myapp h1{
+          width: calc(100vw - 30px);
+        }
+      }
+  
+    }
+  }
+
   @media (max-width: 527px){
     .homepage {
       .homepage__timeline {

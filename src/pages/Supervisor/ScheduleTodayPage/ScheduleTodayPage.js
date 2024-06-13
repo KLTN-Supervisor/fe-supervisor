@@ -46,8 +46,8 @@ function ExamSchedulePage() {
         }
       }
     };
+    document.title = `Lịch thi hôm nay`;
     getBuildingsExam();
-    getStudentsSuspicious();
   }, [date]);
  
     const [times, setTimes] = useState([]);
@@ -107,21 +107,25 @@ function ExamSchedulePage() {
     }
 
     const [students, setStudents] = useState([]);
-
+    const [getStudentsSuspiciousLoading, setGetStudentsSuspiciousLoading] = useState(false);
     const getStudentsSuspicious = async () => {
-      if (!studentsLoading) {
-        setStudentsLoading(true);
+      if (!getStudentsSuspiciousLoading) {
+        setGetStudentsSuspiciousLoading(true);
         try {
           const response = await getSuspiciousStudents(date);
           console.log("getStudentsSuspicious", response)
           setStudents(response);
-          setStudentsLoading(false);
+          setGetStudentsSuspiciousLoading(false);
         } catch (err) {
-          setStudentsLoading(false);
+          setGetStudentsSuspiciousLoading(false);
           console.log("get time error: ", err);
         }
       }
     };
+
+    useEffect(()=>{
+      getStudentsSuspicious();
+    },[])
 
   return (
     <div className={cx("schedulePage")}>
@@ -129,7 +133,7 @@ function ExamSchedulePage() {
         <Sidenav />
       </div>
       <div className={cx("schedulePage__content")}>
-        <h1 style={{fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`, fontWeight: 500, padding:"0px 20px 0px 20px"}}>LỊCH THI HÔM NAY</h1>
+        <h1>LỊCH THI HÔM NAY</h1>
         <List
           sx={{ width: '90%',  bgcolor: '#ff6773', color:"white", marginBottom: 2 }}
           component="nav"
@@ -140,7 +144,7 @@ function ExamSchedulePage() {
             </ListSubheader>
           }
         >
-          {studentsLoading ? (
+          {getStudentsSuspiciousLoading ? (
                   <div
                   style={{
                     width: "100%",
@@ -161,11 +165,15 @@ function ExamSchedulePage() {
                   <ListItemIcon style={ window.screen.width < 800 ? {display: "none"} : null}>
                     <WarningAmberRoundedIcon />
                   </ListItemIcon>
-                  <ListItemText style={{wordWrap: "break-word"}} primary={`${student.student_id}`} />
-                  <ListItemText style={{wordWrap: "break-word"}} primary={`${student.last_name} ${student.middle_name} ${student.first_name}`} />
-                  <ListItemText style={{wordWrap: "break-word"}} primary={student.schedules.map((schedule) => (
-                    `${schedule.room} (${formatHour(schedule.time)})`
-                  )).join(', ')} />
+                  <div className={cx("students__suspicious")} >
+                    <div className={cx("students__suspicious__info")}>
+                      <ListItemText style={{wordWrap: "break-word"}} primary={`${student.student_id}`} />
+                      <ListItemText style={{wordWrap: "break-word"}} primary={`${student.last_name} ${student.middle_name} ${student.first_name}`} />
+                    </div>
+                    <ListItemText className={cx("students__suspicious__rooms")} style={{wordWrap: "break-word"}} primary={student.schedules.map((schedule) => (
+                      `${schedule.room} (${formatHour(schedule.time)})`
+                    )).join(', ')} />
+                  </div>
                 </ListItemButton>))
               ) : (
             <div
