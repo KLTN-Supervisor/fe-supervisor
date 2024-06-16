@@ -69,11 +69,11 @@ function PrintPage() {
   const componentRef = React.useRef();
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "data",
-    onAfterPrint: () => navigate("/"),
+    documentTitle: "In danh sách",
   });
 
   React.useEffect(() => {
+    document.title = "In danh sách phòng thi";
     getInfo();
     getStudentsExam();
   }, [time, room]);
