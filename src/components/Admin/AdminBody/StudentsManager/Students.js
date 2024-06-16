@@ -21,9 +21,6 @@ import {
 import Backdrop from "@mui/material/Backdrop";
 import { StudentsSearch } from "./StudentsSearch";
 import { AdminTable } from "../Common/AdminTable/Table";
-// import { applyPagination } from "../../../../shared/util/apply-pagination";
-// import { useSelection } from "../../../../shared/hook/use-selection";
-import Modal from "react-bootstrap/Modal";
 import classNames from "classnames/bind";
 import styles from "../UsersManager/UserModal.module.scss";
 import styles2 from "../../../Supervisor/StudentCard/StudentCard.module.scss";

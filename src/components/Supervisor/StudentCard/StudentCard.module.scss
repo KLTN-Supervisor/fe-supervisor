@@ -66,8 +66,8 @@
   max-width: 900px;
   min-width: 300px;
   min-height: 400px;
-  max-height: 90%;
-  overflow-y: auto;
+  max-height: 95%;
+  overflow-y: hidden;
   .modal-header {
     color: white;
     text-align: center;
@@ -316,7 +316,7 @@
       .appvide {
         justify-content: baseline;
         align-items: baseline;
-        .video{
+        .video {
           width: 400px;
           height: 300px;
         }
@@ -327,12 +327,12 @@
 @media (max-width: 527px) {
   .student {
     width: 200px;
-    height: 278px
+    height: 278px;
   }
   .modal-navbar-content {
     .modal-main {
       .appvide {
-        .video{
+        .video {
           width: 300px;
           height: 225px;
         }

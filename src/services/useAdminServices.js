@@ -59,9 +59,13 @@ const useAdminServices = () => {
     }
   };
 
-  const getExamFilesUploaded = async () => {
+  const getExamFilesUploaded = async (term, year) => {
     try {
-      const response = await privateRequest(`/admin/examSchedules/excel-files`);
+      const response = await privateRequest(
+        `/admin/examSchedules/excel-files?term=${term}&schoolYear=${year}-${
+          year + 1
+        }`
+      );
 
       return response?.data;
     } catch (err) {
@@ -260,6 +264,18 @@ const useAdminServices = () => {
     }
   };
 
+  const getUploadedFileYears = async () => {
+    try {
+      const response = await privateRequest(
+        `/admin/examSchedules/getFileFilterYear`
+      );
+
+      return response.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   const getYears = async () => {
     try {
       const response = await privateRequest(`/admin/examSchedules/getYear`);
@@ -397,6 +413,7 @@ const useAdminServices = () => {
     getReports,
     trainStudentImages,
     resetAccountPassword,
+    getUploadedFileYears,
   };
 };
 
