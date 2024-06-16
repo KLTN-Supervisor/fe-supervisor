@@ -150,6 +150,7 @@ function RoomingListPage() {
   }, [students, searchRef.current]);
 
   useEffect(() => {
+    document.title = "Tra cứu sinh viên";
     getStudents();
   }, []);
 
