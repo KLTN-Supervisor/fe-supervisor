@@ -50,10 +50,11 @@ const UsersManage = () => {
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const [search, setSearch] = useState("");
   const [data, setData] = useState([]);
-  const [totalRecords, setTotalRecords] = useState(0);
   const [dataLoading, setDataLoading] = useState(true);
   const [modifyDataLoading, setModifyDataLoading] = useState(false);
 
@@ -166,6 +167,7 @@ const UsersManage = () => {
       if (response) {
         setData(response.accounts);
         setTotalRecords(response.total_accounts);
+        setTotalPages(response.total_pages);
       }
     } catch (err) {
       console.log(err);
@@ -407,6 +409,7 @@ const UsersManage = () => {
               isLoading={dataLoading}
               count={totalRecords}
               data={data}
+              totalPages={totalPages}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
               page={page}

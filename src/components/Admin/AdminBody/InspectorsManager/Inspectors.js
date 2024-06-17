@@ -54,6 +54,7 @@ const InspectorsManage = () => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const [search, setSearch] = useState("");
   const [data, setData] = useState([]);
@@ -147,6 +148,7 @@ const InspectorsManage = () => {
           })
         );
         setTotalRecords(response.total_inspectors);
+        setTotalPages(response.total_pages);
         setDataLoading(false);
       }
     } catch (err) {
@@ -443,6 +445,7 @@ const InspectorsManage = () => {
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
               page={page}
+              totalPages={totalPages}
               rowsPerPage={rowsPerPage}
               setItemsSelected={setUsersSelected}
               selected={usersSelected}

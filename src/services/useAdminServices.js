@@ -59,12 +59,12 @@ const useAdminServices = () => {
     }
   };
 
-  const getExamFilesUploaded = async (term, year) => {
+  const getExamFilesUploaded = async (term, year, page, limit) => {
     try {
       const response = await privateRequest(
         `/admin/examSchedules/excel-files?term=${term}&schoolYear=${year}-${
           year + 1
-        }`
+        }&page=${page}&limit=${limit}`
       );
 
       return response?.data;
@@ -77,6 +77,25 @@ const useAdminServices = () => {
     try {
       const response = await privateRequest(
         `/admin/examSchedules/excel-import`,
+        "post",
+        {
+          selectedFiles: ids,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const deleteSelectedFiles = async (ids = []) => {
+    try {
+      const response = await privateRequest(
+        `/admin/examSchedules/delete-files`,
         "post",
         {
           selectedFiles: ids,
@@ -414,6 +433,7 @@ const useAdminServices = () => {
     trainStudentImages,
     resetAccountPassword,
     getUploadedFileYears,
+    deleteSelectedFiles,
   };
 };
 

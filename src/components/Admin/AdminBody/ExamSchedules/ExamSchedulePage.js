@@ -30,6 +30,7 @@ import {
   TableBody,
   TableCell,
   TableHead,
+  TablePagination,
   TableRow,
 } from "@mui/material";
 import Modal from "react-bootstrap/Modal";
@@ -54,7 +55,6 @@ const useItemIds = (items) => {
 
 function ExamSchedules() {
   const {
-    uploadImportFile,
     uploadExamSchedulesExcelFiles,
     getExamFilesUploaded,
     importExamFromFiles,
@@ -63,6 +63,7 @@ function ExamSchedules() {
     getDate,
     getBuildings,
     getUploadedFileYears,
+    deleteSelectedFiles,
   } = useAdminServices();
 
   const { user } = useAuth();
@@ -108,6 +109,11 @@ function ExamSchedules() {
       }
     }
   };
+
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const [allTerms, setAllTerms] = useState([1, 2, 3]);
   const [currentTerm, setCurrentTerm] = useState(() => getCurrentValue("term"));
@@ -203,7 +209,6 @@ function ExamSchedules() {
         setStudentsLoading(true);
         try {
           const response = await getDate(year, term);
-          console.log(response);
 
           // Tạo một Set để lưu trữ các ngày không trùng nhau
           const uniqueDatesSet = new Set();
@@ -288,21 +293,25 @@ function ExamSchedules() {
     try {
       const response = await getExamFilesUploaded(
         fileFilterTerm,
-        fileFilterYear
+        fileFilterYear,
+        page,
+        rowsPerPage
       );
       if (response) {
         setUploadedFiles(response.files);
+        setTotalRecords(response.total_files);
+        setTotalPages(response.total_pages);
       }
     } catch (err) {
       console.log("get uploaded file: ", err);
     }
-  }, [fileFilterYear, fileFilterTerm]);
+  }, [fileFilterYear, fileFilterTerm, page, rowsPerPage]);
 
   useEffect(() => {
     if (modal) {
       getUploadedFiles();
     }
-  }, [modal, fileFilterYear, fileFilterTerm]);
+  }, [modal, fileFilterYear, fileFilterTerm, page, rowsPerPage]);
 
   const handleImportData = async () => {
     try {
@@ -357,10 +366,67 @@ function ExamSchedules() {
     }
   };
 
+  const handleDeleteFiles = async () => {
+    try {
+      const response = await toast.promise(
+        () => deleteSelectedFiles(selectedFiles),
+        {
+          pending: "Đang xóa...",
+          error: {
+            render: ({ data }) => {
+              return `${data.message}`;
+            },
+          },
+          success: {
+            render: ({ data }) => {
+              if (data.failed_deletetion_files === 0)
+                return <span>Xóa thành công!</span>;
+              else
+                return (
+                  <span>
+                    Thành công!
+                    <br />
+                    Không có lịch thi bị trùng
+                  </span>
+                );
+              return (
+                <div>
+                  Thành công!
+                  <br />
+                  Các lịch thi bị trùng:
+                  <br />
+                  {data.duplicates.map((duplicate) => (
+                    <span>
+                      - Kỳ {duplicate.term} Năm: {duplicate.year.from}-
+                      {duplicate.year.to}, Ca {formatHour(duplicate.start_time)}
+                      Phòng: {duplicate.room.room_name} <br />
+                    </span>
+                  ))}
+                </div>
+              );
+            },
+          },
+        }
+      );
+      if (response) {
+      }
+    } catch (err) {
+      console.log("Đổ dữ liệu: ", err);
+    }
+  };
+
   const toggleModal = () => {
     handleDeselectAll?.();
     setModal(!modal);
   };
+
+  const handlePageChange = useCallback((event, value) => {
+    setPage(value + 1);
+  }, []);
+
+  const handleRowsPerPageChange = useCallback((event) => {
+    setRowsPerPage(event.target.value);
+  }, []);
 
   return (
     <>
@@ -701,15 +767,20 @@ function ExamSchedules() {
                       </Table>
                     </Box>
                   </Scrollbar>
-                  {/*<TablePagination
-               component="div"
-               count={uploadedFiles.length}
-               onPageChange={onPageChange}
-               onRowsPerPageChange={onRowsPerPageChange}
-               page={page - 1}
-               rowsPerPage={rowsPerPage}
-               rowsPerPageOptions={[10, 15, 30]}
-             />  */}
+                  <TablePagination
+                    component="div"
+                    count={totalRecords}
+                    onPageChange={handlePageChange}
+                    page={page - 1}
+                    rowsPerPage={rowsPerPage}
+                    rowsPerPageOptions={[10]}
+                    labelRowsPerPage={"Số dòng mỗi trang"}
+                    labelDisplayedRows={({ from, to, count, page }) => {
+                      return `Trang ${page + 1}/${totalPages} | Tổng: ${count}`;
+                    }}
+                    showFirstButton={true}
+                    showLastButton={true}
+                  />
                 </Card>
                 <div
                   style={{

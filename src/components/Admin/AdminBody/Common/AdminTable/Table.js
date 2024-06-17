@@ -39,6 +39,7 @@ export const AdminTable = (props) => {
     onPageChange = () => {},
     onRowsPerPageChange = () => {},
     page = 0,
+    totalPages = 0,
     rowsPerPage = -1,
     setItemsSelected = () => {},
     selected = [],
@@ -135,6 +136,12 @@ export const AdminTable = (props) => {
         page={page - 1}
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[10, 15, 30]}
+        labelRowsPerPage={"Số dòng mỗi trang"}
+        labelDisplayedRows={({ from, to, count, page }) => {
+          return `Trang ${page + 1}/${totalPages} | Tổng: ${count}`;
+        }}
+        showFirstButton={true}
+        showLastButton={true}
       />
     </Card>
   );
