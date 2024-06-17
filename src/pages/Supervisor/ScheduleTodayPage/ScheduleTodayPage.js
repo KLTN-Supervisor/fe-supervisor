@@ -109,6 +109,7 @@ function ExamSchedulePage() {
     }
 
     const [students, setStudents] = useState([]);
+    const [exporting, setExporting] = useState(false);
     const [getStudentsSuspiciousLoading, setGetStudentsSuspiciousLoading] = useState(false);
     const getStudentsSuspicious = async () => {
       if (!getStudentsSuspiciousLoading) {
@@ -130,6 +131,7 @@ function ExamSchedulePage() {
     },[])
 
     const printHandle = () => {
+      setExporting(true)
       handleExport().then((url) => {
         console.log(url);
         const downloadAnchorNode = document.createElement('a');
@@ -137,6 +139,7 @@ function ExamSchedulePage() {
         downloadAnchorNode.setAttribute('download', `DSSVDuThi_${formatDateSpecial(date)}.xlsx`);
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
+        setExporting(false)
       });
     }
   
@@ -812,11 +815,12 @@ function ExamSchedulePage() {
               display: "flex",
             }}
           >
+            {exporting ? <CircularProgress size={25}/> :
             <div onClick={printHandle} style={{backgroundColor: "#0095f6",
               padding: "10px",
               color: "white",
               borderRadius: "10px",
-              cursor: "pointer", marginRight: 10}}>Xuất danh sách</div>
+              cursor: "pointer", marginRight: 10}}>Xuất danh sách</div>}
           </div>
           <div className={cx("title")}>
             <h6 className={cx("text")}>Danh sách tòa nhà</h6>
