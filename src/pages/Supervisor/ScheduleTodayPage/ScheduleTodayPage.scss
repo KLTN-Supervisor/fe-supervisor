@@ -311,6 +311,9 @@ html, body {
     }
     .schedulePage__content {
       .page_content{
+        .title{
+          margin-top: 50px;
+        }
         .page_content__header{
           flex-direction: column;
           .form__select{

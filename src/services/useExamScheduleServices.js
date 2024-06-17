@@ -161,6 +161,18 @@ const useExamScheduleServices = () => {
     }
   };
 
+  const getExamScheduleByDate = async (date) => {
+    try {
+      const response = await privateRequest(
+        `/examSchedule/getExamScheduleByDate?date=${date}`
+      );
+
+      return response.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   return {
     getYears,
     getTerms,
@@ -175,6 +187,7 @@ const useExamScheduleServices = () => {
     getExamReport,
     deleteExamReport,
     getRoomInfo,
+    getExamScheduleByDate,
   };
 };
 

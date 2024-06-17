@@ -28,10 +28,9 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import useExamScheduleServices from "../../../services/useExamScheduleServices";
-import { formatDate } from "../../../untils/format-date";
+import { formatDate, formatHour, formatDateExtend, formatHourExtend } from "../../../untils/format-date";
 import * as XLSX from "xlsx";
 import * as xlsxPopulate from "xlsx-populate/browser/xlsx-populate"
-import { HorizontalRule } from "@mui/icons-material";
 
 const cx = classNames.bind(styles);
 
@@ -298,7 +297,7 @@ function HomePage() {
       console.log(url);
       const downloadAnchorNode = document.createElement('a');
       downloadAnchorNode.href = url;
-      downloadAnchorNode.setAttribute('download', 'data.xlsx');
+      downloadAnchorNode.setAttribute('download', `DSSVDuThi_${formatDateExtend(info.start_time)}_${formatHourExtend(info.start_time)}_${info.room_name}.xlsx`);
       downloadAnchorNode.click();
       downloadAnchorNode.remove();
     });
@@ -327,6 +326,16 @@ function HomePage() {
 
     return blob
   }
+
+  function countObjectsWithAttendanceTrue(data) {
+    let count = 0;
+    for (let obj of data) {
+      if (obj.L === "Có mặt") {
+        count++;
+      }
+    }
+    return count;
+  }
   
   const handleExport = () => {
     let table = []
@@ -353,7 +362,7 @@ function HomePage() {
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(finalData, { origin: 'B20', skipHeader: true });
 
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+    XLSX.utils.book_append_sheet(workbook, worksheet, `${info.room_name}`);
 
     const workbookBlob = workbook2blob(workbook)
 
@@ -443,7 +452,7 @@ function HomePage() {
         })
         pdt.value("PHÒNG ĐÀO TẠO");
 
-        const title = sheet.range("A6:AH6").merged(true).style({
+        const title = sheet.range("A6:AI6").merged(true).style({
           bold: true,
           fontSize: 14,
           fontFamily: "Times New Roman",
@@ -453,14 +462,14 @@ function HomePage() {
         })
         title.value("DANH SÁCH SINH VIÊN DỰ THI");
 
-        const title2 = sheet.range("A7:AH7").merged(true).style({
+        const title2 = sheet.range("A7:AI7").merged(true).style({
           fontSize: 10,
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
           horizontalAlignment: "center",
           wrapText: true
         })
-        title2.value(`Học kỳ 02 - Năm học 2023-2024`);
+        title2.value(`Học kỳ 0${info.term} - Năm học ${info.year.from}-${info.year.to}`);
 
         const subject = sheet.range("C10:D13").merged(true).style({
           fontSize: 10,
@@ -500,7 +509,7 @@ function HomePage() {
           verticalAlignment: "center",
           wrapText: true
         })
-        subjectValue.value(`Anh văn đầu ra - Số Tín Chỉ: 0`);
+        subjectValue.value(`${info.subject_name} - Số Tín Chỉ: ${info.subject_credit}`);
         const subjectIdValue = sheet.range("E14:S16").merged(true).style({
           bold: true,
           fontSize: 10,
@@ -508,7 +517,7 @@ function HomePage() {
           verticalAlignment: "center",
           wrapText: true
         })
-        subjectIdValue.value(`ANDR110026`);
+        subjectIdValue.value(`${info.subject_id}`);
 
         const subjectGroupValue = sheet.range("E17:W17").merged(true).style({
           fontSize: 10,
@@ -524,7 +533,7 @@ function HomePage() {
           verticalAlignment: "center",
           wrapText: true
         })
-        examDateValue.value(`17/03/2024 - Giờ Thi: 07g00 -   phút - Số Tiết 2 - Phòng thi: A2-101`);
+        examDateValue.value(`${formatDate(info.start_time)} - Giờ Thi: ${formatHour(info.start_time)}  -   phút - Số Tiết 2 - Phòng thi: ${info.room_name}`);
 
         const inpector = sheet.range("T9:X12").merged(true).style({
           fontSize: 10,
@@ -538,7 +547,7 @@ function HomePage() {
           fontSize: 10,
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
-          underline: (cell, ri, ci, range) => Math.random() > 0.5,
+          underline: (cell, ri, ci, range) => true,
           wrapText: true
         })
         line1.value("                                                                             ");
@@ -555,7 +564,7 @@ function HomePage() {
           fontSize: 10,
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
-          underline: (cell, ri, ci, range) => Math.random() > 0.5,
+          underline: (cell, ri, ci, range) => true,
           wrapText: true
         })
         line2.value("                                                                             ");
@@ -783,9 +792,9 @@ function HomePage() {
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
           wrapText: true,
-          underline: (cell, ri, ci, range) => Math.random() > 0.5,
+          underline: (cell, ri, ci, range) => true,
         })
-        studentTotalAttendValue.value("          ");
+        studentTotalAttendValue.value(`   ${countObjectsWithAttendanceTrue(finalData)}   `);
 
         const date = sheet.range(`X${23+finalData.length}:Z${25+finalData.length}`).merged(true).style({
           fontSize: 10,
