@@ -3,6 +3,7 @@ import { Button, Menu, MenuItem, Stack, SvgIcon } from "@mui/material";
 import UploadOutlinedIcon from "@mui/icons-material/UploadOutlined";
 
 const UploadInput = ({
+  style = {},
   files,
   setFiles,
   fileIsValid,
@@ -44,6 +45,7 @@ const UploadInput = ({
           }
           variant="contained"
           onClick={() => filePickerRef.current.click()}
+          sx={style}
         >
           {buttonName}
         </Button>

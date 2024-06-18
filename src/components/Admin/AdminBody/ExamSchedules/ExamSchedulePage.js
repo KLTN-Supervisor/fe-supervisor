@@ -43,6 +43,9 @@ import { toast } from "react-toastify";
 import { formatHour } from "../../../../untils/format-date";
 import styles2 from "../../../Supervisor/StudentCard/StudentCard.module.scss";
 import CloseIcon from "@mui/icons-material/Close";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+import DeleteIcon from "@mui/icons-material/Delete";
+import UploadIcon from "@mui/icons-material/Upload";
 
 const cx = classNames.bind(styles);
 const cx2 = classNames.bind(styles2);
@@ -69,6 +72,7 @@ function ExamSchedules() {
   const { user } = useAuth();
 
   const [modal, setModal] = useState(false);
+  const [fileUploadModal, setFileUploadModal] = useState(false);
   const [importLoading, setImportLoading] = useState(false);
 
   const getCurrentValue = (type) => {
@@ -171,9 +175,11 @@ function ExamSchedules() {
         const response = await getUploadedFileYears();
 
         if (response) {
-          if (!response.includes(currentYear) && currentTerm === 1) {
+          if (!response.includes(currentYear) && currentTerm === 1)
             response.push(currentYear);
-          }
+
+          if (!response.includes(currentYear - 1) && currentTerm > 1)
+            response.push(currentYear - 1);
 
           setAllYears(response);
         }
@@ -250,27 +256,38 @@ function ExamSchedules() {
     getBuildingsExam();
   }, [date]);
 
-  const [files, setFiles] = useState();
+  const [files, setFiles] = useState([]);
   const [filesIsValid, setFilesIsValid] = useState();
 
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
 
-  const removeFiles = () => {
-    setFiles(null);
-    setFilesIsValid(false);
-  };
-
   const uploadExamSchedulesFilesHandler = async () => {
     try {
       const formData = new FormData();
-      files.map((file, i) => formData.append("file", file));
-      const response = await uploadExamSchedulesExcelFiles(
-        formData,
-        "examSchedules"
+      files.map((fileObject, i) => formData.append("file", fileObject.file));
+      formData.append("term", fileFilterTerm);
+      formData.append("schoolYear", `${fileFilterYear}-${fileFilterYear + 1}`);
+
+      const response = await toast.promise(
+        () => uploadExamSchedulesExcelFiles(formData, "examSchedules"),
+        {
+          pending: "Đang tải lên...",
+          error: {
+            render: ({ data }) => {
+              return `${data.message}`;
+            },
+          },
+          success: {
+            render: ({ data }) => {
+              return <span>Upload file thành công!</span>;
+            },
+          },
+        }
       );
       if (response) {
-        removeFiles();
+        getUploadedFiles();
+        toggleFileUploadModal();
       }
     } catch (err) {
       console.log("upload file: ", err);
@@ -315,6 +332,7 @@ function ExamSchedules() {
 
   const handleImportData = async () => {
     try {
+      setImportLoading(true);
       const response = await toast.promise(
         () => importExamFromFiles(selectedFiles),
         {
@@ -361,13 +379,16 @@ function ExamSchedules() {
       );
       if (response) {
       }
+      setImportLoading(false);
     } catch (err) {
       console.log("Đổ dữ liệu: ", err);
+      setImportLoading(false);
     }
   };
 
   const handleDeleteFiles = async () => {
     try {
+      setImportLoading(true);
       const response = await toast.promise(
         () => deleteSelectedFiles(selectedFiles),
         {
@@ -379,27 +400,16 @@ function ExamSchedules() {
           },
           success: {
             render: ({ data }) => {
-              if (data.failed_deletetion_files === 0)
+              if (data.failed_deletion_files.length === 0)
                 return <span>Xóa thành công!</span>;
-              else
-                return (
-                  <span>
-                    Thành công!
-                    <br />
-                    Không có lịch thi bị trùng
-                  </span>
-                );
+
               return (
                 <div>
-                  Thành công!
+                  Có lỗi không xóa được các file sau:
                   <br />
-                  Các lịch thi bị trùng:
-                  <br />
-                  {data.duplicates.map((duplicate) => (
-                    <span>
-                      - Kỳ {duplicate.term} Năm: {duplicate.year.from}-
-                      {duplicate.year.to}, Ca {formatHour(duplicate.start_time)}
-                      Phòng: {duplicate.room.room_name} <br />
+                  {data.failed_deletion_files.map((file) => (
+                    <span key={file._id}>
+                      - {file.file_name} <br />
                     </span>
                   ))}
                 </div>
@@ -409,15 +419,34 @@ function ExamSchedules() {
         }
       );
       if (response) {
+        console.log("xóa file");
+        const failedDeletionFileIds = response.failed_deletion_files.map(
+          (file) => file._id
+        );
+        const deletedFileIds = selectedFiles.filter(
+          (fileId) => !failedDeletionFileIds.includes(fileId)
+        );
+
+        setUploadedFiles((prev) =>
+          prev.filter((file) => !deletedFileIds.includes(file._id))
+        );
+        handleDeselectAll?.();
       }
+      setImportLoading(false);
     } catch (err) {
-      console.log("Đổ dữ liệu: ", err);
+      console.log("Lỗi xóa file: ", err);
+      setImportLoading(false);
     }
   };
 
   const toggleModal = () => {
     handleDeselectAll?.();
     setModal(!modal);
+  };
+
+  const toggleFileUploadModal = () => {
+    removeFiles();
+    setFileUploadModal(!fileUploadModal);
   };
 
   const handlePageChange = useCallback((event, value) => {
@@ -427,6 +456,82 @@ function ExamSchedules() {
   const handleRowsPerPageChange = useCallback((event) => {
     setRowsPerPage(event.target.value);
   }, []);
+
+  const validFile = (file) => {
+    // Các định dạng hợp lệ cho Excel và CSV
+    const validTypes = [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
+      "application/vnd.ms-excel", // .xls
+      "text/csv", // .csv
+    ];
+
+    return validTypes.includes(file.type);
+  };
+
+  const [isDragging, setIsDragging] = useState(false);
+  const [isDropping, setIsDropping] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const removeFiles = () => {
+    fileInputRef.current.value = null;
+    setFiles([]);
+    setFilesIsValid(false);
+  };
+
+  const deleteDraftFile = (index) => {
+    setFiles((prevFile) => prevFile.filter((_, i) => i !== index));
+  };
+
+  const onDragOver = (event) => {
+    event.preventDefault();
+    setIsDragging(true);
+    event.dataTransfer.dropEffect = "copy";
+  };
+  const onDragLeave = (event) => {
+    event.preventDefault();
+    setIsDragging(false);
+  };
+  const onDrop = (event) => {
+    event.preventDefault();
+    setIsDragging(false);
+    const dragFiles = event.dataTransfer.files;
+    if (dragFiles.length === 0) return;
+    for (let i = 0; i < dragFiles.length; i++) {
+      if (!validFile(dragFiles[i])) continue;
+      if (!files.some((e) => e.name === dragFiles[i].name)) {
+        setFiles((prevFile) => [
+          ...prevFile,
+          {
+            name: dragFiles[i].name,
+            url: URL.createObjectURL(dragFiles[i]),
+            file: dragFiles[i],
+          },
+        ]);
+      }
+    }
+  };
+
+  const selectFiles = () => {
+    fileInputRef.current.click();
+  };
+
+  const onFileSelect = (event) => {
+    const selectfiles = event.target.files;
+    if (selectfiles.length === 0) return;
+    for (let i = 0; i < selectfiles.length; i++) {
+      if (!validFile(selectfiles[i])) continue;
+      if (!files.some((e) => e.name === selectfiles[i].name)) {
+        setFiles((prevFile) => [
+          ...prevFile,
+          {
+            name: selectfiles[i].name,
+            url: URL.createObjectURL(selectfiles[i]),
+            file: selectfiles[i],
+          },
+        ]);
+      }
+    }
+  };
 
   return (
     <>
@@ -442,15 +547,20 @@ function ExamSchedules() {
             uploadHandler={uploadImportExamSchedulesFileHandler}
           /> */}
             {user?.role === "ACADEMIC_AFFAIRS_OFFICE" ? (
-              <UploadInput
-                files={files}
-                fileIsValid={filesIsValid}
-                setFiles={setFiles}
-                setFileIsValid={setFilesIsValid}
-                removeFile={removeFiles}
-                uploadHandler={uploadExamSchedulesFilesHandler}
-                buttonName="Tải lên file"
-              />
+              <Button
+                color="success"
+                startIcon={
+                  <SvgIcon fontSize="small">
+                    <UploadIcon />
+                  </SvgIcon>
+                }
+                variant="contained"
+                onClick={() => {
+                  setModal(true);
+                }}
+              >
+                Upload lịch thi
+              </Button>
             ) : user?.role === "ADMIN" ? (
               <Button
                 color="success"
@@ -633,9 +743,26 @@ function ExamSchedules() {
                     display: "flex",
                     justifyContent: "center",
                     marginBottom: 5,
-                    width: "70%",
+                    width: "100%",
                   }}
                 >
+                  {user?.role === "ACADEMIC_AFFAIRS_OFFICE" && (
+                    <Button
+                      color="success"
+                      startIcon={
+                        <SvgIcon fontSize="small">
+                          <DownloadIcon />
+                        </SvgIcon>
+                      }
+                      variant="contained"
+                      onClick={() => {
+                        setFileUploadModal(true);
+                      }}
+                      sx={{ width: 400 }}
+                    >
+                      Chọn file
+                    </Button>
+                  )}
                   <FormControl
                     variant="standard"
                     className={cx("form__select")}
@@ -644,7 +771,8 @@ function ExamSchedules() {
                       border: "1px solid rgba(0, 85, 141, 0.5)",
                       padding: "3px 16px",
                       borderRadius: "10px",
-                      marginRight: 2,
+                      mr: 0.5,
+                      ml: 5,
                     }}
                   >
                     <Select
@@ -671,7 +799,6 @@ function ExamSchedules() {
                       border: "1px solid rgba(0, 85, 141, 0.5)",
                       padding: "3px 16px",
                       borderRadius: "10px",
-                      marginRight: 5,
                     }}
                   >
                     <Select
@@ -801,17 +928,165 @@ function ExamSchedules() {
                   >
                     Đóng
                   </button>
+                  {selectedFiles.length > 0 && (
+                    <>
+                      <button
+                        className={cx2("button")}
+                        style={{
+                          backgroundColor: "red",
+                        }}
+                        onClick={handleDeleteFiles}
+                        disabled={importLoading}
+                      >
+                        Xóa
+                      </button>
+                      <button
+                        className={cx2("button")}
+                        style={{
+                          backgroundColor: "lightgreen",
+                        }}
+                        onClick={handleImportData}
+                        disabled={importLoading}
+                      >
+                        Đổ dữ liệu
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {fileUploadModal && (
+        <div
+          className={cx2("modal active-modal")}
+          onDragOver={isDropping ? null : onDragOver}
+          onDragLeave={isDropping ? null : onDragLeave}
+          onDrop={isDropping ? null : onDrop}
+        >
+          <div
+            onClick={toggleFileUploadModal}
+            className={cx2("overlay")}
+            style={{ alignSelf: "flex-end" }}
+          >
+            <CloseIcon
+              //className={cx("sidenav__icon")}
+              style={{
+                width: "27px",
+                height: "27px",
+                color: "white",
+                margin: "12px 30px",
+                position: "absolute",
+                right: "0",
+                cursor: "pointer",
+              }}
+            />
+          </div>
+          <div
+            className={cx2("modal-navbar-content")}
+            style={{ width: "50%", marginTop: 15 }}
+          >
+            <div className={cx2("modal-header")}>Tải lên file</div>
+            <div
+              className={cx2("modal-main")}
+              style={{
+                display: "flex",
+                padding: "0 0 10px 0",
+                flexDirection: "column",
+              }}
+            >
+              <div
+                style={{
+                  height: "70vh",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                  display: "flex",
+                  ...(isDragging && { opacity: 0.6 }),
+                }}
+              >
+                {files.length === 0 ? (
+                  <div className={cx("modal-image")}>
+                    <UploadFileIcon className={cx("modal-logo")} />
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    {files.map((objectFile, i) => (
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          width: 400,
+                        }}
+                      >
+                        <span>{objectFile.name}</span>
+                        <div
+                          onClick={() => deleteDraftFile(i)}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <DeleteIcon />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {isDragging ? (
+                  <div className={cx("modal-text")}>Thả file tại đây</div>
+                ) : (
+                  <div className={cx("modal-text")}>Kéo thả file vào đây</div>
+                )}
+
+                <div className={cx("modal-input")}>
+                  <input
+                    type="file"
+                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, text/csv"
+                    multiple
+                    ref={fileInputRef}
+                    onChange={onFileSelect}
+                    id="myFileInput"
+                    style={{ display: "none" }}
+                  />
+                  <label
+                    role="button"
+                    onClick={selectFiles}
+                    className={cx("modal-upload")}
+                  >
+                    Chọn từ thư mục
+                  </label>
+                </div>
+              </div>
+              <div
+                style={{
+                  width: "80%",
+                  marginTop: 15,
+                  flexDirection: "row",
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <button
+                  className={cx2("button")}
+                  style={{
+                    backgroundColor: "lightpink",
+                  }}
+                  onClick={toggleFileUploadModal}
+                  disabled={importLoading}
+                >
+                  Đóng
+                </button>
+                {files.length > 0 && (
                   <button
                     className={cx2("button")}
                     style={{
                       backgroundColor: "lightgreen",
                     }}
-                    onClick={handleImportData}
+                    onClick={uploadExamSchedulesFilesHandler}
                     disabled={importLoading}
                   >
-                    Đổ dữ liệu
+                    Tải lên
                   </button>
-                </div>
+                )}
               </div>
             </div>
           </div>
