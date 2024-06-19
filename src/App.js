@@ -17,14 +17,12 @@ function App() {
   const loadTrainingData = async () => {
     try {
       const response = await privateRequest(`/train/`);
-      console.log(response);
       const labeledFaceDescriptors = response.data
         .map((x) => {
           console.log(x);
           const descriptors = x.descriptors.map(
             (descriptor) => new Float32Array(descriptor)
           );
-          console.log(descriptors);
           return new faceapi.LabeledFaceDescriptors(x.label, descriptors);
         })
         .filter(Boolean);

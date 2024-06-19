@@ -195,6 +195,33 @@
           .image {
             flex: 1;
             max-height: 567px;
+            .image-slider-container {
+              width: 400px;
+            }
+  
+            .image-slider{
+              width: 100%;
+              position: relative;
+              transition: transform 0.2s;
+              display: flex !important;
+              justify-content: center;
+              flex-shrink: 0;
+              flex-grow: 0;
+              border-radius: 0px 0px 10px 10px;
+            }
+  
+            .image-slider > img {
+              // width: 100%;
+              object-fit: contain;
+              max-height: 380px;
+            }
+            .image-slider > canvas{
+              max-height: 380px;
+              position: absolute; 
+              display: inline-block;
+              top: 0;
+            }
+            
             .img-slider {
               object-fit: none;
               display: block;

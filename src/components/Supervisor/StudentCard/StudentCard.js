@@ -8,7 +8,6 @@ import * as faceapi from "face-api.js";
 import CollectionsOutlinedIcon from "@mui/icons-material/CollectionsOutlined";
 import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
-import usePrivateHttpClient from "../../../hooks/http-hook/private-http-hook";
 import { Alert, Snackbar, CircularProgress } from "@mui/material";
 import { StateContext } from "../../../context/StateContext";
 
@@ -31,7 +30,6 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
     setModal(!modal);
   };
 
-  const { privateRequest } = usePrivateHttpClient();
   const [modalAttendance, setModalAttendance] = useState(false);
 
   const toggleModalAttendance = async () => {
@@ -49,6 +47,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
       imageRef.current = null;
       setIsDropping(false);
       setModalAttendance(!modalAttendance);
+      setIsAttending(false);
     }
   };
 
@@ -79,29 +78,9 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
     }
   };
 
-  const loadTrainingData = async () => {
-    try {
-      const response = await privateRequest(`/train/`);
-      console.log(response);
-      const labeledFaceDescriptors = response.data
-        .map((x) => {
-          console.log(x);
-          const descriptors = x.descriptors.map(
-            (descriptor) => new Float32Array(descriptor)
-          );
-          console.log(descriptors);
-          return new faceapi.LabeledFaceDescriptors(x.label, descriptors);
-        })
-        .filter(Boolean);
-      return labeledFaceDescriptors;
-    } catch (err) {
-      throw err;
-    }
-  };
 
   // STOP VIDEO STREAM FUNCTION
   const stopVideoStream = async () => {
-    console.log("toi ch");
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
       navigator.mediaDevices.addEventListener("removetrack", (event) => {
         console.log(`${event.track.kind} track removed`);
@@ -112,22 +91,10 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
       const tracks = stream?.getTracks();
 
       await tracks.forEach((track) => track.stop());
-      console.log("tat ch");
       videoRef.current.srcObject = null;
     }
   };
 
-  // OPEN YOU FACE WEBCAM
-  // const startVideo = () => {
-  //   navigator.mediaDevices
-  //     .getUserMedia({ video: true })
-  //     .then((currentStream) => {
-  //       videoRef.current.srcObject = currentStream;
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // };
   const startVideo = () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia ) {
       navigator.mediaDevices
@@ -158,9 +125,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
   };
 
   const runFaceDetection = useCallback(async () => {
-    console.log(" chay 1")
     if (isLoadCanvasRef.current && faceMatcher && videoRef?.current) {
-      console.log(" chay 2")
       const detections = await faceapi
         .detectAllFaces(videoRef.current)
         .withFaceLandmarks()
@@ -182,7 +147,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
 
       for (const detection of resized) {
         const box = detection.detection.box;
-        // const context = canvasRef.current.getContext('2d');
+        const context = canvasRef.current.getContext('2d');
         const studentName = await faceMatcher
         .findBestMatch(detection.descriptor)
         .toString();
@@ -190,7 +155,6 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
           label: student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label ? studentName : "unknown",
         });
         
-        console.log(isAttendance);
         if( !isAttendance && student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label &&
           faceMatcher.findBestMatch(detection.descriptor)._label != "unknown"
         ) {
@@ -216,8 +180,6 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
         }
         drawBox.draw(canvasRef.current);
       }
-      
-      
     }
   },[student, isAttendance, setIsAttendance]);
 
@@ -233,9 +195,9 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
   }, [runFaceDetection]);
 
   //Hinh anh
-  const [images, setImages] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isDropping, setIsDropping] = useState(false);
+  const [isAttending, setIsAttending] = useState(false);
   const fileInputRef = useRef(null);
   const imageRef = useRef();
   //Kéo thả ảnh vào phần tạo bài viết
@@ -252,7 +214,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
   const onDrop = async(event) => {
     event.preventDefault();
     setIsDragging(false);
-    const file = event.target.files[0];
+    const file = event.dataTransfer.files[0];
     if (notValidFile(file)){
       setSnackBarNotif({
         severity: "error",
@@ -263,25 +225,29 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
       setIsDropping(false);
       return;
     } 
+    setIsAttending(true);
     const image = await faceapi.bufferToImage(file);
-    console.log(image);
-    if (imageRef.current) {
-      imageRef.current.src = image.src;
+    const container = document.querySelector(`#imgDiv`);
+    if (container) {
+      const container = document.querySelector(`#imgDiv`);
+      const canvas = faceapi.createCanvasFromMedia(image);
+      container.innerHTML = '';
+      container.append(image);
+      container.append(canvas);
 
       const detections = await faceapi
-        .detectAllFaces(imageRef.current)
+        .detectAllFaces(image)
         .withFaceLandmarks()
         .withFaceDescriptors();
 
-      canvasImageRef.current.innerHTML = faceapi.createCanvas(imageRef.current);
-      faceapi.matchDimensions(canvasImageRef.current, {
-        width: imageRef.current && imageRef.current.offsetWidth,
-        height: 420,
+      faceapi.matchDimensions(canvas, {
+        width: image && image.width,
+        height: image && image.height,
       });
 
       const resized = faceapi.resizeResults(detections, {
-        width: imageRef.current && imageRef.current.offsetWidth,
-        height: 420,
+        width: image && image.width,
+        height: image && image.height,
       });
 
       for (const detection of resized) {
@@ -292,6 +258,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
         const drawBox = new faceapi.draw.DrawBox(box, {
           label: student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label ? studentName : "unknown",
         });
+        console.log(isAttendance, student.student_id, faceMatcher.findBestMatch(detection.descriptor)._label);
         if ( !isAttendance && student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label  
           && faceMatcher.findBestMatch(detection.descriptor)._label != "unknown"
         ) {
@@ -303,17 +270,17 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
               "Điểm danh thành công " +
               faceMatcher.findBestMatch(detection.descriptor)._label,
           });
+          console.log(student.student_id);
           setSnackBarOpen(true);
-          imageRef.current = null;
           setTimeout(() => {
             toggleModalAttendance();
             setModal(false);
           }, 3000);
         }
-        drawBox.draw(canvasImageRef.current);
+        drawBox.draw(canvas);
       }
     }
-    setIsDropping(true);
+    setIsAttending(false);
   }
 
   //Validate file
@@ -324,9 +291,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
       file.type !== "image/jpeg" &&
       file.type !== "image/png" &&
       file.type !== "image/gif" &&
-      file.type !== "image/webp" &&
-      file.type !== "video/mp4" &&
-      file.type !== "video/webm"
+      file.type !== "image/webp"
     );
   };
 
@@ -348,37 +313,40 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
       setIsDropping(false);
       return;
     } 
+    setIsAttending(true);
     const image = await faceapi.bufferToImage(file);
-    console.log(image);
-    if (imageRef.current) {
-      imageRef.current.src = image.src;
+    const container = document.querySelector(`#imgDiv`);
+    if (container) {
+      const container = document.querySelector(`#imgDiv`);
+      const canvas = faceapi.createCanvasFromMedia(image);
+      container.innerHTML = '';
+      container.append(image);
+      container.append(canvas);
 
       const detections = await faceapi
-        .detectAllFaces(imageRef.current)
+        .detectAllFaces(image)
         .withFaceLandmarks()
         .withFaceDescriptors();
 
-      canvasImageRef.current.innerHTML = faceapi.createCanvas(imageRef.current);
-      faceapi.matchDimensions(canvasImageRef.current, {
-        width: imageRef.current && imageRef.current.offsetWidth,
-        height: 420,
+      faceapi.matchDimensions(canvas, {
+        width: image && image.width,
+        height: image && image.height,
       });
 
       const resized = faceapi.resizeResults(detections, {
-        width: imageRef.current && imageRef.current.offsetWidth,
-        height: 420,
+        width: image && image.width,
+        height: image && image.height,
       });
 
       for (const detection of resized) {
         const box = detection.detection.box;
-        console.log("faceMatcher ne", faceMatcher);
         const studentName = await faceMatcher
         .findBestMatch(detection.descriptor)
         .toString();
         const drawBox = new faceapi.draw.DrawBox(box, {
           label: student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label ? studentName : "unknown",
         });
-        
+        console.log(isAttendance, student.student_id, faceMatcher.findBestMatch(detection.descriptor)._label);
         if ( !isAttendance && student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label  
           && faceMatcher.findBestMatch(detection.descriptor)._label != "unknown"
         ) {
@@ -390,16 +358,17 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
               "Điểm danh thành công " +
               faceMatcher.findBestMatch(detection.descriptor)._label,
           });
-          imageRef.current = null;
+          console.log(student.student_id);
           setSnackBarOpen(true);
           setTimeout(() => {
             toggleModalAttendance();
             setModal(false);
           }, 3000);
         }
-        drawBox.draw(canvasImageRef.current);
+        drawBox.draw(canvas);
       }
     }
+    setIsAttending(false);
   };
 
 
@@ -594,6 +563,14 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                   <span className={cx("span")}>{student.nationality}</span>
                 </div>
                 <div className={cx("info")}>
+                  <div className={cx("title")}>Khoa:</div>
+                  <span className={cx("span")}>{student.faculty.toString().replace(/^Khoa\s*/, "")}</span>
+                </div>
+                <div className={cx("info")}>
+                  <div className={cx("title")}>Chuyên ngành:</div>
+                  <span className={cx("span")}>{student.major}</span>
+                </div>
+                <div className={cx("info")}>
                   <div className={cx("title")}>Lớp học phần:</div>
                   <span className={cx("span")}>{student.class}</span>
                 </div>
@@ -677,6 +654,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                   imageRef.current = null;
                   setIsDropping(false);
                   setState(1);
+                  setIsAttending(false);
                 }}
               >
                 <ImageOutlinedIcon className={cx("icon")} />
@@ -696,7 +674,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                   crossOrigin="anonymous"
                   ref={videoRef}
                   autoPlay
-                  playsinline 
+                  playsInline
                   style={{ borderRadius: 10 }}
                   className={cx("video")}
                 ></video>
@@ -730,44 +708,37 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                       <div
                         className={cx("image")}
                         style={{
+                          display: !isAttending ? "flex" : "none",
                           minHeight: "420px",
                           width: "100%",
+                          justifyContent: "center",
                           display: "flex",
                           overflow: "hidden",
                         }}
                       >
-                        <div
-                          className={cx("img-slider")}
-                          style={{
-                            width: "100%",
-                            transition: "transform 0.2s",
-                            display: "flex",
-                            justifyContent: "center",
-                            flexShrink: "0",
-                            flexGrow: "0",
-                            borderRadius: "0px 0px 10px 10px",
-                          }}
-                        >
-                          <img
-                            ref={imageRef}
-                            style={{
-                              objectFit: "contain",
-                              height: "420px",
-                              display: "block",
-                              flexShrink: "0",
-                              flexGrow: "0",
-                              borderRadius: "10px 10px 10px 10px",
-                            }}
-                            // src={images[0].url}
-                          />
-                          <canvas
-                            ref={canvasImageRef}
-                            style={{ position: "absolute", display: "inline-block" }}
-                            width={imageRef.current?.naturalWidth}
-                            height={imageRef.current?.naturalHeight}
-                          />
+                        <div className={cx("image-slider-container")}>
+                          <div
+                            id={`imgDiv`}
+                            className={cx("image-slider")}
+                            style={{ display: "flex !important", justifyContent: "center", alignItems: "center" }}
+                          ></div>
                         </div>
                         
+                      </div>
+                      <div
+                        style={{
+                          display: isAttending ? "block" : "none",
+                          width: "100%",
+                          textAlign: "center",
+                          fontWeight: 600,
+                          fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                        Helvetica, Arial, sans-serif`,
+                          color: "rgb(61 60 60)",
+                        }}
+                      >
+                        <CircularProgress size={25}/>
+                        <br/>
+                        Đang kiểm tra hình ảnh
                       </div>
                     </div>
                   </div>

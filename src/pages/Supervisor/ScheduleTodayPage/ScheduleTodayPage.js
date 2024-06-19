@@ -36,7 +36,6 @@ function ExamSchedulePage() {
   useEffect(() => {
     const getBuildingsExam = async () => {
       if (!studentsLoading) {
-        console.log(date)
         setStudentsLoading(true);
         try {
           const response = await getBuildings(date);
@@ -103,7 +102,6 @@ function ExamSchedulePage() {
 
 
     const handleRoomClick = (room, time, roomName) =>{
-      console.log(time, room);
       navigate("attendance", { state: { time, room, roomName } });
       // toggleModalAttendance();
     }
@@ -116,12 +114,11 @@ function ExamSchedulePage() {
         setGetStudentsSuspiciousLoading(true);
         try {
           const response = await getSuspiciousStudents(date);
-          console.log("getStudentsSuspicious", response)
           setStudents(response);
           setGetStudentsSuspiciousLoading(false);
         } catch (err) {
           setGetStudentsSuspiciousLoading(false);
-          console.log("get time error: ", err);
+          console.log("get warning student error: ", err);
         }
       }
     };
@@ -133,7 +130,6 @@ function ExamSchedulePage() {
     const printHandle = () => {
       setExporting(true)
       handleExport().then((url) => {
-        console.log(url);
         const downloadAnchorNode = document.createElement('a');
         downloadAnchorNode.href = url;
         downloadAnchorNode.setAttribute('download', `DSSVDuThi_${formatDateSpecial(date)}.xlsx`);

@@ -984,6 +984,7 @@ function HomePage() {
         .getUserMedia({ video: true })
         .then((currentStream) => {
           videoRef.current.srcObject = currentStream;
+          setIsAttending(true);
         })
         .catch((err) => {
           console.error('Error accessing camera:', err);
@@ -992,6 +993,7 @@ function HomePage() {
             message:
               "Xảy ra lỗi khi sử dụng camera"
           });
+          setIsAttending(false);
           setSnackBarOpen(true);
         });
     } else {
@@ -1057,6 +1059,7 @@ function HomePage() {
         }
         drawBox.draw(canvasRef.current);
       }
+      setIsAttending(false);
     }
   },[students]);
 
@@ -1077,6 +1080,7 @@ function HomePage() {
   const [images, setImages] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isDropping, setIsDropping] = useState(false);
+  const [isAttending, setIsAttending] = useState(false);
   const fileInputAttendRef = useRef(null);
   const imageRef = useRef();
   //Kéo thả ảnh vào phần tạo bài viết
@@ -1094,7 +1098,7 @@ function HomePage() {
     event.preventDefault();
     setIsDragging(false);
     setIsDropping(true); 
-    const files = event.target.files;
+    const files = event.dataTransfer.files;
     const newImages = [];
 
     for (const file of files) {
@@ -1110,64 +1114,6 @@ function HomePage() {
       newImages.push(image);
     }
     setImages(newImages);
-
-    
-    const file = event.dataTransfer?.files[0];
-    if (notValidFile(file)){
-      setSnackBarNotif({
-        severity: "error",
-        message:
-          "Chọn file không đúng định dạng" ,
-      });
-      setSnackBarOpen(true);
-      setIsDropping(false);
-      return;
-    }
-    const image = await faceapi.bufferToImage(file);
-    if (imageRef.current) {
-      imageRef.current.src = image.src;
-
-      const detections = await faceapi
-        .detectAllFaces(imageRef.current)
-        .withFaceLandmarks()
-        .withFaceDescriptors();
-
-      canvasImageRef.current.innerHTML = faceapi.createCanvas(imageRef.current);
-      faceapi.matchDimensions(canvasImageRef.current, {
-        width: imageRef.current && imageRef.current.offsetWidth,
-        height: 420,
-      });
-
-      const resized = faceapi.resizeResults(detections, {
-        width: imageRef.current && imageRef.current.offsetWidth,
-        height: 420,
-      });
-
-      for (const detection of resized) {
-        const box = detection.detection.box;
-        const studentName = await faceMatcher
-        .findBestMatch(detection.descriptor)
-        .toString();
-        const student = students.find(s => s?.student?.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label)
-        const drawBox = new faceapi.draw.DrawBox(box, {
-          label: student ? ( student.attendance ? "Đã điểm danh" : studentName) : "unknown",
-        });
-        if ( student && !student.attendance
-          && faceMatcher.findBestMatch(detection.descriptor)._label != "unknown"
-        ) {
-          updateAttendance(student.student.student_id);
-          setSnackBarNotif({
-            severity: "success",
-            message:
-              "Điểm danh thành công " +
-              faceMatcher.findBestMatch(detection.descriptor)._label,
-          });
-          setSnackBarOpen(true);
-        }
-        drawBox.draw(canvasImageRef.current);
-      }
-    }
-    
   }
 
   function selectAttendFiles() { 
@@ -1200,9 +1146,9 @@ function HomePage() {
 
   useEffect(() => {
     const detectImage = async () => {
+      setIsAttending(true);
       doneAttended.current = false;
       if(images.length > 0){
-        const promises = [];
         for(let i = 0; i< images.length; ++i){
           const container = document.querySelector(`#imgDiv${i}`);
           const image = images[i];
@@ -1216,8 +1162,6 @@ function HomePage() {
               .detectAllFaces(image)
               .withFaceLandmarks()
               .withFaceDescriptors();
-    
-            // canvas = faceapi.createCanvas(image);
 
             faceapi.matchDimensions(canvas, {
               width: image && image.width,
@@ -1228,7 +1172,6 @@ function HomePage() {
               width: image && image.width,
               height: image && image.height,
             });
-            
             
             for (const detection of resized) {
               const box = detection.detection.box;
@@ -1257,7 +1200,8 @@ function HomePage() {
             }
           }
         }
-        doneAttended.current=true
+        doneAttended.current=true;
+        setIsAttending(false);
       }
     }
     detectImage();
@@ -1710,6 +1654,26 @@ function HomePage() {
                 height="480"
                 className={cx("appcanvas")}
               />
+              <div
+                style={{
+                  display: isAttending ? "block" : "none",
+                  position: "absolute",
+                  zIndex: 5,
+                  top: "105px",
+                  width: "100%",
+                  height: "82%",
+                  backgroundColor: "white",
+                  textAlign: "center",
+                  fontWeight: 600,
+                  fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                Helvetica, Arial, sans-serif`,
+                  color: "rgb(61 60 60)",
+                }}
+              >
+                <CircularProgress size={25} style={{marginTop: 10}}/>
+                <br/>
+                Đang chuẩn bị camera ...
+              </div>
             </>
           ) : (
             <div
@@ -1734,6 +1698,7 @@ function HomePage() {
                       <div
                         className={cx("image")}
                         style={{
+                          display: !isAttending ? "flex" : "none",
                           minHeight: "420px",
                           width: "100%",
                           display: "flex",
@@ -1742,8 +1707,8 @@ function HomePage() {
                         }}
                       >
                         <div className={cx("image-slider-container")}>
-                          <Slider ref={sliderRef}  {...settings} >
-                          {images.map((image, index) => (
+                          <Slider ref={sliderRef}  {...settings}>
+                            {images.map((image, index) => (
                               <div
                                 id={`imgDiv${index}`}
                                 className={cx("image-slider")}
@@ -1753,9 +1718,29 @@ function HomePage() {
                             ))}
                           </Slider>
                         </div>
+                        <div
+                          style={{
+                            display: isAttending ? "block" : "none",
+                            position: "absolute",
+                            zIndex: 5,
+                            width: "100%",
+                            height: "80%",
+                            backgroundColor: "white",
+                            textAlign: "center",
+                            fontWeight: 600,
+                            fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                          Helvetica, Arial, sans-serif`,
+                            color: "rgb(61 60 60)",
+                          }}
+                        >
+                          <CircularProgress size={25}/>
+                          <br/>
+                          Đang kiểm tra hình ảnh
+                        </div>
                       </div>
                     </div>
                   </div>
+                  {!isAttending && 
                   <div className={cx("modal-input")}>
                     <input
                       type="file"
@@ -1774,7 +1759,7 @@ function HomePage() {
                     >
                       Select from device
                     </label>
-                  </div>
+                  </div>}
                 </div>
               ) : (
                 <div className={cx("content")} style={isDragging ? { backgroundColor: "#0094f61b" } : null}>
