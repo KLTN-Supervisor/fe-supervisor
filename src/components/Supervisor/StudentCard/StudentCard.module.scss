@@ -133,6 +133,7 @@
     .appcanvas {
       position: absolute;
       top: 100px;
+      height: 480;
     }
 
     .myapp h1 {
@@ -297,10 +298,8 @@
     width: 29.7%;
   }
 }
-@media (max-width: 720px) {
-  .student {
-    width: 46%;
-  }
+
+@media (max-width: 840px){
   .modal-navbar-content {
     .modal-main {
       flex-direction: column;
@@ -313,6 +312,10 @@
           }
         }
       }
+      .appcanvas {
+        width: 400px;
+        height: 300px;
+      }
       .appvide {
         justify-content: baseline;
         align-items: baseline;
@@ -324,13 +327,29 @@
     }
   }
 }
+
+@media (max-width: 720px) {
+  .student {
+    width: 46%;
+    .student-image > img{
+      max-height: 260px;
+    }
+  }
+}
 @media (max-width: 527px) {
   .student {
-    width: 200px;
-    height: 278px;
+    width: 180px;
+    height: 290px;
+    .student-image > img{
+      max-height: 184px;
+    }
   }
   .modal-navbar-content {
     .modal-main {
+      .appcanvas {
+        width: 300px;
+        height: 225px;
+      }
       .appvide {
         .video {
           width: 300px;

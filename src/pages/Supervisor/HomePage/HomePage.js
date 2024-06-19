@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback, useContext } from "react";
 import classNames from "classnames/bind";
 import styles from "./HomePage.module.scss";
 import Sidenav from "../../../components/Sidenav";
@@ -29,16 +29,97 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import useExamScheduleServices from "../../../services/useExamScheduleServices";
 import { formatDate, formatHour, formatDateExtend, formatHourExtend } from "../../../untils/format-date";
+import usePrivateHttpClient from "../../../hooks/http-hook/private-http-hook";
 import * as XLSX from "xlsx";
-import * as xlsxPopulate from "xlsx-populate/browser/xlsx-populate"
+import * as xlsxPopulate from "xlsx-populate/browser/xlsx-populate";
+import * as faceapi from "face-api.js";
+import CollectionsOutlinedIcon from "@mui/icons-material/CollectionsOutlined";
+import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
+import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
+import { StateContext } from "../../../context/StateContext";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 const cx = classNames.bind(styles);
 
 function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { privateRequest } = usePrivateHttpClient();
   const { getStudents, attendanceStudent, noteReport, getExamReport, deleteExamReport, getRoomInfo, writeExcel } =
     useExamScheduleServices();
+
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const sliderRef = useRef()
+  const NextArrow = () => {
+    return (
+      <button
+        type="button"
+        className={cx("slick-next")}
+        style={{display: currentSlide === images.length - 1 ? 'none' : 'flex'}}
+        onClick={() => sliderRef.current.slickNext()}
+      >
+        <ArrowForwardIosIcon
+          style={{
+            width: "16px",
+            height: "16px",
+            // marginBottom: "2px",
+            marginLeft: "3px",
+            color: "white"
+          }}
+          aria-hidden
+        />
+      </button>
+    );
+  };
+
+  const BackArrow = () => {
+    return (
+      <button
+        type="button"
+        className={cx("slick-prev")}
+        style={{display: currentSlide === 0 ? 'none' : 'flex'}}
+        onClick={() => sliderRef.current.slickPrev()}
+      >
+        <ArrowBackIosNewIcon
+          style={{
+            width: "16px",
+            height: "16px",
+            // marginBottom: "2px",
+            marginRight: "3px",
+            color: "white"
+          }}
+          aria-hidden
+        />
+      </button>
+    );
+  };
+  // <ArrowBackIosNewIcon
+  //   style={{
+  //     width: "16px",
+  //     height: "16px",
+  //     marginBottom: "2px",
+  //   }}
+  //   aria-hidden
+  // />
+  
+  const settings = {
+      dots: true,
+      centerMode: true,
+      speed: 500,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      infinite: false,
+      initialSlide: 0,
+      autoplay: true,
+      autoplaySpeed: 3000,
+      nextArrow: <NextArrow/>,
+      prevArrow: <BackArrow/>,
+      afterChange: (index) => setCurrentSlide(index),
+    };
   // Lưu giá trị vào localStorage khi trang được tải
   useEffect(() => {
     if (location.state) {
@@ -101,10 +182,6 @@ function HomePage() {
     getStudentsExam();
     getReportsExam()
   }, [time, room]);
-  useEffect(() => {
-    console.log(students);
-    // loadModels();
-  }, [isFetched]);
 
   const fileInputRef = useRef(null);
   //Kéo thả ảnh vào phần tạo bài viết
@@ -229,7 +306,7 @@ function HomePage() {
             date: time,
             room: room,
           };
-          console.log(newReport)
+
           setReport((prev) => [...prev, newReport]);
           toggleModalCreate();
           setSnackBarNotif({
@@ -275,16 +352,16 @@ function HomePage() {
 
   const updateAttendanceTrue = async (studentId) => {
     const updatedStudents = await Promise.all(
-      students.map(async (student) => {
+      students.map((student) => {
         if (student.student.student_id === studentId) {
-          await attendanceStudent(time, room, studentId, true);
+          attendanceStudent(time, room, studentId, true);
           return { ...student, attendance: true };
         }
         return student;
       })
     );
 
-    setStudents(updatedStudents);
+    await setStudents(updatedStudents);
   };
 
   // const printHandle = () => {
@@ -294,7 +371,6 @@ function HomePage() {
 
   const printHandle = () => {
     handleExport().then((url) => {
-      console.log(url);
       const downloadAnchorNode = document.createElement('a');
       downloadAnchorNode.href = url;
       downloadAnchorNode.setAttribute('download', `DSSVDuThi_${formatDateExtend(info.start_time)}_${formatHourExtend(info.start_time)}_${info.room_name}.xlsx`);
@@ -846,6 +922,362 @@ function HomePage() {
     });
   };
 
+
+  const [modalAttendance, setModalAttendance] = useState(false);
+
+  const toggleModalAttendance = async () => {
+    if(!modalAttendance ){
+      setModalAttendance(!modalAttendance);
+      setState(0);
+      isLoadCanvasRef.current = true;
+      await startVideo();
+      videoRef?.current &&
+        (intervalRef.current = setInterval(runFaceDetection, 2000));
+    } else{
+      if(videoRef?.current){
+        await clear();
+      }
+      imageRef.current = null;
+      setIsDropping(false);
+      setModalAttendance(!modalAttendance);
+    }
+  };
+
+  const [state, setState] = useState(0);
+  const videoRef = useRef();
+  const canvasRef = useRef();
+  const canvasImageRef = useRef();
+  const isLoadCanvasRef = useRef(true);
+  const intervalRef = useRef(null);
+  const { faceMatcher } = useContext(StateContext);
+
+
+  // STOP VIDEO STREAM
+  const clear = async () => {
+    isLoadCanvasRef.current = false;
+    // Stop the video stream
+    if(videoRef.current !== null){
+      await stopVideoStream();
+    }
+    // Stop the interval if it's running
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+  };
+
+
+  // STOP VIDEO STREAM FUNCTION
+  const stopVideoStream = async () => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
+      navigator.mediaDevices.addEventListener("removetrack", (event) => {
+        console.log(`${event.track.kind} track removed`);
+      });
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current?.srcObject;
+      const tracks = stream?.getTracks();
+
+      await tracks.forEach((track) => track.stop());
+      videoRef.current.srcObject = null;
+    }
+  };
+
+  
+  const startVideo = () => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia ) {
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then((currentStream) => {
+          videoRef.current.srcObject = currentStream;
+        })
+        .catch((err) => {
+          console.error('Error accessing camera:', err);
+          setSnackBarNotif({
+            severity: "error",
+            message:
+              "Xảy ra lỗi khi sử dụng camera"
+          });
+          setSnackBarOpen(true);
+        });
+    } else {
+      videoRef.current = null;
+      console.error('Trình duyệt không hỗ trợ camera');
+      // Xử lý trường hợp trình duyệt không hỗ trợ API
+      setSnackBarNotif({
+        severity: "error",
+        message:
+          "Trình duyệt không hỗ trợ camera"
+      });
+      setSnackBarOpen(true);
+    }
+  };
+
+
+  const runFaceDetection = useCallback(async () => {
+    if (isLoadCanvasRef.current && faceMatcher && videoRef?.current) {
+      const detections = await faceapi
+        .detectAllFaces(videoRef.current)
+        .withFaceLandmarks()
+        .withFaceDescriptors();
+
+      const screenWidth = window.screen.width;
+      // DRAW YOU FACE IN WEBCAM
+      canvasRef.current.innerHTML = faceapi.createCanvas(videoRef.current);
+      faceapi.matchDimensions(canvasRef.current, {
+        width: videoRef.current ? videoRef.current.offsetWidth : 0,
+        height: screenWidth < 720 ? (screenWidth < 527 ? 225 : 300) : 480,
+      });
+
+      const resized = faceapi.resizeResults(detections, {
+        width: videoRef.current ? videoRef.current.offsetWidth : 0,
+        height: screenWidth < 720 ? (screenWidth < 527 ? 225 : 300) : 480,
+      });
+
+      for (const detection of resized) {
+        const box = detection.detection.box;
+        const studentName = await faceMatcher
+        .findBestMatch(detection.descriptor)
+        .toString();
+        const student = students.find(s => s.student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label)
+        const drawBox = new faceapi.draw.DrawBox(box, {
+          label: student ? ( student.attendance ? "Đã điểm danh" : studentName) : "unknown",
+        });
+        if ( student && !student.attendance &&
+          faceMatcher.findBestMatch(detection.descriptor)._label != "unknown"
+        ) {
+          await updateAttendanceTrue(student.student.student_id);
+          setSnackBarNotif({
+            severity: "success",
+            message:
+              "Điểm danh thành công " +
+              faceMatcher.findBestMatch(detection.descriptor)._label,
+          });
+          setSnackBarOpen(true);
+          videoRef.current.pause();
+          // Sau 3 giây tắt video
+          setTimeout(() => {
+            if(videoRef?.current)
+              videoRef?.current.play();
+          }, 3000);
+        }
+        drawBox.draw(canvasRef.current);
+      }
+    }
+  },[students]);
+
+  useEffect(() => {
+    if (videoRef?.current) {
+      isLoadCanvasRef.current = true;
+      intervalRef.current = setInterval(runFaceDetection, 2000);
+    }
+  
+    return () => {
+      isLoadCanvasRef.current = false;
+      clearInterval(intervalRef.current);
+    };
+  }, [runFaceDetection]);
+
+
+  //Hinh anh
+  const [images, setImages] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isDropping, setIsDropping] = useState(false);
+  const fileInputAttendRef = useRef(null);
+  const imageRef = useRef();
+  //Kéo thả ảnh vào phần tạo bài viết
+  function onDragOver(event) {
+    event.preventDefault();
+    setIsDragging(true);
+    event.dataTransfer.dropEffect = "copy";
+  }
+  function onDragLeave(event) {
+    event.preventDefault();
+    setIsDragging(false);
+  }
+  
+  const onDrop = async(event) => {
+    event.preventDefault();
+    setIsDragging(false);
+    setIsDropping(true); 
+    const files = event.target.files;
+    const newImages = [];
+
+    for (const file of files) {
+      if (notValidFile(file)) {
+        setSnackBarNotif({
+          severity: "error",
+          message: "Chọn file không đúng định dạng",
+        });
+        setSnackBarOpen(true);
+        continue;
+      }
+      const image = await faceapi.bufferToImage(file);
+      newImages.push(image);
+    }
+    setImages(newImages);
+
+    
+    const file = event.dataTransfer?.files[0];
+    if (notValidFile(file)){
+      setSnackBarNotif({
+        severity: "error",
+        message:
+          "Chọn file không đúng định dạng" ,
+      });
+      setSnackBarOpen(true);
+      setIsDropping(false);
+      return;
+    }
+    const image = await faceapi.bufferToImage(file);
+    if (imageRef.current) {
+      imageRef.current.src = image.src;
+
+      const detections = await faceapi
+        .detectAllFaces(imageRef.current)
+        .withFaceLandmarks()
+        .withFaceDescriptors();
+
+      canvasImageRef.current.innerHTML = faceapi.createCanvas(imageRef.current);
+      faceapi.matchDimensions(canvasImageRef.current, {
+        width: imageRef.current && imageRef.current.offsetWidth,
+        height: 420,
+      });
+
+      const resized = faceapi.resizeResults(detections, {
+        width: imageRef.current && imageRef.current.offsetWidth,
+        height: 420,
+      });
+
+      for (const detection of resized) {
+        const box = detection.detection.box;
+        const studentName = await faceMatcher
+        .findBestMatch(detection.descriptor)
+        .toString();
+        const student = students.find(s => s?.student?.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label)
+        const drawBox = new faceapi.draw.DrawBox(box, {
+          label: student ? ( student.attendance ? "Đã điểm danh" : studentName) : "unknown",
+        });
+        if ( student && !student.attendance
+          && faceMatcher.findBestMatch(detection.descriptor)._label != "unknown"
+        ) {
+          updateAttendance(student.student.student_id);
+          setSnackBarNotif({
+            severity: "success",
+            message:
+              "Điểm danh thành công " +
+              faceMatcher.findBestMatch(detection.descriptor)._label,
+          });
+          setSnackBarOpen(true);
+        }
+        drawBox.draw(canvasImageRef.current);
+      }
+    }
+    
+  }
+
+  function selectAttendFiles() { 
+    fileInputAttendRef.current.click();
+  }
+
+  const onFileSelect = async (event) => {
+    setIsDropping(true);
+
+    const newImages = [];
+    const files = event.target.files;
+    for (const file of files) {
+      if (notValidFile(file)) {
+        setSnackBarNotif({
+          severity: "error",
+          message: "Chọn file không đúng định dạng",
+        });
+        setSnackBarOpen(true);
+        continue;
+      }
+
+      const image = await faceapi.bufferToImage(file);
+      newImages.push(image);
+    } 
+    setImages(newImages);
+  };
+
+  const [attended, setAttended] = useState();
+  const doneAttended = useRef()
+
+  useEffect(() => {
+    const detectImage = async () => {
+      doneAttended.current = false;
+      if(images.length > 0){
+        const promises = [];
+        for(let i = 0; i< images.length; ++i){
+          const container = document.querySelector(`#imgDiv${i}`);
+          const image = images[i];
+          const canvas = faceapi.createCanvasFromMedia(image);
+          if(container){
+            container.innerHTML = '';
+            container.append(images[i]);
+            container.append(canvas);
+    
+            const detections = await faceapi
+              .detectAllFaces(image)
+              .withFaceLandmarks()
+              .withFaceDescriptors();
+    
+            // canvas = faceapi.createCanvas(image);
+
+            faceapi.matchDimensions(canvas, {
+              width: image && image.width,
+              height: image && image.height,
+            });
+    
+            const resized = faceapi.resizeResults(detections, {
+              width: image && image.width,
+              height: image && image.height,
+            });
+            
+            
+            for (const detection of resized) {
+              const box = detection.detection.box;
+              const studentName = await faceMatcher
+                .findBestMatch(detection.descriptor)
+                .toString();
+              const student = students.find(s => s?.student?.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label)
+              const drawBox = new faceapi.draw.DrawBox(box, {
+                label: student ? ( student.attendance ? "Đã điểm danh" : studentName) : "unknown",
+              });
+              if ( student && !student.attendance
+                && faceMatcher.findBestMatch(detection.descriptor)._label != "unknown"
+              ) {
+                // const promise = updateAttendanceTrue(student.student.student_id).then(() => {
+                  setAttended(student.student.student_id);
+                  setSnackBarNotif({
+                    severity: "success",
+                    message: `Điểm danh thành công ${faceMatcher.findBestMatch(detection.descriptor)._label}`,
+                  });
+                  setSnackBarOpen(true);
+                // });
+                // promises.push(promise);
+                
+              }
+              drawBox.draw(canvas);
+            }
+          }
+        }
+        doneAttended.current=true
+      }
+    }
+    detectImage();
+    
+  },[images])
+
+  const updateAttend = () =>{
+    updateAttendanceTrue(attended);
+    setAttended("");
+  }
+  useEffect(() => {
+    if(attended){
+      updateAttend();
+    }
+  },[attended])
+
   return (
     <div className={cx("homepage")}>
       <div className={cx("homepage__navWraper")}>
@@ -858,22 +1290,31 @@ function HomePage() {
               position: "absolute",
               right: "5%",
               top: "40px",
-              display: "flex",
             }}
           >
-            <div onClick={printHandle} style={{backgroundColor: "#0095f6",
-              padding: "10px",
-              color: "white",
-              borderRadius: "10px",
-              cursor: "pointer", marginRight: 10}}>In danh sách</div>
+            <div style={{
+              display: "flex",
+              marginBottom: 10
+            }}>
+              <div onClick={toggleModalAttendance} style={{backgroundColor: "#0095f6",
+                padding: "10px",
+                color: "white",
+                borderRadius: "10px",
+                cursor: "pointer", marginRight: 10}}>Điểm danh</div>
 
-            <div onClick={toggleModal} style={{backgroundColor: "#0095f6",
-              padding: "10px",
-              color: "white",
-              borderRadius: "10px",
-              cursor: "pointer",}}>Báo cáo {report.length > 0 && `(${report.length})`}</div>
+              <div onClick={toggleModal} style={{backgroundColor: "#0095f6",
+                padding: "10px",
+                color: "white",
+                borderRadius: "10px",
+                cursor: "pointer",}}>Báo cáo {report.length > 0 && `(${report.length})`}</div>
+            </div>
+            <div onClick={printHandle} style={{backgroundColor: "#0095f6",
+                padding: "10px",
+                color: "white",
+                borderRadius: "10px",
+                cursor: "pointer", textAlign: "center"}}>Xuất file excel</div>
           </div>
-          <div style={{display: "flex", margin: "50px 25px 20px 15px"}}>
+          <div className={cx("all-title")}>
             <div>
               <KeyboardBackspaceIcon style={{ marginRight: 20, width: 30, height: 30}} onClick={()=> navigate(-1)}/>
             </div>
@@ -1165,6 +1606,222 @@ function HomePage() {
                   Tạo báo cáo
                 </Button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {modalAttendance && (
+        <div className={cx("modal active-modal")}>
+          <div
+            onClick={toggleModalAttendance}
+            className={cx("overlay")}
+            style={{ alignSelf: "flex-end" }}
+          >
+            <CloseIcon
+              className={cx("sidenav__icon")}
+              style={{
+                width: "27px",
+                height: "27px",
+                color: "white",
+                margin: "12px 30px",
+                position: "absolute",
+                right: "0",
+                cursor: "pointer",
+              }}
+            />
+          </div>
+          <div className={cx("modal-navbar-content")} style={{ width: "80%" }}>
+            <div className={cx("modal-header")}>Điểm danh
+            </div>
+            <div className={cx("modal-main")} style={{flexDirection: "column", height: "540px", padding: "0px 0 30px 0px"}}>
+            <div className={cx("home__tag")}>
+            <a>
+              <div
+                className={cx("choose")}
+                style={
+                  state === 0
+                    ? {
+                        color: "#00558d",
+                        borderBottom: "#00558d solid 1px",
+                        marginRight: "25px",
+                      }
+                    : { marginRight: "25px" }
+                }
+                onClick={async () => {
+                  isLoadCanvasRef.current = true;
+                  setState(0);
+                  await startVideo();
+                  videoRef?.current !== null &&
+                    (intervalRef.current = setInterval(runFaceDetection, 2000));
+                  
+                }}
+              >
+                <CameraAltOutlinedIcon className={cx("icon")} />
+                <span
+                  className={cx("span")}
+                  style={{ textTransform: "uppercase" }}
+                >
+                  Camera
+                </span>
+              </div>
+            </a>
+            <a>
+              <div
+                className={cx("choose")}
+                style={
+                  state === 1
+                    ? {
+                        color: "#00558d",
+                        borderBottom: "#00558d solid 1px",
+                        marginLeft: "25px",
+                      }
+                    : { marginLeft: "25px" }
+                }
+                onClick={async () => {
+                  if(videoRef.current !== null){
+                    await clear();
+                  }
+                  imageRef.current = null;
+                  setIsDropping(false);
+                  setState(1);
+                }}
+              >
+                <ImageOutlinedIcon className={cx("icon")} />
+                <span
+                  className={cx("span")}
+                  style={{ textTransform: "uppercase" }}
+                >
+                  Hình ảnh
+                </span>
+              </div>
+            </a>
+          </div>
+          {state === 0 ? (
+            <>
+              <div className={cx("appvide")}>
+                <video
+                  crossOrigin="anonymous"
+                  ref={videoRef}
+                  autoPlay
+                  playsInline 
+                  style={{ borderRadius: 10 }}
+                  className={cx("video")}
+                ></video>
+              </div>
+              <canvas
+                ref={canvasRef}
+                width={videoRef?.current && videoRef?.current.offsetWidth}
+                height="480"
+                className={cx("appcanvas")}
+              />
+            </>
+          ) : (
+            <div
+              style={{ width: "100%", height: "90%" }}
+              onDragOver={isDropping ? null : onDragOver}
+              onDragLeave={isDropping ? null : onDragLeave}
+              onDrop={isDropping ? null : onDrop}
+            >
+              {isDropping ? (
+                <div className={cx("content")} style={{flexDirection: "column"}}>
+                  <div
+                    className={cx("main")}
+                    style={isDragging ? { backgroundColor: "black", height: "80%" } : { height: "80%" }}
+                  >
+                    <div
+                      className={cx("container")}
+                      style={{
+                        borderRadius: "10px 10px 10px 10px",
+                        display: "flex",
+                      }}
+                    >
+                      <div
+                        className={cx("image")}
+                        style={{
+                          minHeight: "420px",
+                          width: "100%",
+                          display: "flex",
+                          justifyContent: "center",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <div className={cx("image-slider-container")}>
+                          <Slider ref={sliderRef}  {...settings} >
+                          {images.map((image, index) => (
+                              <div
+                                id={`imgDiv${index}`}
+                                className={cx("image-slider")}
+                                key={index}
+                                style={{ display: "flex !important", justifyContent: "center", alignItems: "center" }}
+                              ></div>
+                            ))}
+                          </Slider>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className={cx("modal-input")}>
+                    <input
+                      type="file"
+                      accept="image/jpg,image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+                      multiple
+                      ref={fileInputAttendRef}
+                      onChange={onFileSelect}
+                      id="myFileInput"
+                      style={{ display: "none" }}
+                    />
+                    <label
+                      style={{marginBottom: 0}}
+                      role="button"
+                      onClick={selectAttendFiles}
+                      className={cx("modal-upload")}
+                    >
+                      Select from device
+                    </label>
+                  </div>
+                </div>
+              ) : (
+                <div className={cx("content")} style={isDragging ? { backgroundColor: "#0094f61b" } : null}>
+                  <div
+                    className={cx("main")}
+                  >
+                    <div>
+                      <div className={cx("modal-image")}>
+                        <CollectionsOutlinedIcon className={cx("modal-logo")} />
+                      </div>
+                      {isDragging ? (
+                        <div className={cx("modal-text")}>
+                          Thả hình ảnh vào đây
+                        </div>
+                      ) : (
+                        <div className={cx("modal-text")}>
+                          Kéo hình ảnh vào đây
+                        </div>
+                      )}
+
+                      <div className={cx("modal-input")}>
+                        <input
+                          type="file"
+                          accept="image/jpg,image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+                          multiple
+                          ref={fileInputAttendRef}
+                          onChange={onFileSelect}
+                          id="myFileInput"
+                          style={{ display: "none" }}
+                        />
+                        <label
+                          role="button"
+                          onClick={selectAttendFiles}
+                          className={cx("modal-upload")}
+                        >
+                          Select from device
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}</div>
+            )}
             </div>
           </div>
         </div>
