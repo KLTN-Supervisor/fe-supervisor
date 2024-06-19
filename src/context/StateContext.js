@@ -1,4 +1,4 @@
-import { createContext, useEffect, useReducer, useState } from "react";
+import { createContext, useReducer, useState } from "react";
 import StateReducer from "./StateReducer";
 
 const INITIAL_STATE = {
@@ -7,18 +7,7 @@ const INITIAL_STATE = {
   otpToken: null,
   user: null,
   isFetching: false,
-  isLoadingMsg: true,
-  error: false,
-  currentChat: null,
-  posts: new Map(),
-  conversations: [],
-  messages: [],
-  messageRemoves: [],
-  socket: undefined,
-  voiceCall: undefined,
-  videoCall: undefined,
-  incomingVideoCall: undefined,
-  incomingVoiceCall: undefined,
+  faceMatcher: null,
 };
 
 export const StateContext = createContext(INITIAL_STATE);
@@ -36,18 +25,7 @@ export const StateContextProvider = ({ children }) => {
         auth: auth,
         user: state.user,
         isFetching: state.isFetching,
-        isLoadingMsg: state.isLoadingMsg,
-        error: state.error,
-        currentChat: state.currentChat,
-        posts: state.posts,
-        conversations: state.conversations,
-        messages: state.messages,
-        messageRemoves: state.messageRemoves,
-        socket: state.socket,
-        voiceCall: state.voiceCall,
-        videoCall: state.videoCall,
-        incomingVideoCall: state.incomingVideoCall,
-        incomingVoiceCall: state.incomingVoiceCall,
+        faceMatcher: state.faceMatcher,
         dispatch,
         setAuth,
       }}

@@ -3,6 +3,42 @@ html, body {
     margin: 0;
     padding: 0;
   }
+  .slick-prev, .slick-next{
+    font-size: 0;
+    line-height: 0;
+    position: absolute;
+    top: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    display: block;
+    width: 25px;
+    height: 25px;
+    padding: 10px;
+    border-radius: 50%;
+    padding: 0;
+    transform: translate(0, -50%);
+    cursor: pointer;
+    color: transparent;
+    border: none;
+    outline: none;
+    background: #0000001f;
+  }
+
+  .slick-next{
+    right: -35px;
+  }
+  .slick-prev{
+    left: -35px;
+  }
+  .slick-prev:hover, .slick-next:hover {
+    width: 30px;
+    height: 30px;
+    background-color: rgba(167, 167, 167, 0.5);
+    transition: all 0.3s ease-in-out;
+  }
+  
+  
   .homepage {
     display: flex;
     flex-direction: row;
@@ -32,33 +68,37 @@ html, body {
           justify-content: center;
           margin-top: 10px;
       }
-      .title{
-        border-width: 0px 0px thin;
-        border-bottom: rgba(0, 0, 0, 0.12) solid 0.5px;
-        .text{
-          margin: 0;
-          display: inline-block;
-          padding: 0 18px;
-          text-transform: uppercase;
-          line-height: 37px;
-          position: relative;
-          color: #fff;
-          background: #00558d;
-          font-size: 1.0938rem;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-          font-weight: 700;
-          box-sizing: border-box;
-        }
-        .text::before{
-          border-right: 20px solid transparent;
-          border-bottom: 35px solid #7b848a;
-          content: "";
-          display: inline-block;
-          height: 0;
-          position: absolute;
-          right: -20px;
-          top: 0;
-          width: 0;
+      .all-title{
+        display: flex;
+        margin: 70px 25px 20px 15px;
+        .title{
+          border-width: 0px 0px thin;
+          border-bottom: rgba(0, 0, 0, 0.12) solid 0.5px;
+          .text{
+            margin: 0;
+            display: inline-block;
+            padding: 0 18px;
+            text-transform: uppercase;
+            line-height: 37px;
+            position: relative;
+            color: #fff;
+            background: #00558d;
+            font-size: 1.0938rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            font-weight: 700;
+            box-sizing: border-box;
+          }
+          .text::before{
+            border-right: 20px solid transparent;
+            border-bottom: 35px solid #7b848a;
+            content: "";
+            display: inline-block;
+            height: 0;
+            position: absolute;
+            right: -20px;
+            top: 0;
+            width: 0;
+          }
         }
       }
       .page_content__body{
@@ -199,6 +239,7 @@ html, body {
     width: 100%;
     height: 100%;
     line-height: 1.4;
+    margin-top: 20px;
     background: white;
     border-radius: 10px;
     min-height: 400px;
@@ -214,6 +255,47 @@ html, body {
         .image {
           flex: 1;
           max-height: 567px;
+
+          .image-slider-container {
+            // width: 100%;
+            // margin: 0 auto;
+            width: 400px;
+            .slick-initialized{
+              .slick-list{
+                padding: 0;
+              }
+            }
+          }
+
+          .slick-slider{ .slick-list{
+            padding: 0;
+          }}
+
+          .image-slider{
+            width: 100%;
+            position: relative;
+            transition: transform 0.2s;
+            display: flex !important;
+            justify-content: center;
+            flex-shrink: 0;
+            flex-grow: 0;
+            border-radius: 0px 0px 10px 10px;
+          }
+
+          .image-slider > img {
+            // width: 100%;
+            object-fit: contain;
+            max-height: 380px;
+          }
+          .image-slider > canvas{
+            width: 100%;
+            max-height: 380px;
+            position: absolute; 
+            display: inline-block;
+            top: 0;
+            left: 0;
+          }
+          
           .img-slider {
             object-fit: none;
             display: block;
@@ -274,7 +356,7 @@ html, body {
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-top: 20px;
+      margin-top: 40px;
     }
     .modal-upload {
       background-color: #0095f6;
@@ -366,6 +448,53 @@ html, body {
     border-radius: 0px 0px 10px 10px;
     width: 100%;
     background-color: #fff;
+    .appvide {
+      display: flex;
+      flex: 1;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .appcanvas {
+      position: absolute;
+      top: 100px;
+    }
+
+    .myapp h1 {
+      width: calc(100vw - 270px);
+      text-align: center;
+      background: #00558d;
+      color: white;
+      margin: 0;
+      padding: 15px;
+    }
+    .home__tag {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 10px;
+      .choose {
+        color: #a8a8a8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 52px;
+
+        cursor: pointer;
+        .icon {
+          width: 16px;
+          margin-right: 7px;
+        }
+        .span {
+          font-size: 14px;
+          font-weight: 600;
+          margin: 0px 0px 0px 0px;
+          font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+            Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+            sans-serif;
+        }
+      }
+    }
     .modal-main-title {
       width: 92%;
       margin-top: 10px;
@@ -392,8 +521,6 @@ html, body {
     }
     .modal-input {
       width: 100%;
-      display: flex;
-      align-items: center;
     }
     .modal-upload {
       background-color: #565555a9;
@@ -445,6 +572,36 @@ html, body {
     }
   }
 
+  @media (max-width: 840px){
+    .modal-navbar-content {
+      .modal-main {
+        flex-direction: column;
+        .modal-info {
+          flex: 1;
+          width: 100%;
+          .info {
+            .title {
+              width: 40%;
+            }
+          }
+        }
+        .appcanvas {
+          width: 400px;
+          height: 300px;
+        }
+        .appvide {
+          justify-content: baseline;
+          align-items: baseline;
+          .video {
+            width: 400px;
+            height: 300px;
+          }
+        }
+      }
+    }
+  }
+
+
   @media (max-width: 720px){
     .homepage {
       flex-direction: column;
@@ -467,6 +624,9 @@ html, body {
     .homepage {
       .homepage__timeline {
         .page_content{
+          .all-title{
+            margin: 100px 25px 20px 15px;
+          }
           .page_content__body{
             .students{
               justify-content: center;
@@ -474,6 +634,34 @@ html, body {
           }
         }
       }
-  
+      .content {
+        .main {
+          .container {
+            .image {
+              
+              .image-slider > img {
+                max-height: 300px;
+              }
+              .image-slider > canvas {
+                max-height: 300px;
+              }
+            }
+          }
+        }    
+      }
+    }
+    .modal-navbar-content {
+      .modal-main {
+        .appcanvas {
+          width: 300px;
+          height: 225px;
+        }
+        .appvide {
+          .video {
+            width: 300px;
+            height: 225px;
+          }
+        }
+      }
     }
   }
