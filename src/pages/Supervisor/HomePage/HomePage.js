@@ -410,7 +410,7 @@ function HomePage() {
         count++;
       }
     }
-    return count;
+    return count - 1;
   }
   
   const handleExport = () => {
@@ -853,7 +853,7 @@ function HomePage() {
           horizontalAlignment: "center",
           wrapText: true
         })
-        studentTotalValue.value(finalData.length);
+        studentTotalValue.value(finalData.length - 1);
 
         const studentTotalAttend = sheet.range(`I${22+finalData.length}:L${25+finalData.length}`).merged(true).style({
           fontSize: 10,
@@ -914,11 +914,7 @@ function HomePage() {
         })
         signInpector.value("Cán bộ chấm thi");
       });
-
-      
-
       return workbook.outputAsync().then((workbookBlob) => URL.createObjectURL(workbookBlob));
-
     });
   };
 
