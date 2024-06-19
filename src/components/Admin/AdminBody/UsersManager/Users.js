@@ -54,6 +54,7 @@ const UsersManage = () => {
   const [totalPages, setTotalPages] = useState(0);
 
   const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
   const [data, setData] = useState([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [modifyDataLoading, setModifyDataLoading] = useState(false);
@@ -163,7 +164,12 @@ const UsersManage = () => {
   const getData = useCallback(async () => {
     try {
       setDataLoading(true);
-      const response = await getAdminUsers(page, rowsPerPage, search);
+      const response = await getAdminUsers(
+        page,
+        rowsPerPage,
+        search,
+        roleFilter
+      );
       if (response) {
         setData(response.accounts);
         setTotalRecords(response.total_accounts);
@@ -173,11 +179,11 @@ const UsersManage = () => {
       console.log(err);
     }
     setDataLoading(false);
-  }, [page, rowsPerPage, search]);
+  }, [page, rowsPerPage, search, roleFilter]);
 
   useEffect(() => {
     getData();
-  }, [page, rowsPerPage, search]);
+  }, [page, rowsPerPage, search, roleFilter]);
 
   const handleBanUsers = async () => {
     const selectedIds = [...usersSelected]; // Sao chép usersSelected vào một mảng tạm thời
@@ -404,6 +410,37 @@ const UsersManage = () => {
               </div>
             </Stack>
             <UserSearch setSearch={setSearch} />
+            <FormControl
+              variant="standard"
+              className={cx("form__select")}
+              sx={{
+                border: "1px solid rgba(0, 85, 141, 0.5)",
+                padding: "0px 16px",
+                borderRadius: "10px",
+                backgroundColor: "white",
+              }}
+            >
+              <Select
+                id="role"
+                name="role"
+                value={roleFilter}
+                onChange={(event) => setRoleFilter(event.target.value)}
+                displayEmpty
+                disableUnderline
+                inputProps={{ "aria-label": "Without label" }}
+                sx={{ height: "100%" }}
+              >
+                <MenuItem value="">
+                  <em>Lọc theo quyền</em>
+                </MenuItem>
+                {Object.entries(userRole)?.length > 0 &&
+                  Object.entries(userRole).map(([key, value]) => (
+                    <MenuItem key={key} value={String(key)}>
+                      {value}
+                    </MenuItem>
+                  ))}
+              </Select>
+            </FormControl>
 
             <UserTable
               isLoading={dataLoading}

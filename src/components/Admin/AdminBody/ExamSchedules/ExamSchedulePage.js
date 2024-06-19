@@ -419,7 +419,6 @@ function ExamSchedules() {
         }
       );
       if (response) {
-        console.log("xóa file");
         const failedDeletionFileIds = response.failed_deletion_files.map(
           (file) => file._id
         );

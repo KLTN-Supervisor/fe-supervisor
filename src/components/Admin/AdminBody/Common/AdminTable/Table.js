@@ -97,10 +97,8 @@ export const AdminTable = (props) => {
                       onSelectOne={handleSelectOne}
                       selected={selected}
                       colsData={colsData}
-                      options={[
-                        { name: "Xem thông tin", handleClick: onClickItem },
-                      ]}
                       hasCheckBox={hasCheckBox}
+                      handleRowClick={onClickItem}
                     />
                   ))
                 : null}

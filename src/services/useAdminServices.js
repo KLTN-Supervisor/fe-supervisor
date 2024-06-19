@@ -13,10 +13,10 @@ const useAdminServices = () => {
     }
   };
 
-  const getAdminUsers = async (page, limit, search = "") => {
+  const getAdminUsers = async (page, limit, search = "", role = "") => {
     try {
       const response = await privateRequest(
-        `/admin/accounts?page=${page}&limit=${limit}&search=${search}`
+        `/admin/accounts?page=${page}&limit=${limit}&search=${search}&role=${role}`
       );
 
       return response?.data;

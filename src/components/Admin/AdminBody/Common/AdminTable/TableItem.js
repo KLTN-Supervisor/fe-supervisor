@@ -29,6 +29,7 @@ const AdminTableItem = (props) => {
     colsData = [],
     options = [],
     hasCheckBox = true,
+    handleRowClick = () => {},
   } = props;
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -42,13 +43,17 @@ const AdminTableItem = (props) => {
 
   const isSelected = selected.includes(item._id);
 
+  const onRowClick = () => {
+    handleRowClick(item);
+  };
+
   return (
     <>
       <TableRow
         hover
         key={item._id}
         selected={isSelected}
-        onClick={handleClick}
+        onClick={options.length > 0 ? handleClick : onRowClick}
       >
         {hasCheckBox && (
           <TableCell padding="checkbox">

@@ -26,7 +26,8 @@ const Error404Page = ({ notAuthPage }) => {
     >
       <div style={{ fontFamily: "inherit", color: "inherit" }}>
         <h2 style={{ fontFamily: "inherit", color: "inherit" }}>
-          Page not found {!notAuthPage && <a href="/login">Back to Login</a>}
+          Không tìm thấy trang yêu cầu{" "}
+          {!notAuthPage && <a href="/login">Trở về trang đăng nhập</a>}
         </h2>
       </div>
     </div>
