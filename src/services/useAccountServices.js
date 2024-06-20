@@ -2,7 +2,6 @@ import usePrivateHttpClient from "../hooks/http-hook/private-http-hook";
 import usePulicHttpClient from "../hooks/http-hook/public-http-hook";
 
 const useAccountServices = () => {
-  const { publicRequest } = usePulicHttpClient();
   const { privateRequest } = usePrivateHttpClient();
 
   const login = async (username, password) => {

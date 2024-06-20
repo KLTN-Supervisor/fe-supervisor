@@ -150,7 +150,7 @@ const AuthPage = () => {
             : navigate("/", { replace: true });
         }
       } catch (err) {
-        console.log("login: ", err);
+        //console.log("login: ", err);
       }
       setOnLoading(false);
     })();

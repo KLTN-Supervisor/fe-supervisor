@@ -405,7 +405,7 @@ const UsersManage = () => {
                   variant="contained"
                   disabled={privateHttpRequest.isLoading}
                 >
-                  Add
+                  Tạo
                 </Button>
               </div>
             </Stack>
