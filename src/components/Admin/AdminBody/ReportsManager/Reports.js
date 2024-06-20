@@ -171,6 +171,9 @@ const UsersManage = () => {
         }}
       >
         <Container maxWidth="xl">
+          <div className={cx("title")} style={{margin: 0}}>
+            <h6 className={cx("text")}>Báo cáo sự cố</h6>
+          </div>
           <Stack spacing={3}>
             <Stack
               direction="row"
@@ -179,7 +182,7 @@ const UsersManage = () => {
               spacing={4}
             >
               <Stack spacing={1}>
-                <Typography variant="h4">Báo cáo sự cố</Typography>
+                
                 {/* <ImportInput
                   file={file}
                   fileIsValid={fileIsValid}
@@ -259,7 +262,7 @@ const UsersManage = () => {
                   displayEmpty
                   disableUnderline
                   inputProps={{ "aria-label": "Without label" }}
-                  sx={{ height: "100%" }}
+                  sx={{ height: "100%", marginRight: 0, }}
                 >
                   <MenuItem value="">
                     <em>Chọn năm</em>
@@ -280,7 +283,6 @@ const UsersManage = () => {
                   border: "1px solid rgba(0, 85, 141, 0.5)",
                   padding: "3px 16px",
                   borderRadius: "10px",
-                  marginRight: 5,
                 }}
               >
                 <Select
@@ -289,7 +291,7 @@ const UsersManage = () => {
                   displayEmpty
                   disableUnderline
                   inputProps={{ "aria-label": "Without label" }}
-                  sx={{ height: "100%" }}
+                  sx={{ height: "100%", marginRight: 0, }}
                 >
                   <MenuItem value="">
                     <em>Chọn học kỳ</em>

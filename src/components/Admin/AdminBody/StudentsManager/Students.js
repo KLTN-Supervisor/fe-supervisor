@@ -449,6 +449,9 @@ const StudentsManage = () => {
         }}
       >
         <Container maxWidth="xl">
+          <div className={cx("title")} style={{margin: "0 0 15px 0"}}>
+            <h6 className={cx("text")}>Sinh viên</h6>
+          </div>
           <Stack spacing={3}>
             <Stack
               direction="row"
@@ -457,7 +460,6 @@ const StudentsManage = () => {
               spacing={4}
             >
               <Stack spacing={1}>
-                <Typography variant="h4">Sinh viên</Typography>
                 <ImportInput
                   file={file}
                   fileIsValid={fileIsValid}
@@ -603,7 +605,7 @@ const StudentsManage = () => {
           </div>
           <div
             className={cx2("modal-navbar-content")}
-            style={{ width: "80%", marginTop: 30 }}
+            style={{ width: "80%", marginTop: 0 }}
           >
             <div className={cx2("modal-header")}>Thông tin sinh viên</div>
             <div
@@ -700,7 +702,7 @@ const StudentsManage = () => {
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Giới tính:</div>
-                  <FormControl sx={{ width: "90.6%" }}>
+                  <FormControl sx={{ width: "90.6%", p: 7 }}>
                     <RadioGroup
                       row
                       value={modalData?.gender}
@@ -748,19 +750,18 @@ const StudentsManage = () => {
                   </FormControl>
                 </div>
                 <div className={cx2("info")}>
-                  <div className={cx2("title")}>Ngày sinh:</div>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <div className={cx2("title")} style={{marginTop: 5}}>Ngày sinh:</div>
+                  <LocalizationProvider dateAdapter={AdapterDayjs} style={{maxWidth: "60%"}}>
                     <DatePicker
                       slotProps={{
                         textField: {
                           inputProps: {
-                            style: { padding: 0 },
+                            style: { padding: "5px 0px" },
                           },
                           sx: {
-                            p: 0,
-                            minwidth: 150,
-                            width: "25%",
-                            mr: 40.8,
+                            p: 0.2,
+                            minwidth: 200,
+                            width: "90%",
                           },
                           variant: "standard",
                         },

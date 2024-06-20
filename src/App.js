@@ -19,7 +19,6 @@ function App() {
       const response = await privateRequest(`/train/`);
       const labeledFaceDescriptors = response.data
         .map((x) => {
-          console.log(x);
           const descriptors = x.descriptors.map(
             (descriptor) => new Float32Array(descriptor)
           );

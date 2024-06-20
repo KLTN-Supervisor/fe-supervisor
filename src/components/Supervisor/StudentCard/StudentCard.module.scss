@@ -306,11 +306,20 @@
   font-family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,Helvetica, Arial, sans-serif';
   font-size: inherit;
   font-weight: 450;
-  border: none;
-  width: 90%;
+  padding: 7px 16px;
+  width: 85%;
+  border-radius: 10px;
+  outline: none;
+  border:#0094f672 solid 0.5px 
 }
 .input-span-focus:focus-visible {
   outline: none;
+  border: none;
+}
+
+input-span:focus {
+  outline: none;
+  border: rgba(0, 148, 246, 0.69) solid 0.5px;
 }
 
 .close-modal {

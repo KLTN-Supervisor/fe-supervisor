@@ -8,11 +8,16 @@ export const UserSearch = ({ setSearch }) => {
   };
 
   return (
-    <Card sx={{ p: 2 }}>
+    <Card sx={{ p: 1.5 }}>
       <OutlinedInput
         defaultValue=""
         fullWidth
         placeholder="Tên đăng nhập, tên...."
+        inputProps={{
+          sx: {
+            p: 1.5
+          }
+        }}
         onKeyUp={handleSearch}
         startAdornment={
           <InputAdornment position="start">

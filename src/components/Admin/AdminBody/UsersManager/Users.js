@@ -343,7 +343,9 @@ const UsersManage = () => {
               spacing={4}
             >
               <Stack spacing={1}>
-                <Typography variant="h4">Tài khoản</Typography>
+                <div className={cx("title")}>
+                  <h6 className={cx("text")}>Tài khoản</h6>
+                </div>
                 {/* <ImportInput
                   file={file}
                   fileIsValid={fileIsValid}
@@ -428,7 +430,7 @@ const UsersManage = () => {
                 displayEmpty
                 disableUnderline
                 inputProps={{ "aria-label": "Without label" }}
-                sx={{ height: "100%" }}
+                sx={{ height: "100%", p: 1 }}
               >
                 <MenuItem value="">
                   <em>Lọc theo quyền</em>
@@ -498,6 +500,7 @@ const UsersManage = () => {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
+                  marginRight: 10
                 }}
               >
                 <div
@@ -525,11 +528,12 @@ const UsersManage = () => {
                   />
                 </div>
               </div>
-              <div className={cx2("modal-info")}>
+              <div className={cx2("modal-info")} style={{width: "90%"}}>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Tên đăng nhập:</div>
                   <input
                     id="username"
+                    style={{border: !isEdit && !isCreateNew && "none"}}
                     className={cx2(
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
@@ -544,6 +548,7 @@ const UsersManage = () => {
                     <div className={cx2("title")}>Mật khẩu:</div>
                     <input
                       id="password"
+                      style={{border: !isEdit && !isCreateNew && "none"}}
                       className={cx2(
                         "input-span",
                         !isEdit && !isCreateNew && "input-span-focus"
@@ -558,6 +563,7 @@ const UsersManage = () => {
                   <div className={cx2("title")}>Tên người dùng:</div>
                   <input
                     id="fullname"
+                    style={{border: !isEdit && !isCreateNew && "none"}}
                     className={cx2(
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
@@ -571,6 +577,7 @@ const UsersManage = () => {
                   <div className={cx2("title")}>Email:</div>
                   <input
                     id="email"
+                    style={{border: !isEdit && !isCreateNew && "none"}}
                     className={cx2(
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
@@ -587,8 +594,8 @@ const UsersManage = () => {
                     className={cx("form__select")}
                     sx={{
                       width: 0.843,
-                      border: "1px solid rgba(0, 85, 141, 0.5)",
-                      padding: "0px 16px",
+                      border: !isEdit && !isCreateNew ? "none" : "1px solid rgba(0, 85, 141, 0.5)",
+                      padding: "5px 16px",
                       borderRadius: "10px",
                       height: 28,
                     }}
@@ -622,6 +629,7 @@ const UsersManage = () => {
                       <div className={cx2("title")}>Trạng thái:</div>
                       <input
                         id="banned"
+                        style={{border: "none"}}
                         className={cx2("input-span", "input-span-focus")}
                         value={modalData?.banned ? "Bị khóa" : "Bình thường"}
                         readOnly
@@ -631,6 +639,7 @@ const UsersManage = () => {
                       <div className={cx2("title")}>Tình trạng:</div>
                       <input
                         id="online"
+                        style={{border: "none"}}
                         className={cx2("input-span", "input-span-focus")}
                         value={
                           modalData?.online ? "Đang hoạt động" : "Ngoại tuyến"
@@ -642,6 +651,7 @@ const UsersManage = () => {
                       <div className={cx2("title")}>Lần đăng nhập cuối:</div>
                       <input
                         id="last_online"
+                        style={{border: "none"}}
                         className={cx2("input-span", "input-span-focus")}
                         value={
                           formatHour(modalData?.last_online) +
@@ -653,7 +663,11 @@ const UsersManage = () => {
                     </div>
                   </>
                 )}
-
+                <div style={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                  }}>
                 <div
                   style={{
                     width: "80%",
@@ -687,6 +701,7 @@ const UsersManage = () => {
                   >
                     {isEdit || isCreateNew ? "Lưu" : "Chỉnh sửa"}
                   </button>
+                </div>
                 </div>
               </div>
             </div>
