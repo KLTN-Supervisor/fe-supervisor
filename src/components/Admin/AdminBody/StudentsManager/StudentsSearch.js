@@ -9,12 +9,17 @@ export const StudentsSearch = ({ setSearch }) => {
   };
 
   return (
-    <Card sx={{ p: 2 }}>
+    <Card sx={{ p: 1.5 }}>
       <OutlinedInput
         defaultValue=""
         fullWidth
         placeholder="Tên, mã sinh viên...."
         onKeyUp={handleSearch}
+        inputProps={{
+          sx: {
+            p: 1.5
+          }
+        }}
         startAdornment={
           <InputAdornment position="start">
             <SvgIcon

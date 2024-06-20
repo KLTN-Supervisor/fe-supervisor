@@ -9,6 +9,7 @@ import TextField from "@mui/material/TextField";
 import SearchIcon from "@mui/icons-material/Search";
 import classNames from "classnames/bind";
 import styles from "./ExamSchedulePage.module.scss";
+import styles3 from "../ReportsManager/ReportModal.module.scss";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -49,6 +50,7 @@ import UploadIcon from "@mui/icons-material/Upload";
 
 const cx = classNames.bind(styles);
 const cx2 = classNames.bind(styles2);
+const cx3 = classNames.bind(styles3);
 
 const useItemIds = (items) => {
   return useMemo(() => {
@@ -536,7 +538,10 @@ function ExamSchedules() {
     <>
       <Box className={cx("schedulePage")}>
         <div className={cx("schedulePage__content")}>
-          <div style={{ width: "100%" }}>
+          <div className={cx3("title")} style={{ width: "92%", margin: "0 0 15px 0" }}>
+            <h6 className={cx3("text")}>Lịch thi</h6>
+          </div>
+          <div style={{ width: "92%", marginBottom: 15 }}>
             {/* <ImportInput
             file={file}
             fileIsValid={fileIsValid}
@@ -577,7 +582,6 @@ function ExamSchedules() {
               </Button>
             ) : null}
           </div>
-          <h1>Tra cứu lịch thi</h1>
           <div className={cx("page_content")}>
             <div className={cx("page_content__header")}>
               <FormControl
