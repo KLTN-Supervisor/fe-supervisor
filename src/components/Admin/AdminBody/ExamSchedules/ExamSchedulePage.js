@@ -538,7 +538,7 @@ function ExamSchedules() {
     <>
       <Box className={cx("schedulePage")}>
         <div className={cx("schedulePage__content")}>
-          <div className={cx3("title")} style={{ width: "92%", margin: "0 0 15px 0" }}>
+          <div className={cx3("title")} style={{ width: "92%", margin: "24px 0 15px" }}>
             <h6 className={cx3("text")}>Lịch thi</h6>
           </div>
           <div style={{ width: "92%", marginBottom: 15 }}>

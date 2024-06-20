@@ -67,7 +67,7 @@
   min-width: 300px;
   min-height: 400px;
   max-height: 95%;
-  overflow-y: hidden;
+  overflow-y: auto;
   .modal-header {
     color: white;
     text-align: center;
@@ -183,7 +183,7 @@
       border-radius: 10px;
       min-height: 400px;
       .main {
-        display: flex;
+        display: inline-block;
         justify-content: center;
         align-items: center;
         height: 93.5%;
@@ -328,6 +328,9 @@ input-span:focus {
   right: 10px;
   padding: 5px 7px;
 }
+.form-control{
+  width: 90.6% !important;
+}
 
 @media (max-width: 1164px) {
   .student {
@@ -361,6 +364,12 @@ input-span:focus {
         }
       }
     }
+  }
+  .input-span{
+    width: 45%;
+  }
+  .form-control{
+    width: 49% !important;
   }
 }
 

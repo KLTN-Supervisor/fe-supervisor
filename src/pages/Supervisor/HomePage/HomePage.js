@@ -410,7 +410,7 @@ function HomePage() {
         count++;
       }
     }
-    return count - 1;
+    return count;
   }
   
   const handleExport = () => {

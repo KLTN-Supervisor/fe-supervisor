@@ -1,11 +1,7 @@
 import { React, useCallback, useEffect, useRef, useState } from "react";
-// import { subDays, subHours } from "date-fns";
-import VerticalAlignTopOutlinedIcon from "@mui/icons-material/VerticalAlignTopOutlined";
 import AddIcon from "@mui/icons-material/Add";
-import BlockIcon from "@mui/icons-material/Block";
-import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import EditIcon from '@mui/icons-material/Edit';
 import {
-  Alert,
   Box,
   Button,
   CircularProgress,
@@ -16,16 +12,13 @@ import {
   RadioGroup,
   Stack,
   SvgIcon,
-  Typography,
 } from "@mui/material";
-import Backdrop from "@mui/material/Backdrop";
 import { StudentsSearch } from "./StudentsSearch";
 import { AdminTable } from "../Common/AdminTable/Table";
 import classNames from "classnames/bind";
 import styles from "../UsersManager/UserModal.module.scss";
 import styles2 from "../../../Supervisor/StudentCard/StudentCard.module.scss";
 import useAdminServices from "../../../../services/useAdminServices";
-import usePrivateHttpClient from "../../../../hooks/http-hook/private-http-hook";
 import ImportInput from "../UploadFile/ImportInput";
 import { getStudentsImageSource } from "../../../../untils/getImageSource";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -612,9 +605,7 @@ const StudentsManage = () => {
               className={cx2("modal-main")}
               style={{
                 display: "flex",
-                padding: "20px 0 30px 0px",
-                overflow: "auto",
-                maxHeight: 500,
+                padding: "10px 0 20px 0px",
               }}
             >
               <div
@@ -629,6 +620,7 @@ const StudentsManage = () => {
               >
                 <div
                   style={{
+                    display:"flex", justifyContent: "center", flexDirection: "column", alignItems: "center",
                     height: "250px",
                     cursor: isEdit || isCreateNew ? "pointer" : "",
                   }}
@@ -637,10 +629,12 @@ const StudentsManage = () => {
                   }}
                 >
                   <img
-                    style={{ width: "100%", maxHeight: "250px" }}
+                    style={{ width: "100%", maxHeight: "200px" }}
                     src={getStudentsImageSource(previewPortraitImg)}
                     alt="Ảnh thẻ sinh viên"
                   />
+                  <EditIcon style={{color: "#e6e614", marginTop: 10}}/>
+                  
                   <input
                     id="portrait_img"
                     ref={imgRef}
@@ -707,7 +701,7 @@ const StudentsManage = () => {
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Giới tính:</div>
-                  <FormControl sx={{ width: "90.6%", p: 0.5 }}>
+                  <FormControl sx={{ p: 0.5 }} className={cx2("form-control")}>
                     <RadioGroup
                       row
                       value={modalData?.gender}
@@ -754,15 +748,17 @@ const StudentsManage = () => {
                     </RadioGroup>
                   </FormControl>
                 </div>
-                <div className={cx2("info")}>
+                <div className={cx2("info")} style={{marginTop: 0}}>
                   <div className={cx2("title")} style={{ marginTop: 5 }}>
                     Ngày sinh:
                   </div>
                   <LocalizationProvider
                     dateAdapter={AdapterDayjs}
                     style={{ maxWidth: "60%" }}
+                    className={cx2("form-control")}
                   >
                     <DatePicker
+                      className={cx2("form-control")}
                       slotProps={{
                         textField: {
                           inputProps: {
@@ -896,6 +892,7 @@ const StudentsManage = () => {
                 <div
                   style={{
                     width: "80%",
+                    margin: "auto",
                     marginTop: 15,
                     flexDirection: "row",
                     display: "flex",

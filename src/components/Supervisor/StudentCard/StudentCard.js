@@ -450,10 +450,10 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
           </div>
           <div className={cx("modal-navbar-content")} style={{ width: "80%" }}>
             <div className={cx("modal-header")}>Thông tin sinh viên</div>
-            <div className={cx("modal-main")} style={{padding: "20px 0 30px 0px"}}>
+            <div className={cx("modal-main")} style={{padding: "10px 0 20px 0px"}}>
               <div style={{ flex: 0.2, height: "100%", display: "flex", flexDirection:"column", justifyContent: "center", alignItems: "center"}}>
                 <img
-                  style={{ width: "100%", maxHeight: "250px", marginBottom: "15px" }}
+                  style={{ width: "100%", maxHeight: "200px", marginBottom: "15px" }}
                   src={getStudentsImageSource(student?.portrait_img)}
                 />
                 {!attendance && !isAttendance ? (

@@ -1,11 +1,7 @@
 import { React, useCallback, useEffect, useRef, useState } from "react";
-// import { subDays, subHours } from "date-fns";
-import VerticalAlignTopOutlinedIcon from "@mui/icons-material/VerticalAlignTopOutlined";
 import AddIcon from "@mui/icons-material/Add";
-import BlockIcon from "@mui/icons-material/Block";
-import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import EditIcon from '@mui/icons-material/Edit';
 import {
-  Alert,
   Box,
   Button,
   CircularProgress,
@@ -16,13 +12,9 @@ import {
   RadioGroup,
   Stack,
   SvgIcon,
-  Typography,
 } from "@mui/material";
 import { StudentsSearch } from "./StudentsSearch";
 import { AdminTable } from "../Common/AdminTable/Table";
-// import { applyPagination } from "../../../../shared/util/apply-pagination";
-// import { useSelection } from "../../../../shared/hook/use-selection";
-import Modal from "react-bootstrap/Modal";
 import classNames from "classnames/bind";
 import styles from "../UsersManager/UserModal.module.scss";
 import styles2 from "../../../Supervisor/StudentCard/StudentCard.module.scss";
@@ -489,7 +481,7 @@ const InspectorsManage = () => {
           </div>
           <div
             className={cx2("modal-navbar-content")}
-            style={{ width: "80%", marginTop: 30 }}
+            style={{ width: "80%" }}
           >
             <div className={cx2("modal-header")}>Thông tin thanh tra</div>
             <div
@@ -508,7 +500,8 @@ const InspectorsManage = () => {
               >
                 <div
                   style={{
-                    height: "250px",
+                    display:"flex", justifyContent: "center", flexDirection: "column", alignItems: "center",
+                    height: "250px", 
                     cursor: isEdit || isCreateNew ? "pointer" : "",
                   }}
                   onClick={() => {
@@ -516,10 +509,11 @@ const InspectorsManage = () => {
                   }}
                 >
                   <img
-                    style={{ width: "100%", maxHeight: "250px" }}
+                    style={{ width: "100%", maxHeight: "200px" }}
                     src={getStudentsImageSource(previewPortraitImg)}
                     alt="Ảnh thẻ sinh viên"
                   />
+                  <EditIcon style={{color: "#e6e614", marginTop: 10}}/>
                   <input
                     id="portrait_img"
                     ref={imgRef}
@@ -573,7 +567,7 @@ const InspectorsManage = () => {
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Giới tính:</div>
-                  <FormControl sx={{ width: "90.6%" }}>
+                  <FormControl sx={{ p: 0.5 }} className={cx2("form-control")}>
                     <RadioGroup
                       row
                       value={modalData?.gender}
@@ -620,10 +614,11 @@ const InspectorsManage = () => {
                     </RadioGroup>
                   </FormControl>
                 </div>
-                <div className={cx2("info")}>
+                <div className={cx2("info")} style={{marginTop: 0}}>
                   <div className={cx2("title")} style={{marginTop: 5}}>Ngày sinh:</div>
-                  <LocalizationProvider dateAdapter={AdapterDayjs} style={{maxWidth: "60%"}}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs} style={{maxWidth: "60%"}} className={cx2("form-control")}>
                     <DatePicker
+                    className={cx2("form-control")}
                       slotProps={{
                         textField: {
                           inputProps: {
@@ -727,11 +722,13 @@ const InspectorsManage = () => {
                     onChange={changeHandler}
                   />
                 </div>
-
+                <div style={{
+                    width: "100%",display: "flex",
+                    justifyContent: "space-between",}}>
                 <div
                   style={{
                     width: "80%",
-                    marginTop: 15,
+                    margin: "15px auto auto",
                     flexDirection: "row",
                     display: "flex",
                     justifyContent: "space-between",
@@ -769,6 +766,7 @@ const InspectorsManage = () => {
                       "Chỉnh sửa"
                     )}
                   </button>
+                </div>
                 </div>
               </div>
             </div>
