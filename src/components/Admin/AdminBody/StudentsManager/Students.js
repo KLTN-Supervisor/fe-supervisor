@@ -449,7 +449,7 @@ const StudentsManage = () => {
         }}
       >
         <Container maxWidth="xl">
-          <div className={cx("title")} style={{margin: "0 0 15px 0"}}>
+          <div className={cx("title")} style={{ margin: "0 0 15px 0" }}>
             <h6 className={cx("text")}>Sinh viên</h6>
           </div>
           <Stack spacing={3}>
@@ -610,7 +610,12 @@ const StudentsManage = () => {
             <div className={cx2("modal-header")}>Thông tin sinh viên</div>
             <div
               className={cx2("modal-main")}
-              style={{ display: "flex", padding: "20px 0 30px 0px" }}
+              style={{
+                display: "flex",
+                padding: "20px 0 30px 0px",
+                overflow: "auto",
+                maxHeight: 500,
+              }}
             >
               <div
                 style={{
@@ -702,7 +707,7 @@ const StudentsManage = () => {
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Giới tính:</div>
-                  <FormControl sx={{ width: "90.6%", p: 7 }}>
+                  <FormControl sx={{ width: "90.6%", p: 0.5 }}>
                     <RadioGroup
                       row
                       value={modalData?.gender}
@@ -750,8 +755,13 @@ const StudentsManage = () => {
                   </FormControl>
                 </div>
                 <div className={cx2("info")}>
-                  <div className={cx2("title")} style={{marginTop: 5}}>Ngày sinh:</div>
-                  <LocalizationProvider dateAdapter={AdapterDayjs} style={{maxWidth: "60%"}}>
+                  <div className={cx2("title")} style={{ marginTop: 5 }}>
+                    Ngày sinh:
+                  </div>
+                  <LocalizationProvider
+                    dateAdapter={AdapterDayjs}
+                    style={{ maxWidth: "60%" }}
+                  >
                     <DatePicker
                       slotProps={{
                         textField: {

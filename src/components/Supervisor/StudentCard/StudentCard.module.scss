@@ -25,7 +25,7 @@
 }
 
 .button {
-  width: 100px;
+  min-width: 100px;
   height: 35px;
   border: none;
   border-radius: 10px;
@@ -198,8 +198,8 @@
             .image-slider-container {
               width: 400px;
             }
-  
-            .image-slider{
+
+            .image-slider {
               width: 100%;
               position: relative;
               transition: transform 0.2s;
@@ -209,19 +209,19 @@
               flex-grow: 0;
               border-radius: 0px 0px 10px 10px;
             }
-  
+
             .image-slider > img {
               // width: 100%;
               object-fit: contain;
               max-height: 380px;
             }
-            .image-slider > canvas{
+            .image-slider > canvas {
               max-height: 380px;
-              position: absolute; 
+              position: absolute;
               display: inline-block;
               top: 0;
             }
-            
+
             .img-slider {
               object-fit: none;
               display: block;
@@ -310,7 +310,7 @@
   width: 85%;
   border-radius: 10px;
   outline: none;
-  border:#0094f672 solid 0.5px 
+  border: #0094f672 solid 0.5px;
 }
 .input-span-focus:focus-visible {
   outline: none;
@@ -335,7 +335,7 @@ input-span:focus {
   }
 }
 
-@media (max-width: 840px){
+@media (max-width: 840px) {
   .modal-navbar-content {
     .modal-main {
       flex-direction: column;
@@ -367,7 +367,7 @@ input-span:focus {
 @media (max-width: 720px) {
   .student {
     width: 46%;
-    .student-image > img{
+    .student-image > img {
       max-height: 260px;
     }
   }
@@ -376,7 +376,7 @@ input-span:focus {
   .student {
     width: 180px;
     height: 290px;
-    .student-image > img{
+    .student-image > img {
       max-height: 184px;
     }
   }

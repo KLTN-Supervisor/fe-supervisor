@@ -289,16 +289,19 @@ const UsersManage = () => {
       formData.append("email", modalData?.email);
       formData.append("role", modalData?.role);
 
-      const response = await toast.promise(() => updateAccount(formData), {
-        pending: "Đang tạo...",
-        error: {
-          render({ data }) {
-            // When the promise reject, data will contains the error
-            return `${data.message}`;
+      const response = await toast.promise(
+        () => updateAccount(modalData._id, formData),
+        {
+          pending: "Đang cập nhật...",
+          error: {
+            render({ data }) {
+              // When the promise reject, data will contains the error
+              return `${data.message}`;
+            },
           },
-        },
-        success: "Cập nhật tài khoản thành công",
-      });
+          success: "Cập nhật tài khoản thành công",
+        }
+      );
 
       if (response) {
         if (isEdit) setIsEdit(false);
@@ -308,6 +311,32 @@ const UsersManage = () => {
     } catch (err) {
       console.error(err);
       setDataLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    try {
+      const responses = await toast.promise(
+        () => resetAccountPassword(modalData._id),
+        {
+          pending: "Đang reset...",
+          success: {
+            render: ({ data }) => {
+              return `${data.message}`;
+            },
+          },
+          error: {
+            render: ({ data }) => {
+              return `${data.message}`;
+            },
+          },
+        }
+      );
+
+      if (responses) {
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -500,7 +529,7 @@ const UsersManage = () => {
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
-                  marginRight: 10
+                  marginRight: 10,
                 }}
               >
                 <div
@@ -528,12 +557,12 @@ const UsersManage = () => {
                   />
                 </div>
               </div>
-              <div className={cx2("modal-info")} style={{width: "90%"}}>
+              <div className={cx2("modal-info")} style={{ width: "90%" }}>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Tên đăng nhập:</div>
                   <input
                     id="username"
-                    style={{border: !isEdit && !isCreateNew && "none"}}
+                    style={{ border: !isEdit && !isCreateNew && "none" }}
                     className={cx2(
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
@@ -548,7 +577,7 @@ const UsersManage = () => {
                     <div className={cx2("title")}>Mật khẩu:</div>
                     <input
                       id="password"
-                      style={{border: !isEdit && !isCreateNew && "none"}}
+                      style={{ border: !isEdit && !isCreateNew && "none" }}
                       className={cx2(
                         "input-span",
                         !isEdit && !isCreateNew && "input-span-focus"
@@ -563,7 +592,7 @@ const UsersManage = () => {
                   <div className={cx2("title")}>Tên người dùng:</div>
                   <input
                     id="fullname"
-                    style={{border: !isEdit && !isCreateNew && "none"}}
+                    style={{ border: !isEdit && !isCreateNew && "none" }}
                     className={cx2(
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
@@ -577,7 +606,7 @@ const UsersManage = () => {
                   <div className={cx2("title")}>Email:</div>
                   <input
                     id="email"
-                    style={{border: !isEdit && !isCreateNew && "none"}}
+                    style={{ border: !isEdit && !isCreateNew && "none" }}
                     className={cx2(
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
@@ -594,7 +623,10 @@ const UsersManage = () => {
                     className={cx("form__select")}
                     sx={{
                       width: 0.843,
-                      border: !isEdit && !isCreateNew ? "none" : "1px solid rgba(0, 85, 141, 0.5)",
+                      border:
+                        !isEdit && !isCreateNew
+                          ? "none"
+                          : "1px solid rgba(0, 85, 141, 0.5)",
                       padding: "5px 16px",
                       borderRadius: "10px",
                       height: 28,
@@ -629,7 +661,7 @@ const UsersManage = () => {
                       <div className={cx2("title")}>Trạng thái:</div>
                       <input
                         id="banned"
-                        style={{border: "none"}}
+                        style={{ border: "none" }}
                         className={cx2("input-span", "input-span-focus")}
                         value={modalData?.banned ? "Bị khóa" : "Bình thường"}
                         readOnly
@@ -639,7 +671,7 @@ const UsersManage = () => {
                       <div className={cx2("title")}>Tình trạng:</div>
                       <input
                         id="online"
-                        style={{border: "none"}}
+                        style={{ border: "none" }}
                         className={cx2("input-span", "input-span-focus")}
                         value={
                           modalData?.online ? "Đang hoạt động" : "Ngoại tuyến"
@@ -651,7 +683,7 @@ const UsersManage = () => {
                       <div className={cx2("title")}>Lần đăng nhập cuối:</div>
                       <input
                         id="last_online"
-                        style={{border: "none"}}
+                        style={{ border: "none" }}
                         className={cx2("input-span", "input-span-focus")}
                         value={
                           formatHour(modalData?.last_online) +
@@ -663,45 +695,58 @@ const UsersManage = () => {
                     </div>
                   </>
                 )}
-                <div style={{
+                <div
+                  style={{
                     width: "100%",
                     display: "flex",
                     justifyContent: "center",
-                  }}>
-                <div
-                  style={{
-                    width: "80%",
-                    marginTop: 15,
-                    flexDirection: "row",
-                    display: "flex",
-                    justifyContent: "space-between",
                   }}
                 >
-                  <button
-                    className={cx2("button")}
+                  <div
                     style={{
-                      backgroundColor: "lightpink",
+                      width: "80%",
+                      marginTop: 15,
+                      flexDirection: "row",
+                      display: "flex",
+                      justifyContent: "space-between",
                     }}
-                    onClick={isEdit ? handleEditClick : toggleModal}
                   >
-                    {isEdit ? "Hủy" : "Đóng"}
-                  </button>
-                  <button
-                    className={cx2("button")}
-                    style={{
-                      backgroundColor: "lightgreen",
-                    }}
-                    onClick={
-                      isEdit
-                        ? handleUpdateAccount
-                        : isCreateNew
-                        ? handleCreateAccount
-                        : handleEditClick
-                    }
-                  >
-                    {isEdit || isCreateNew ? "Lưu" : "Chỉnh sửa"}
-                  </button>
-                </div>
+                    <button
+                      className={cx2("button")}
+                      style={{
+                        backgroundColor: "lightpink",
+                      }}
+                      onClick={isEdit ? handleEditClick : toggleModal}
+                    >
+                      {isEdit ? "Hủy" : "Đóng"}
+                    </button>
+                    {!isCreateNew && (
+                      <button
+                        className={cx2("button")}
+                        style={{
+                          backgroundColor: "red",
+                        }}
+                        onClick={handleResetPassword}
+                      >
+                        Đặt lại mật khẩu
+                      </button>
+                    )}
+                    <button
+                      className={cx2("button")}
+                      style={{
+                        backgroundColor: "lightgreen",
+                      }}
+                      onClick={
+                        isEdit
+                          ? handleUpdateAccount
+                          : isCreateNew
+                          ? handleCreateAccount
+                          : handleEditClick
+                      }
+                    >
+                      {isEdit || isCreateNew ? "Lưu" : "Chỉnh sửa"}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

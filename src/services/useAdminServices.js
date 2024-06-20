@@ -158,10 +158,10 @@ const useAdminServices = () => {
     }
   };
 
-  const updateAccount = async (formData) => {
+  const updateAccount = async (id, formData) => {
     try {
       const response = await privateRequest(
-        "/admin/accounts/",
+        `/admin/accounts/${id}`,
         "put",
         formData
       );
