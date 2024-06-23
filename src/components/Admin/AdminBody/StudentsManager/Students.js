@@ -605,12 +605,13 @@ const StudentsManage = () => {
               className={cx2("modal-main")}
               style={{
                 display: "flex",
-                padding: "10px 0 20px 0px",
+                padding: "10px 0 10px 0px",
               }}
             >
               <div
                 style={{
-                  flex: 0.2,
+                  flex: 0.25,
+                  marginLeft: 20,
                   height: "100%",
                   display: "flex",
                   flexDirection: "column",
@@ -893,6 +894,7 @@ const StudentsManage = () => {
                   style={{
                     width: "80%",
                     margin: "auto",
+                    paddingBottom: "20px",
                     marginTop: 15,
                     flexDirection: "row",
                     display: "flex",

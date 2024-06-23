@@ -346,7 +346,6 @@ const UsersManage = () => {
           </div>
           <div
             className={cx("modal-content")}
-            style={{ width: "80%", marginTop: 30 }}
           >
             <div className={cx("modal-header")}>Chi tiết</div>
             <div
@@ -365,10 +364,10 @@ const UsersManage = () => {
               >
                 {modalData.images.map((image, index) => (
                   <div
+                    key={index}
                     className={cx("img-slider")}
                     style={{
                       width: "100%",
-
                       transform: `translateX(-${100 * imageIndex}%)`,
                       transition: "transform 0.2s",
                       display: "flex",
@@ -482,7 +481,7 @@ const UsersManage = () => {
                   </div>
                   <div className={cx("info")} style={{flexDirection: "column"}}>
                     <div className={cx("title")}>Ghi chú:</div>
-                    <textarea id="inspector_id">
+                    <textarea readOnly value={modalData?.note} id="inspector_id">
                       {modalData?.note}
                     </textarea>
                   </div>

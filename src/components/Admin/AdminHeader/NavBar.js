@@ -12,7 +12,7 @@ const cx = classNames.bind(styles);
 const NavBarAdmin = ({ handleDrawerToggle }) => {
   const { user } = useAuth();
   return (
-    <AppBar position="sticky" sx={{ zIndex: 1 }}>
+    <AppBar position="sticky" sx={{ zIndex: 2 }}>
       <Toolbar className={cx("toolbar")}>
         <Typography variant="h6" className={cx("logo")}>
           {user?.role === "ADMIN"

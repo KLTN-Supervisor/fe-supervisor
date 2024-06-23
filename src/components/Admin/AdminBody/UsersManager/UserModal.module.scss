@@ -107,3 +107,9 @@
 //     background-color: rgb(103, 103, 103);
 // }
 
+@media (max-width: 840px) {
+    .form__select {
+        width: 50%;
+    }
+}
+
