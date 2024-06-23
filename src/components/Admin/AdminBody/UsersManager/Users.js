@@ -514,7 +514,7 @@ const UsersManage = () => {
           </div>
           <div
             className={cx2("modal-navbar-content")}
-            style={{ width: "80%", marginTop: 30 }}
+            style={{ width: "80%" }}
           >
             <div className={cx2("modal-header")}>Thông tin tài khoản</div>
             <div
@@ -523,7 +523,8 @@ const UsersManage = () => {
             >
               <div
                 style={{
-                  flex: 0.2,
+                  flex: 0.25,
+                  marginLeft: 20,
                   height: "100%",
                   display: "flex",
                   flexDirection: "column",

@@ -24,7 +24,7 @@ export const StudentsSearch = ({ setSearch }) => {
           <InputAdornment position="start">
             <SvgIcon
               color="action"
-              //fontSize="small"
+              fontSize="small"
             >
               <SearchIcon />
             </SvgIcon>

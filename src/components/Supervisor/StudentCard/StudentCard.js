@@ -450,58 +450,64 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
           </div>
           <div className={cx("modal-navbar-content")} style={{ width: "80%" }}>
             <div className={cx("modal-header")}>Thông tin sinh viên</div>
-            <div className={cx("modal-main")} style={{padding: "10px 0 20px 0px"}}>
-              <div style={{ flex: 0.2, height: "100%", display: "flex", flexDirection:"column", justifyContent: "center", alignItems: "center"}}>
-                <img
-                  style={{ width: "100%", maxHeight: "200px", marginBottom: "15px" }}
-                  src={getStudentsImageSource(student?.portrait_img)}
-                />
-                {!attendance && !isAttendance ? (
-                  <span
-                    style={{
-                      cursor: home ? "pointer" : "default",
-                      color: "#ed4956",
-                      marginBottom: "10px",
-                      fontSize: "14px",
-                      fontWeight: 500,
-                      fontFamily:
-                        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,Helvetica, Arial, sans-serif',
-                    }}
-                    onClick={handleClick}
-                  >
-                    Vắng thi
-                  </span>
-                ): (
-                  <span
-                    style={{
-                      cursor: home ? "pointer" : "default",
-                      color: "rgb(73 237 136)",
-                      marginBottom: "10px",
-                      fontSize: "14px",
-                      fontWeight: 500,
-                      fontFamily:
-                        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,Helvetica, Arial, sans-serif',
-                    }}
-                    onClick={handleClick}
-                  >
-                    Có mặt
-                  </span>
-                )}
-                {home && !attendance && !isAttendance &&
-                  <div
-                    onClick={toggleModalAttendance}
-                    style={{
-                      display: "inline-block",
-                      backgroundColor: "#0095f6",
-                      padding: "10px",
-                      color: "white",
-                      borderRadius: "10px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Điểm danh
-                  </div>
-                }
+            <div className={cx("modal-main")} style={{padding: "10px 0 0px 0px"}}>
+              <div style={{ flex: 0.25, marginLeft: 20, height: "100%", display: "flex", flexDirection:"column", justifyContent: "center", alignItems: "center"}}>
+                <div
+                  style={{
+                    display:"flex", justifyContent: "center", flexDirection: "column", alignItems: "center",
+                    // height: "290px",
+                  }}>
+                  <img
+                    style={{ width: "100%", maxHeight: "200px", marginBottom: "15px" }}
+                    src={getStudentsImageSource(student?.portrait_img)}
+                  />
+                  {!attendance && !isAttendance ? (
+                    <span
+                      style={{
+                        cursor: home ? "pointer" : "default",
+                        color: "#ed4956",
+                        marginBottom: "10px",
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        fontFamily:
+                          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,Helvetica, Arial, sans-serif',
+                      }}
+                      onClick={handleClick}
+                    >
+                      Vắng thi
+                    </span>
+                  ): (
+                    <span
+                      style={{
+                        cursor: home ? "pointer" : "default",
+                        color: "rgb(73 237 136)",
+                        marginBottom: "10px",
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        fontFamily:
+                          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,Helvetica, Arial, sans-serif',
+                      }}
+                      onClick={handleClick}
+                    >
+                      Có mặt
+                    </span>
+                  )}
+                  {home && !attendance && !isAttendance &&
+                    <div
+                      onClick={toggleModalAttendance}
+                      style={{
+                        display: "inline-block",
+                        backgroundColor: "#0095f6",
+                        padding: "10px",
+                        color: "white",
+                        borderRadius: "10px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Điểm danh
+                    </div>
+                  }
+                </div>
               </div>
               <div className={cx("modal-info")}>
                 <div className={cx("info")}>
@@ -570,10 +576,11 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                   <div className={cx("title")}>Chuyên ngành:</div>
                   <span className={cx("span")}>{student.major}</span>
                 </div>
-                <div className={cx("info")}>
+                <div className={cx("info")} >
                   <div className={cx("title")}>Lớp học phần:</div>
                   <span className={cx("span")}>{student.class}</span>
                 </div>
+                <div style={{height: 20, width: 20, display: "inline-block"}}></div>
               </div>
             </div>
           </div>

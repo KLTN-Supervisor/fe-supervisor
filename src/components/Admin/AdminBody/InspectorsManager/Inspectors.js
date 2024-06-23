@@ -486,7 +486,7 @@ const InspectorsManage = () => {
             <div className={cx2("modal-header")}>Thông tin thanh tra</div>
             <div
               className={cx2("modal-main")}
-              style={{ display: "flex", padding: "20px 0 30px 0px" }}
+              style={{ display: "flex", padding: "15px 0 10px 0px" }}
             >
               <div
                 style={{
@@ -728,6 +728,7 @@ const InspectorsManage = () => {
                 <div
                   style={{
                     width: "80%",
+                    paddingBottom: 20,
                     margin: "15px auto auto",
                     flexDirection: "row",
                     display: "flex",
