@@ -1,6 +1,6 @@
 import { React, useCallback, useEffect, useRef, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from '@mui/icons-material/Edit';
+import EditIcon from "@mui/icons-material/Edit";
 import {
   Box,
   Button,
@@ -620,9 +620,16 @@ const StudentsManage = () => {
               >
                 <div
                   style={{
-                    display:"flex", justifyContent: "center", flexDirection: "column", alignItems: "center",
+                    display: "flex",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                    alignItems: "center",
                     height: "250px",
                     cursor: isEdit || isCreateNew ? "pointer" : "",
+                    ...((isEdit || isCreateNew) && {
+                      border: "black solid 1px",
+                      borderRadius: 10,
+                    }),
                   }}
                   onClick={() => {
                     if (isEdit || isCreateNew) imgRef.current.click();
@@ -633,8 +640,10 @@ const StudentsManage = () => {
                     src={getStudentsImageSource(previewPortraitImg)}
                     alt="Ảnh thẻ sinh viên"
                   />
-                  <EditIcon style={{color: "#e6e614", marginTop: 10}}/>
-                  
+                  {(isEdit || isCreateNew) && (
+                    <EditIcon style={{ color: "#e6e614", marginTop: 10 }} />
+                  )}
+
                   <input
                     id="portrait_img"
                     ref={imgRef}
@@ -655,6 +664,7 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{ border: !isEdit && !isCreateNew && "none" }}
                     value={modalData?.student_id}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -668,6 +678,7 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{ border: !isEdit && !isCreateNew && "none" }}
                     value={modalData?.fullname}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -681,6 +692,7 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{ border: !isEdit && !isCreateNew && "none" }}
                     value={modalData?.citizen_identification_number}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -694,6 +706,7 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{ border: !isEdit && !isCreateNew && "none" }}
                     value={modalData?.school_year}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -701,7 +714,10 @@ const StudentsManage = () => {
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Giới tính:</div>
-                  <FormControl sx={{ p: 0.5 }} className={cx2("form-control")}>
+                  <FormControl
+                    sx={{ pt: 0.5, pb: 0.5 }}
+                    className={cx2("form-control")}
+                  >
                     <RadioGroup
                       row
                       value={modalData?.gender}
@@ -748,7 +764,7 @@ const StudentsManage = () => {
                     </RadioGroup>
                   </FormControl>
                 </div>
-                <div className={cx2("info")} style={{marginTop: 0}}>
+                <div className={cx2("info")} style={{ marginTop: 0 }}>
                   <div className={cx2("title")} style={{ marginTop: 5 }}>
                     Ngày sinh:
                   </div>
@@ -792,6 +808,7 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{ border: !isEdit && !isCreateNew && "none" }}
                     value={modalData?.place_of_birth}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -805,6 +822,7 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{ border: !isEdit && !isCreateNew && "none" }}
                     value={modalData?.city_or_province}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -818,6 +836,7 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{ border: !isEdit && !isCreateNew && "none" }}
                     value={modalData?.district}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -831,6 +850,7 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{ border: !isEdit && !isCreateNew && "none" }}
                     value={modalData?.address}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -844,6 +864,7 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{ border: !isEdit && !isCreateNew && "none" }}
                     value={modalData?.nationality}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -857,6 +878,7 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{ border: !isEdit && !isCreateNew && "none" }}
                     value={modalData?.current_address}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -870,6 +892,7 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{ border: !isEdit && !isCreateNew && "none" }}
                     value={modalData?.class}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -883,6 +906,7 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{ border: !isEdit && !isCreateNew && "none" }}
                     value={modalData?.education_program}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}

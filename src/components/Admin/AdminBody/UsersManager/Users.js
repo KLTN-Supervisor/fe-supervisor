@@ -627,9 +627,9 @@ const UsersManage = () => {
                         !isEdit && !isCreateNew
                           ? "none"
                           : "1px solid rgba(0, 85, 141, 0.5)",
-                      padding: "5px 16px",
+                      padding: "5px 8px",
                       borderRadius: "10px",
-                      height: 28,
+                      height: 24,
                     }}
                   >
                     <Select
