@@ -21,6 +21,8 @@ import { formatDate } from "../../../../untils/format-date";
 import ImportInput from "../UploadFile/ImportInput";
 import useAdminServices from "../../../../services/useAdminServices";
 import UploadInput from "../UploadFile/UploadInput";
+import DescriptionIcon from '@mui/icons-material/Description';
+import CheckIcon from '@mui/icons-material/Check';
 import {
   Box,
   Button,
@@ -729,23 +731,25 @@ function ExamSchedules() {
             <div className={cx2("modal-header")}>Đổ dữ liệu lịch thi</div>
             <div
               className={cx2("modal-main")}
-              style={{ display: "flex", padding: "10px 0 15px 0px" }}
+              style={{ display: "flex", padding: "10px 0 15px 0px"}}
             >
               <div
                 style={{
+                  padding: "0 15px",
                   flex: 0.2,
                   height: "100%",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
+                  margin: "0 auto auto",
                 }}
               >
                 <div
                   style={{
                     display: "flex",
                     justifyContent: "center",
-                    marginBottom: 5,
+                    marginBottom: 15,
                     width: "100%",
                   }}
                 >
@@ -761,7 +765,7 @@ function ExamSchedules() {
                       onClick={() => {
                         setFileUploadModal(true);
                       }}
-                      sx={{ width: 400 }}
+                      sx={{ width: 400, mr: 2 }}
                     >
                       Chọn file
                     </Button>
@@ -774,8 +778,8 @@ function ExamSchedules() {
                       border: "1px solid rgba(0, 85, 141, 0.5)",
                       padding: "3px 16px",
                       borderRadius: "10px",
-                      mr: 0.5,
-                      ml: 5,
+                      mr: 2,
+                      ml: 0,
                     }}
                   >
                     <Select
@@ -915,7 +919,8 @@ function ExamSchedules() {
                 <div
                   style={{
                     width: "80%",
-                    marginTop: 15,
+                    margin: "15px auto auto",
+                    paddingBottom: 15,
                     flexDirection: "row",
                     display: "flex",
                     justifyContent: "space-between",
@@ -988,7 +993,7 @@ function ExamSchedules() {
           </div>
           <div
             className={cx2("modal-navbar-content")}
-            style={{ width: "50%", marginTop: 15 }}
+            style={{ width: "50%"}}
           >
             <div className={cx2("modal-header")}>Tải lên file</div>
             <div
@@ -1001,7 +1006,7 @@ function ExamSchedules() {
             >
               <div
                 style={{
-                  height: "70vh",
+                  height: "60vh",
                   alignItems: "center",
                   justifyContent: "center",
                   flexDirection: "column",
@@ -1010,13 +1015,59 @@ function ExamSchedules() {
                 }}
               >
                 {files.length === 0 ? (
+                  <>
                   <div className={cx("modal-image")}>
                     <UploadFileIcon className={cx("modal-logo")} />
                   </div>
+                  {isDragging ? (
+                    <div className={cx("modal-text")}>Thả file tại đây</div>
+                  ) : (
+                    <div className={cx("modal-text")}>Kéo thả file vào đây</div>
+                  )}</>
                 ) : (
-                  <div style={{ display: "flex", flexDirection: "column" }}>
+                  <div style={{ display: "flex", flexDirection: "column", paddingTop: 30, width: "90%" }}>
                     {files.map((objectFile, i) => (
-                      <div
+                      <>
+                      <section className={cx("loading-area")}>
+                        <div className={cx("row")}>
+                          <DescriptionIcon style={{color: "#0086fe"}}/>
+                          <div className={cx("content-file")}>
+                            <div className={cx("details-file")}>
+                              <span className={cx("name")} >{objectFile.name}</span>
+                              <span className={cx("percent")} style={{marginLeft: 10, marginRight: 3}}>90%</span>
+                              <div className={cx("loading-bar")}>
+                                <div className={cx("loading")}></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </section>
+                      <section className={cx("uploaded-area")}>
+                        <div className={cx("row")}>
+                          <DescriptionIcon style={{color: "#0086fe"}}/>
+                          <div className={cx("content-file")}>
+                            <div className={cx("details-file")}>
+                              <span className={cx("name")}>{objectFile.name}</span>
+                              <span className={cx("size")}>size file</span>
+                            </div>
+                          </div>
+                          <CheckIcon style={{color: "#0086fe"}}/>
+                        </div>
+                      </section>
+
+                      <section className={cx("uploaded-area")}>
+                        <div className={cx("row")}>
+                          <DescriptionIcon style={{color: "#0086fe"}}/>
+                          <div className={cx("content-file")}>
+                            <div className={cx("details-file")}>
+                              <span className={cx("name")}>{objectFile.name}</span>
+                              <span className={cx("size")}>size file</span>
+                            </div>
+                          </div>
+                          <DeleteIcon style={{color: "rgb(232 56 75 / 77%)", cursor: "pointer"}} onClick={() => deleteDraftFile(i)}/>
+                        </div>
+                      </section>
+                      {/* <div
                         style={{
                           display: "flex",
                           justifyContent: "space-between",
@@ -1030,15 +1081,12 @@ function ExamSchedules() {
                         >
                           <DeleteIcon />
                         </div>
-                      </div>
+                      </div> */}
+                      </>
                     ))}
                   </div>
                 )}
-                {isDragging ? (
-                  <div className={cx("modal-text")}>Thả file tại đây</div>
-                ) : (
-                  <div className={cx("modal-text")}>Kéo thả file vào đây</div>
-                )}
+                
 
                 <div className={cx("modal-input")}>
                   <input
@@ -1062,7 +1110,8 @@ function ExamSchedules() {
               <div
                 style={{
                   width: "80%",
-                  marginTop: 15,
+                  margin: "15px auto auto",
+                  paddingBottom: 15,
                   flexDirection: "row",
                   display: "flex",
                   justifyContent: "space-between",
