@@ -369,10 +369,10 @@ input-span:focus {
     }
   }
   .input-span{
-    width: 50%;
+    width: 45%;
   }
   .form-control{
-    width: 54% !important;
+    width: 50% !important;
   }
 }
 
@@ -391,6 +391,12 @@ input-span:focus {
     .student-image > img {
       max-height: 184px;
     }
+  }
+  .input-span{
+    width: 40%;
+  }
+  .form-control{
+    width: 45% !important;
   }
   .modal-navbar-content {
     .modal-main {
