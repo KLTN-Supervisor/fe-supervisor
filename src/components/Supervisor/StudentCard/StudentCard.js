@@ -2,6 +2,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import classNames from "classnames/bind";
 import React, { useState, useEffect, useRef, useCallback, useContext } from "react";
 import styles from "./StudentCard.module.scss";
+import styles2 from "../../../pages/Supervisor/HomePage/HomePage.module.scss";
 import { formatDate } from "../../../untils/format-date";
 import { getStudentsImageSource } from "../../../untils/getImageSource";
 import * as faceapi from "face-api.js";
@@ -13,6 +14,7 @@ import { StateContext } from "../../../context/StateContext";
 
 
 const cx = classNames.bind(styles);
+const cx2 = classNames.bind(styles2);
 
 function StudentCard({ student, attendance, home, updateAttendance, updateAttendanceTrue }) {
   const [modal, setModal] = useState(false);
@@ -101,6 +103,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
         .getUserMedia({ video: true })
         .then((currentStream) => {
           videoRef.current.srcObject = currentStream;
+          setIsAttending(true);
         })
         .catch((err) => {
           console.error('Error accessing camera:', err);
@@ -109,6 +112,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
             message:
               "Xảy ra lỗi khi sử dụng camera"
           });
+          setIsAttending(false);
           setSnackBarOpen(true);
         });
     } else {
@@ -137,12 +141,14 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
       canvasRef.current.innerHTML = faceapi.createCanvas(videoRef.current);
       faceapi.matchDimensions(canvasRef.current, {
         width: videoRef.current ? videoRef.current.offsetWidth : 0,
-        height: screenWidth < 720 ? (screenWidth < 527 ? 225 : 300) : 480,
+        height: videoRef.current ? videoRef.current.offsetHeight : 0,
+        // screenWidth < 720 ? (screenWidth < 527 ? 225 : 300) : 480,
       });
 
       const resized = faceapi.resizeResults(detections, {
         width: videoRef.current ? videoRef.current.offsetWidth : 0,
-        height: screenWidth < 720 ? (screenWidth < 527 ? 225 : 300) : 480,
+        height: videoRef.current ? videoRef.current.offsetHeight : 0,
+        // screenWidth < 720 ? (screenWidth < 527 ? 225 : 300) : 480,
       });
 
       for (const detection of resized) {
@@ -180,6 +186,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
         }
         drawBox.draw(canvasRef.current);
       }
+      setIsAttending(false);
     }
   },[student, isAttendance, setIsAttendance]);
 
@@ -319,6 +326,10 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
     if (container) {
       const container = document.querySelector(`#imgDiv`);
       const canvas = faceapi.createCanvasFromMedia(image);
+      canvas.width = image.offsetWidth;
+      canvas.height = image.offsetHeight;
+      canvas.style.width = 'auto';
+      canvas.style.left = 'auto';
       container.innerHTML = '';
       container.append(image);
       container.append(canvas);
@@ -329,13 +340,13 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
         .withFaceDescriptors();
 
       faceapi.matchDimensions(canvas, {
-        width: image && image.width,
-        height: image && image.height,
+        width: image && image.offsetWidth,
+        height: image && image.offsetHeight,
       });
 
       const resized = faceapi.resizeResults(detections, {
-        width: image && image.width,
-        height: image && image.height,
+        width: image && image.offsetWidth,
+        height: image && image.offsetHeight,
       });
 
       for (const detection of resized) {
@@ -587,14 +598,14 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
         </div>
       )}
       {modalAttendance && (
-        <div className={cx("modal active-modal")}>
+        <div className={cx2("modal active-modal")}>
           <div
             onClick={toggleModalAttendance}
-            className={cx("overlay")}
+            className={cx2("overlay")}
             style={{ alignSelf: "flex-end" }}
           >
             <CloseIcon
-              className={cx("sidenav__icon")}
+              className={cx2("sidenav__icon")}
               style={{
                 width: "27px",
                 height: "27px",
@@ -606,14 +617,14 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
               }}
             />
           </div>
-          <div className={cx("modal-navbar-content")} style={{ width: "80%" }}>
-            <div className={cx("modal-header")}>Điểm danh
+          <div className={cx2("modal-navbar-content")} style={{ width: "80%" }}>
+            <div className={cx2("modal-header")}>Điểm danh
             </div>
-            <div className={cx("modal-main")} style={{flexDirection: "column", height: "540px", padding: "0px 0 30px 0px"}}>
-            <div className={cx("home__tag")}>
+            <div className={cx2("modal-main")} style={{flexDirection: "column", height: "540px", padding: "0px 0 30px 0px"}}>
+            <div className={cx2("home__tag")}>
             <a>
               <div
-                className={cx("choose")}
+                className={cx2("choose")}
                 style={
                   state === 0
                     ? {
@@ -633,9 +644,9 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                   
                 }}
               >
-                <CameraAltOutlinedIcon className={cx("icon")} />
+                <CameraAltOutlinedIcon className={cx2("icon")} />
                 <span
-                  className={cx("span")}
+                  className={cx2("span")}
                   style={{ textTransform: "uppercase" }}
                 >
                   Camera
@@ -644,7 +655,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
             </a>
             <a>
               <div
-                className={cx("choose")}
+                className={cx2("choose")}
                 style={
                   state === 1
                     ? {
@@ -664,9 +675,9 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                   setIsAttending(false);
                 }}
               >
-                <ImageOutlinedIcon className={cx("icon")} />
+                <ImageOutlinedIcon className={cx2("icon")} />
                 <span
-                  className={cx("span")}
+                  className={cx2("span")}
                   style={{ textTransform: "uppercase" }}
                 >
                   Hình ảnh
@@ -676,21 +687,42 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
           </div>
           {state === 0 ? (
             <>
-              <div className={cx("appvide")}>
+              <div className={cx2("appvide")}>
                 <video
                   crossOrigin="anonymous"
                   ref={videoRef}
                   autoPlay
                   playsInline
-                  style={{ borderRadius: 10 }}
-                  className={cx("video")}
+                  style={{ borderRadius: "2%" }}
+                  className={cx2("video")}
                 ></video>
               </div>
               <canvas
                 ref={canvasRef}
                 width={videoRef?.current && videoRef?.current.offsetWidth}
-                className={cx("appcanvas")}
+                height={videoRef?.current && videoRef?.current.height}
+                className={cx2("appcanvas")}
               />
+              <div
+                style={{
+                  display: isAttending ? "block" : "none",
+                  position: "absolute",
+                  zIndex: 5,
+                  top: "102px",
+                  width: "100%",
+                  height: "82%",
+                  backgroundColor: "white",
+                  textAlign: "center",
+                  fontWeight: 600,
+                  fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                Helvetica, Arial, sans-serif`,
+                  color: "rgb(61 60 60)",
+                }}
+              >
+                <CircularProgress size={25} style={{marginTop: 10}}/>
+                <br/>
+                Đang chuẩn bị camera ...
+              </div>
             </>
           ) : (
             <div
@@ -700,20 +732,20 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
               onDrop={isDropping ? null : onDrop}
             >
               {isDropping ? (
-                <div className={cx("content")} style={{flexDirection: "column"}}>
+                <div className={cx2("content")} style={{flexDirection: "column"}}>
                   <div
-                    className={cx("main")}
+                    className={cx2("main")}
                     style={isDragging ? { backgroundColor: "black", height: "80%" } : { height: "80%" }}
                   >
                     <div
-                      className={cx("container")}
+                      className={cx2("container")}
                       style={{
                         borderRadius: "10px 10px 10px 10px",
                         display: "flex",
                       }}
                     >
                       <div
-                        className={cx("image")}
+                        className={cx2("image")}
                         style={{
                           display: !isAttending ? "flex" : "none",
                           minHeight: "420px",
@@ -723,10 +755,10 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                           overflow: "hidden",
                         }}
                       >
-                        <div className={cx("image-slider-container")}>
+                        <div className={cx2("image-slider-container")}>
                           <div
                             id={`imgDiv`}
-                            className={cx("image-slider")}
+                            className={cx2("image-slider")}
                             style={{ display: "flex !important", justifyContent: "center", alignItems: "center" }}
                           ></div>
                         </div>
@@ -750,7 +782,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                     </div>
                   </div>
                   {!isAttendance &&
-                  <div className={cx("modal-input")}>
+                  <div className={cx2("modal-input")} style={{marginTop: 0}}>
                     <input
                       type="file"
                       accept="image/jpg,image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
@@ -764,32 +796,33 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                       style={{marginBottom: 0}}
                       role="button"
                       onClick={selectFiles}
-                      className={cx("modal-upload")}
+                      className={cx2("modal-upload")}
                     >
                       Select from device
                     </label>
                   </div>}
                 </div>
               ) : (
-                <div className={cx("content")} style={isDragging ? { backgroundColor: "#0094f61b" } : null}>
+                <div className={cx2("content")} style={{display: "flex", backgroundColor: isDragging && "#0094f61b"}}>
                   <div
-                    className={cx("main")}
+                    style={{height: "auto"}}
+                    className={cx2("main")}
                   >
                     <div>
-                      <div className={cx("modal-image")}>
-                        <CollectionsOutlinedIcon className={cx("modal-logo")} />
+                      <div className={cx2("modal-image")}>
+                        <CollectionsOutlinedIcon className={cx2("modal-logo")} />
                       </div>
                       {isDragging ? (
-                        <div className={cx("modal-text")}>
+                        <div className={cx2("modal-text")}>
                           Thả hình ảnh vào đây
                         </div>
                       ) : (
-                        <div className={cx("modal-text")}>
+                        <div className={cx2("modal-text")}>
                           Kéo hình ảnh vào đây
                         </div>
                       )}
 
-                      <div className={cx("modal-input")}>
+                      <div className={cx2("modal-input")}>
                         <input
                           type="file"
                           accept="image/jpg,image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
@@ -802,7 +835,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                         <label
                           role="button"
                           onClick={selectFiles}
-                          className={cx("modal-upload")}
+                          className={cx2("modal-upload")}
                         >
                           Select from device
                         </label>

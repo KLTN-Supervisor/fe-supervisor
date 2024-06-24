@@ -1785,7 +1785,7 @@ async function switchCamera() {
                     </div>
                   </div>
                   {!isAttending && 
-                  <div className={cx("modal-input")}>
+                  <div className={cx("modal-input")} style={{marginTop: 0}}>
                     <input
                       type="file"
                       accept="image/jpg,image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
@@ -1806,8 +1806,9 @@ async function switchCamera() {
                   </div>}
                 </div>
               ) : (
-                <div className={cx("content")} style={isDragging ? { backgroundColor: "#0094f61b" } : null}>
+                <div className={cx("content")} style={{display: "flex", backgroundColor: isDragging && "#0094f61b"}}>
                   <div
+                    style={{height: "auto"}}
                     className={cx("main")}
                   >
                     <div>
