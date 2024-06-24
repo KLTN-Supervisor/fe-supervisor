@@ -187,6 +187,7 @@ html, body {
       align-items: center;
     }
     
+    
     .appcanvas{
       position: absolute;
       top: 100px;
@@ -455,9 +456,13 @@ html, body {
       align-items: center;
     }
 
+    .switch-video{
+      width: 640px;
+    }
+
     .appcanvas {
       position: absolute;
-      top: 100px;
+      top: 105px;
     }
 
     .myapp h1 {
@@ -585,9 +590,12 @@ html, body {
             }
           }
         }
-        .appcanvas {
+        // .appcanvas {
+        //   width: 400px;
+        //   height: 300px;
+        // }
+        .switch-video{
           width: 400px;
-          height: 300px;
         }
         .appvide {
           justify-content: baseline;
@@ -652,9 +660,12 @@ html, body {
     }
     .modal-navbar-content {
       .modal-main {
-        .appcanvas {
+        // .appcanvas {
+        //   width: 300px;
+        //   height: 225px;
+        // }
+        .switch-video{
           width: 300px;
-          height: 225px;
         }
         .appvide {
           .video {

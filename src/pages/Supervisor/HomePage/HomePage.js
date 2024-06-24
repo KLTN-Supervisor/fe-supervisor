@@ -42,6 +42,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
 
 const cx = classNames.bind(styles);
 
@@ -940,9 +941,10 @@ function HomePage() {
   };
 
   const [state, setState] = useState(0);
+  const [cameraIds, setcameraIds] = useState('');
+  const [currentCameraIndex , setcurrentCameraIndex ] = useState(0);
   const videoRef = useRef();
   const canvasRef = useRef();
-  const canvasImageRef = useRef();
   const isLoadCanvasRef = useRef(true);
   const intervalRef = useRef(null);
   const { faceMatcher } = useContext(StateContext);
@@ -977,12 +979,50 @@ function HomePage() {
     }
   };
 
+  const getNumberOfCameras = async () => {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const cameras = devices.filter((device) => device.kind === 'videoinput');
+      setcameraIds(cameras.map((camera) => camera.deviceId));
+    } catch (error) {
+      console.error('Lỗi khi lấy danh sách thiết bị:', error);
+    }
+  }
+
+  // Hàm switch camera
+async function switchCamera() {
+  try {
+    // Lấy ID của camera tiếp theo
+    const nextCameraId = cameraIds[++currentCameraIndex % cameraIds.length];
+    setcurrentCameraIndex(++currentCameraIndex % cameraIds.length);
+    // Gọi getUserMedia với deviceId tương ứng
+    await navigator.mediaDevices.getUserMedia({
+      video: { deviceId: { exact: nextCameraId } }
+    }).then((currentStream) => {
+      videoRef.current.srcObject = currentStream;
+      setIsAttending(true);
+    })
+    .catch((err) => {
+      console.error('Error accessing camera:', err);
+      setSnackBarNotif({
+        severity: "error",
+        message:
+          "Xảy ra lỗi khi sử dụng camera"
+      });
+      setIsAttending(false);
+      setSnackBarOpen(true);
+    });;
+  } catch (error) {
+    console.error('Lỗi khi switch camera:', error);
+  }
+}
   
   const startVideo = () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia ) {
       navigator.mediaDevices
         .getUserMedia({ video: true })
         .then((currentStream) => {
+          getNumberOfCameras()
           videoRef.current.srcObject = currentStream;
           setIsAttending(true);
         })
@@ -1022,12 +1062,14 @@ function HomePage() {
       canvasRef.current.innerHTML = faceapi.createCanvas(videoRef.current);
       faceapi.matchDimensions(canvasRef.current, {
         width: videoRef.current ? videoRef.current.offsetWidth : 0,
-        height: screenWidth < 720 ? (screenWidth < 527 ? 225 : 300) : 480,
+        height: videoRef.current ? videoRef.current.offsetHeight : 0,
+        // screenWidth < 720 ? (screenWidth < 527 ? 225 : 300) : 480,
       });
 
       const resized = faceapi.resizeResults(detections, {
         width: videoRef.current ? videoRef.current.offsetWidth : 0,
-        height: screenWidth < 720 ? (screenWidth < 527 ? 225 : 300) : 480,
+        height: videoRef.current ? videoRef.current.offsetHeight : 0,
+        // screenWidth < 720 ? (screenWidth < 527 ? 225 : 300) : 480,
       });
 
       for (const detection of resized) {
@@ -1573,7 +1615,7 @@ function HomePage() {
           <div className={cx("modal-navbar-content")} style={{ width: "80%" }}>
             <div className={cx("modal-header")}>Điểm danh
             </div>
-            <div className={cx("modal-main")} style={{flexDirection: "column", height: "540px", padding: "0px 0 30px 0px"}}>
+            <div className={cx("modal-main")} style={{flexDirection: "column", padding: "0px 0 30px 0px"}}>
             <div className={cx("home__tag")}>
             <a>
               <div
@@ -1644,14 +1686,16 @@ function HomePage() {
                   ref={videoRef}
                   autoPlay
                   playsInline 
-                  style={{ borderRadius: 10 }}
+                  style={{ borderRadius: cameraIds.length > 1 ? "2% 2% 0 0" : "2% 2% 2% 2%" }}
                   className={cx("video")}
                 ></video>
               </div>
+              {cameraIds.length > 1 &&
+              <div onClick={switchCamera} className={cx("switch-video")} style={{padding: "15px 0", display: "flex", justifyContent: "center", backgroundColor: "rgb(173 173 173)", borderRadius: "0px 0 10px 10px", cursor: "pointer"}}><CameraswitchIcon style={{color: "#00558d"}}/></div>}
               <canvas
                 ref={canvasRef}
                 width={videoRef?.current && videoRef?.current.offsetWidth}
-                height="480"
+                height={videoRef?.current && videoRef?.current.height}
                 className={cx("appcanvas")}
               />
               <div
@@ -1659,7 +1703,7 @@ function HomePage() {
                   display: isAttending ? "block" : "none",
                   position: "absolute",
                   zIndex: 5,
-                  top: "105px",
+                  top: "102px",
                   width: "100%",
                   height: "82%",
                   backgroundColor: "white",
