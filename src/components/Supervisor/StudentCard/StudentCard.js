@@ -739,7 +739,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                 ></video>
               </div>
               {cameraIds.length > 1 &&
-                <div onClick={switchCamera} className={cx("switch-video")} 
+                <div onClick={switchCamera} className={cx2("switch-video")} 
                   style={{padding: "15px 0", display: "flex", justifyContent: "center", backgroundColor: "rgb(173 173 173)", 
                   borderRadius: "0px 0 10px 10px", cursor: "pointer", width: videoRef?.current && videoRef?.current.offsetWidth}}
                 >
