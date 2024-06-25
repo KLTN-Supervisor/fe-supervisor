@@ -11,6 +11,7 @@ import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import { Alert, Snackbar, CircularProgress } from "@mui/material";
 import { StateContext } from "../../../context/StateContext";
+import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
 
 
 const cx = classNames.bind(styles);
