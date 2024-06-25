@@ -365,11 +365,11 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
     setIsAttending(true);
     const image = await faceapi.bufferToImage(file);
     const container = document.querySelector(`#imgDiv`);
-    if (container) {
+    if (container && image) {
       const container = document.querySelector(`#imgDiv`);
       const canvas = faceapi.createCanvasFromMedia(image);
-      canvas.width = image.offsetWidth;
-      canvas.height = image.offsetHeight;
+      canvas.width = image.width;
+      canvas.height = image.height;
       canvas.style.width = 'auto';
       canvas.style.left = 'auto';
       container.innerHTML = '';
@@ -382,13 +382,13 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
         .withFaceDescriptors();
 
       faceapi.matchDimensions(canvas, {
-        width: image && image.offsetWidth,
-        height: image && image.offsetHeight,
+        width: image && image.width,
+        height: image && image.height,
       });
 
       const resized = faceapi.resizeResults(detections, {
-        width: image && image.offsetWidth,
-        height: image && image.offsetHeight,
+        width: image && image.width,
+        height: image && image.height,
       });
 
       for (const detection of resized) {
@@ -662,7 +662,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
           <div className={cx2("modal-navbar-content")} style={{ width: "80%" }}>
             <div className={cx2("modal-header")}>Điểm danh
             </div>
-            <div className={cx2("modal-main")} style={{flexDirection: "column", height: "540px", padding: "0px 0 30px 0px"}}>
+            <div className={cx2("modal-main")} style={{flexDirection: "column", padding: "0px 0 30px 0px"}}>
             <div className={cx2("home__tag")}>
             <a>
               <div
@@ -798,7 +798,6 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                         className={cx2("image")}
                         style={{
                           display: !isAttending ? "flex" : "none",
-                          minHeight: "420px",
                           width: "100%",
                           justifyContent: "center",
                           display: "flex",

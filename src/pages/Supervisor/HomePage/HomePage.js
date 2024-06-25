@@ -1195,8 +1195,11 @@ function HomePage() {
         for(let i = 0; i< images.length; ++i){
           const container = document.querySelector(`#imgDiv${i}`);
           const image = images[i];
-          const canvas = faceapi.createCanvasFromMedia(image);
-          if(container){
+          if(container && image){
+            const canvas = faceapi.createCanvasFromMedia(image);
+            canvas.style.width = 'auto';
+            canvas.style.height = image.height;
+            canvas.style.left = 'auto';
             container.innerHTML = '';
             container.append(images[i]);
             container.append(canvas);

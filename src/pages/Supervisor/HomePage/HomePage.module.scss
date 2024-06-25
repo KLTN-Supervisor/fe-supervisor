@@ -4,6 +4,7 @@ html, body {
     padding: 0;
   }
   .slick-prev, .slick-next{
+    z-index: 2;
     font-size: 0;
     line-height: 0;
     position: absolute;
@@ -22,19 +23,19 @@ html, body {
     color: transparent;
     border: none;
     outline: none;
-    background: #0000001f;
+    background: rgb(31 29 29);
   }
 
   .slick-next{
-    right: -35px;
+    right: 0px;
   }
   .slick-prev{
-    left: -35px;
+    left: 0px;
   }
   .slick-prev:hover, .slick-next:hover {
     width: 30px;
     height: 30px;
-    background-color: rgba(167, 167, 167, 0.5);
+    background-color: rgba(112, 112, 112, 0.5);
     transition: all 0.3s ease-in-out;
   }
   
@@ -254,13 +255,12 @@ html, body {
       .container {
         width: 80%;
         .image {
+          min-height: 420px;
           flex: 1;
           max-height: 567px;
 
           .image-slider-container {
-            // width: 100%;
-            // margin: 0 auto;
-            width: 400px;
+            width: 100%;
             .slick-initialized{
               .slick-list{
                 padding: 0;
@@ -577,7 +577,48 @@ html, body {
     }
   }
 
+  @media (max-width: 950px){
+    .homepage {
+      .content {
+        .main {
+          .container {
+            .image {
+              min-height: 400px;
+              .image-slider > img {
+                max-height: 350px;
+                max-width: 440px;
+              }
+              .image-slider > canvas {
+                max-width: 440px;
+                max-height: 350px;
+              }
+            }
+          }
+        }    
+      }
+    }
+  }
+
   @media (max-width: 840px){
+    .homepage {
+      .content {
+        .main {
+          .container {
+            .image {
+              min-height: 330px;
+              .image-slider > img {
+                max-height: 300px;
+                max-width: 380px;
+              }
+              .image-slider > canvas {
+                max-width: 380px;
+                max-height: 300px;
+              }
+            }
+          }
+        }    
+      }
+    }
     .modal-navbar-content {
       .modal-main {
         flex-direction: column;
@@ -612,6 +653,24 @@ html, body {
 
   @media (max-width: 720px){
     .homepage {
+      .content {
+        min-height: 320px;
+        .main {
+          .container {
+            .image {
+              min-height: 280px;
+              .image-slider > img {
+                max-height: 250px;
+                max-width: 300px;
+              }
+              .image-slider > canvas {
+                max-width: 300px;
+                max-height: 250px;
+              }
+            }
+          }
+        }    
+      }
       flex-direction: column;
       .homepage__navWraper {
         position: relative;
@@ -625,6 +684,30 @@ html, body {
         }
       }
   
+    }
+  }
+
+
+  @media (max-width: 630px){
+    .homepage {
+      .content {
+        min-height: 300px;
+        .main {
+          .container {
+            .image {
+              min-height: 250px;
+              .image-slider > img {
+                max-height: 200px;
+                max-width: 250px;
+              }
+              .image-slider > canvas {
+                max-width: 250px;
+                max-height: 200px;
+              }
+            }
+          }
+        }    
+      }
     }
   }
 
@@ -643,15 +726,17 @@ html, body {
         }
       }
       .content {
+        min-height: 250px;
         .main {
           .container {
             .image {
+              min-height: 200px;
               .image-slider > img {
                 max-height: 300px;
-                max-width: 250px;
+                max-width: 210px;
               }
               .image-slider > canvas {
-                max-width: 250px;
+                max-width: 210px;
                 max-height: 300px;
               }
             }
