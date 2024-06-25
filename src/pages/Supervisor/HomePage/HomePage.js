@@ -1000,7 +1000,7 @@ function HomePage() {
       }).then((currentStream) => {
         videoRef.current.srcObject = currentStream;
         setIsAttending(true);
-        setCurrentCameraIndex(1);
+        setCurrentCameraIndex(0);
       })
       .catch((err) => {
         console.error('Error accessing camera:', err);
@@ -1022,10 +1022,10 @@ function HomePage() {
       navigator.mediaDevices
         .getUserMedia({ video: true })
         .then((currentStream) => {
-          setCurrentCameraIndex(0);
           getNumberOfCameras();
           videoRef.current.srcObject = currentStream;
           setIsAttending(true);
+          setCurrentCameraIndex(1);
         })
         .catch((err) => {
           console.error('Error accessing camera:', err);
