@@ -120,7 +120,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
       }).then((currentStream) => {
         videoRef.current.srcObject = currentStream;
         setIsAttending(true);
-        setCurrentCameraIndex(currentCameraIndex == 0 ? 1 : 0);
+        setCurrentCameraIndex(1);
       })
       .catch((err) => {
         console.error('Error accessing camera:', err);
@@ -142,6 +142,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
       navigator.mediaDevices
         .getUserMedia({ video: true })
         .then((currentStream) => {
+          setCurrentCameraIndex(0);
           getNumberOfCameras()
           videoRef.current.srcObject = currentStream;
           setIsAttending(true);
@@ -739,7 +740,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                 ></video>
               </div>
               {cameraIds.length > 1 &&
-                <div onClick={switchCamera} className={cx2("switch-video")} 
+                <div onClick={currentCameraIndex === 0 ? startVideo : switchCamera} className={cx2("switch-video")} 
                   style={{padding: "15px 0", display: "flex", justifyContent: "center", backgroundColor: "rgb(173 173 173)", 
                   borderRadius: "0px 0 10px 10px", cursor: "pointer", width: videoRef?.current && videoRef?.current.offsetWidth}}
                 >
