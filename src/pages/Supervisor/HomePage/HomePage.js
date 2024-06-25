@@ -993,7 +993,7 @@ function HomePage() {
   async function switchCamera() {
     try {
       // Lấy ID của camera tiếp theo
-      const nextCameraId = currentCameraIndex == 0 ? 'environment' : "user";
+      const nextCameraId = currentCameraIndex == 0 ? 'user' : "environment";
       // Gọi getUserMedia với deviceId tương ứng
       await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { exact: nextCameraId } }
