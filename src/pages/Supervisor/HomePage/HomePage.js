@@ -1753,7 +1753,6 @@ function HomePage() {
                         className={cx("image")}
                         style={{
                           display: !isAttending ? "flex" : "none",
-                          minHeight: "420px",
                           width: "100%",
                           display: "flex",
                           justifyContent: "center",
