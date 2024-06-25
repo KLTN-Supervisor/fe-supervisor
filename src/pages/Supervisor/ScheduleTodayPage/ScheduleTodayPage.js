@@ -30,7 +30,7 @@ import * as xlsxPopulate from "xlsx-populate/browser/xlsx-populate";
 const cx = classNames.bind(styles);
 function ExamSchedulePage() {
   const navigate = useNavigate();
-  const [date, setDate] = useState("16/03/2024");
+  const [date, setDate] = useState("17/03/2024");
   const [building, setBuilding] = useState([]);
   const [buildingClick, setBuildingClick] = useState(null);
 

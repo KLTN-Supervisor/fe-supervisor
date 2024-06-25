@@ -595,13 +595,13 @@ html, body {
         //   height: 300px;
         // }
         .switch-video{
-          width: 400px;
+          max-width: 400px;
         }
         .appvide {
           justify-content: baseline;
           align-items: baseline;
           .video {
-            width: 400px;
+            max-width: 400px;
             height: 300px;
           }
         }
@@ -666,11 +666,11 @@ html, body {
         //   height: 225px;
         // }
         .switch-video{
-          width: 300px;
+          max-width: 300px;
         }
         .appvide {
           .video {
-            width: 300px;
+            max-width: 300px;
             height: 225px;
           }
         }

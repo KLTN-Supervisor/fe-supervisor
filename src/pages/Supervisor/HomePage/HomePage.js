@@ -941,8 +941,8 @@ function HomePage() {
   };
 
   const [state, setState] = useState(0);
-  const [cameraIds, setcameraIds] = useState('');
-  const [currentCameraIndex , setcurrentCameraIndex ] = useState(0);
+  const [cameraIds, setCameraIds] = useState('');
+  const [currentCameraIndex , setCurrentCameraIndex ] = useState(0);
   const videoRef = useRef();
   const canvasRef = useRef();
   const isLoadCanvasRef = useRef(true);
@@ -983,7 +983,7 @@ function HomePage() {
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const cameras = devices.filter((device) => device.kind === 'videoinput');
-      setcameraIds(cameras.map((camera) => camera.deviceId));
+      setCameraIds(cameras.map((camera) => camera.deviceId));
     } catch (error) {
       console.error('Lỗi khi lấy danh sách thiết bị:', error);
     }
@@ -993,14 +993,14 @@ function HomePage() {
 async function switchCamera() {
   try {
     // Lấy ID của camera tiếp theo
-    const nextCameraId = cameraIds[++currentCameraIndex % cameraIds.length];
-    setcurrentCameraIndex(++currentCameraIndex % cameraIds.length);
+    const nextCameraId = currentCameraIndex == 0 ? 'user' : "environment";
     // Gọi getUserMedia với deviceId tương ứng
     await navigator.mediaDevices.getUserMedia({
-      video: { deviceId: { exact: nextCameraId } }
+      video: { facingMode: { exact: nextCameraId } }
     }).then((currentStream) => {
       videoRef.current.srcObject = currentStream;
       setIsAttending(true);
+      setCurrentCameraIndex(currentCameraIndex == 0 ? 1 : 0);
     })
     .catch((err) => {
       console.error('Error accessing camera:', err);
