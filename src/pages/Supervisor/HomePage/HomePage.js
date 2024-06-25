@@ -993,7 +993,7 @@ function HomePage() {
 async function switchCamera() {
   try {
     // Lấy ID của camera tiếp theo
-    const nextCameraId = currentCameraIndex == 0 ? 'user' : "environment";
+    const nextCameraId = currentCameraIndex == 0 ? 'environment' : "user";
     // Gọi getUserMedia với deviceId tương ứng
     await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { exact: nextCameraId } }
@@ -1691,7 +1691,7 @@ async function switchCamera() {
                 ></video>
               </div>
               {cameraIds.length > 1 &&
-              <div onClick={switchCamera} className={cx("switch-video")} style={{padding: "15px 0", display: "flex", justifyContent: "center", backgroundColor: "rgb(173 173 173)", borderRadius: "0px 0 10px 10px", cursor: "pointer"}}><CameraswitchIcon style={{color: "#00558d"}}/></div>}
+              <div onClick={switchCamera} className={cx("switch-video")} style={{padding: "15px 0", display: "flex", justifyContent: "center", backgroundColor: "rgb(173 173 173)", borderRadius: "0px 0 10px 10px", cursor: "pointer", width: videoRef?.current && videoRef?.current.offsetWidth}}><CameraswitchIcon style={{color: "#00558d"}}/></div>}
               <canvas
                 ref={canvasRef}
                 width={videoRef?.current && videoRef?.current.offsetWidth}
