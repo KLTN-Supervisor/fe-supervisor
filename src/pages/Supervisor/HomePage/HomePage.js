@@ -990,32 +990,32 @@ function HomePage() {
   }
 
   // Hàm switch camera
-async function switchCamera() {
-  try {
-    // Lấy ID của camera tiếp theo
-    const nextCameraId = currentCameraIndex == 0 ? 'environment' : "user";
-    // Gọi getUserMedia với deviceId tương ứng
-    await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { exact: nextCameraId } }
-    }).then((currentStream) => {
-      videoRef.current.srcObject = currentStream;
-      setIsAttending(true);
-      setCurrentCameraIndex(currentCameraIndex == 0 ? 1 : 0);
-    })
-    .catch((err) => {
-      console.error('Error accessing camera:', err);
-      setSnackBarNotif({
-        severity: "error",
-        message:
-          "Xảy ra lỗi khi sử dụng camera"
-      });
-      setIsAttending(false);
-      setSnackBarOpen(true);
-    });;
-  } catch (error) {
-    console.error('Lỗi khi switch camera:', error);
+  async function switchCamera() {
+    try {
+      // Lấy ID của camera tiếp theo
+      const nextCameraId = currentCameraIndex == 0 ? 'environment' : "user";
+      // Gọi getUserMedia với deviceId tương ứng
+      await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: nextCameraId } }
+      }).then((currentStream) => {
+        videoRef.current.srcObject = currentStream;
+        setIsAttending(true);
+        setCurrentCameraIndex(currentCameraIndex == 0 ? 1 : 0);
+      })
+      .catch((err) => {
+        console.error('Error accessing camera:', err);
+        setSnackBarNotif({
+          severity: "error",
+          message:
+            "Xảy ra lỗi khi sử dụng camera"
+        });
+        setIsAttending(false);
+        setSnackBarOpen(true);
+      });;
+    } catch (error) {
+      console.error('Lỗi khi switch camera:', error);
+    }
   }
-}
   
   const startVideo = () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia ) {
@@ -1691,7 +1691,13 @@ async function switchCamera() {
                 ></video>
               </div>
               {cameraIds.length > 1 &&
-              <div onClick={switchCamera} className={cx("switch-video")} style={{padding: "15px 0", display: "flex", justifyContent: "center", backgroundColor: "rgb(173 173 173)", borderRadius: "0px 0 10px 10px", cursor: "pointer", width: videoRef?.current && videoRef?.current.offsetWidth}}><CameraswitchIcon style={{color: "#00558d"}}/></div>}
+                <div onClick={switchCamera} className={cx("switch-video")} 
+                  style={{padding: "15px 0", display: "flex", justifyContent: "center", backgroundColor: "rgb(173 173 173)", 
+                  borderRadius: "0px 0 10px 10px", cursor: "pointer", width: videoRef?.current && videoRef?.current.offsetWidth}}
+                  >
+                    <CameraswitchIcon style={{color: "#00558d"}}/>
+                </div>
+              }
               <canvas
                 ref={canvasRef}
                 width={videoRef?.current && videoRef?.current.offsetWidth}

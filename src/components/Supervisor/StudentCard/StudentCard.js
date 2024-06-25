@@ -54,9 +54,10 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
   };
 
   const [state, setState] = useState(0);
+  const [cameraIds, setCameraIds] = useState('');
+  const [currentCameraIndex , setCurrentCameraIndex ] = useState(0);
   const videoRef = useRef();
   const canvasRef = useRef();
-  const canvasImageRef = useRef();
   const isLoadCanvasRef = useRef(true);
   const intervalRef = useRef(null);
   const { faceMatcher } = useContext(StateContext);
@@ -97,11 +98,50 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
     }
   };
 
+  const getNumberOfCameras = async () => {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const cameras = devices.filter((device) => device.kind === 'videoinput');
+      setCameraIds(cameras.map((camera) => camera.deviceId));
+    } catch (error) {
+      console.error('Lỗi khi lấy danh sách thiết bị:', error);
+    }
+  }
+
+  // Hàm switch camera
+  async function switchCamera() {
+    try {
+      // Lấy ID của camera tiếp theo
+      const nextCameraId = currentCameraIndex == 0 ? 'environment' : "user";
+      // Gọi getUserMedia với deviceId tương ứng
+      await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { exact: nextCameraId } }
+      }).then((currentStream) => {
+        videoRef.current.srcObject = currentStream;
+        setIsAttending(true);
+        setCurrentCameraIndex(currentCameraIndex == 0 ? 1 : 0);
+      })
+      .catch((err) => {
+        console.error('Error accessing camera:', err);
+        setSnackBarNotif({
+          severity: "error",
+          message:
+            "Xảy ra lỗi khi sử dụng camera"
+        });
+        setIsAttending(false);
+        setSnackBarOpen(true);
+      });;
+    } catch (error) {
+      console.error('Lỗi khi switch camera:', error);
+    }
+  }
+
   const startVideo = () => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia ) {
       navigator.mediaDevices
         .getUserMedia({ video: true })
         .then((currentStream) => {
+          getNumberOfCameras()
           videoRef.current.srcObject = currentStream;
           setIsAttending(true);
         })
@@ -693,10 +733,18 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                   ref={videoRef}
                   autoPlay
                   playsInline
-                  style={{ borderRadius: "2%" }}
+                  style={{ borderRadius: cameraIds.length > 1 ? "2% 2% 0 0" : "2% 2% 2% 2%" }}
                   className={cx2("video")}
                 ></video>
               </div>
+              {cameraIds.length > 1 &&
+                <div onClick={switchCamera} className={cx("switch-video")} 
+                  style={{padding: "15px 0", display: "flex", justifyContent: "center", backgroundColor: "rgb(173 173 173)", 
+                  borderRadius: "0px 0 10px 10px", cursor: "pointer", width: videoRef?.current && videoRef?.current.offsetWidth}}
+                >
+                  <CameraswitchIcon style={{color: "#00558d"}}/>
+                </div>
+              }
               <canvas
                 ref={canvasRef}
                 width={videoRef?.current && videoRef?.current.offsetWidth}
