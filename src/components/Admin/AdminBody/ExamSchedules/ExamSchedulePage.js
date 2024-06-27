@@ -475,6 +475,7 @@ function ExamSchedules() {
     if (fileUploadModal) getExamCheduleFileList();
     removeFiles();
     setFileUploadModal(!fileUploadModal);
+    setIsDropping(false);
   };
 
   const handlePageChange = useCallback((event, value) => {
@@ -539,6 +540,7 @@ function ExamSchedules() {
       }
     }
     setShowProgress(true);
+    setIsDropping(true);
   };
 
   const selectFiles = () => {
@@ -563,6 +565,7 @@ function ExamSchedules() {
       }
     }
     setShowProgress(true);
+    setIsDropping(true);
   };
 
   useEffect(() => {
@@ -662,7 +665,7 @@ function ExamSchedules() {
                   border: "1px solid rgba(0, 85, 141, 0.5)",
                   padding: "3px 16px",
                   borderRadius: "10px",
-                  marginRight: 5,
+                  marginRight: 2,
                 }}
               >
                 <Select
@@ -1037,15 +1040,16 @@ function ExamSchedules() {
                 display: "flex",
                 padding: "0 0 10px 0",
                 flexDirection: "column",
+                maxHeight: "70%",
               }}
             >
               <div
                 style={{
-                  height: "60vh",
                   alignItems: "center",
                   justifyContent: "center",
                   flexDirection: "column",
                   display: "flex",
+                  ...(!isDropping && { height: "60vh" }),
                   ...(isDragging && { opacity: 0.6 }),
                 }}
               >
@@ -1071,6 +1075,7 @@ function ExamSchedules() {
                     role="button"
                     onClick={selectFiles}
                     className={cx("modal-upload")}
+                    style={{marginBottom: 15}}
                   >
                     Chọn từ thư mục
                   </label>
