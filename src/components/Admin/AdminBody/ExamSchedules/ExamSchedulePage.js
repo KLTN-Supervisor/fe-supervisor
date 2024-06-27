@@ -274,9 +274,6 @@ function ExamSchedules() {
       newFiles[0].loading = Math.floor((loaded / total) * 100);
       return newFiles;
     });
-    if (loaded === total) {
-      deleteDraftFile(0);
-    }
   };
 
   const uploadExamSchedulesFilesHandler = async () => {
@@ -304,6 +301,7 @@ function ExamSchedules() {
               ? `${file.size} KB`
               : `${(file.size / (1024 * 1024)).toFixed(2)} MB`;
           if (response.uploaded_files.length > 0) {
+            deleteDraftFile(0);
             const uploadedFile = response.uploaded_files[0];
             setUploadedFiles((prev) => [
               {
@@ -504,6 +502,7 @@ function ExamSchedules() {
   const removeFiles = () => {
     fileInputRef.current.value = null;
     setFiles([]);
+    setUploadedFiles([]);
     setFilesIsValid(false);
   };
 
@@ -1075,7 +1074,7 @@ function ExamSchedules() {
                     role="button"
                     onClick={selectFiles}
                     className={cx("modal-upload")}
-                    style={{marginBottom: 15}}
+                    style={{ marginBottom: 15 }}
                   >
                     Chọn từ thư mục
                   </label>
@@ -1161,18 +1160,6 @@ function ExamSchedules() {
                 >
                   Đóng
                 </button>
-                {files.length > 0 && (
-                  <button
-                    className={cx2("button")}
-                    style={{
-                      backgroundColor: "lightgreen",
-                    }}
-                    onClick={uploadExamSchedulesFilesHandler}
-                    disabled={importLoading}
-                  >
-                    Tải lên
-                  </button>
-                )}
               </div>
             </div>
           </div>

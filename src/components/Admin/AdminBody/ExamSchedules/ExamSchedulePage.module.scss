@@ -238,21 +238,18 @@ section .row {
   border-radius: inherit;
 }
 
-.del-icon {
-  display: none;
-  color: rgb(223, 1, 23);
-  cursor: pointer;
-}
-
-.check-icon {
-  color: #0086fe;
-}
-
 .uploaded-area {
-  &:hover {
-    opacity: 0.9;
-
-    .row {
+  .row {
+    .del-icon {
+      display: none;
+      color: rgb(223, 1, 23);
+      cursor: pointer;
+    }
+    .check-icon {
+      color: #0086fe;
+    }
+    &:hover {
+      opacity: 0.9;
       .del-icon {
         display: block;
       }
