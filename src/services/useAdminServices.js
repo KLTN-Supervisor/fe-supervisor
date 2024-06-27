@@ -186,13 +186,20 @@ const useAdminServices = () => {
     }
   };
 
-  const uploadExamSchedulesExcelFiles = async (formData, type = "students") => {
+  const uploadExamSchedulesExcelFiles = async (
+    formData,
+    onUploadProgress = () => {},
+    type = "students"
+  ) => {
     try {
       const response = await privateRequest(
         `/admin/${type}/excels-upload`,
         "post",
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          onUploadProgress: onUploadProgress,
+        }
       );
 
       return response?.data;

@@ -19,7 +19,7 @@ const usePrivateHttpClient = () => {
           method,
           url,
           data: body,
-          options,
+          ...options,
           signal: activePrivateHttpRequests.current.signal,
         });
 

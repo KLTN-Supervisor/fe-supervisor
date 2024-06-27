@@ -21,8 +21,8 @@ import { formatDate } from "../../../../untils/format-date";
 import ImportInput from "../UploadFile/ImportInput";
 import useAdminServices from "../../../../services/useAdminServices";
 import UploadInput from "../UploadFile/UploadInput";
-import DescriptionIcon from '@mui/icons-material/Description';
-import CheckIcon from '@mui/icons-material/Check';
+import DescriptionIcon from "@mui/icons-material/Description";
+import CheckIcon from "@mui/icons-material/Check";
 import {
   Box,
   Button,
@@ -261,41 +261,65 @@ function ExamSchedules() {
   }, [date]);
 
   const [files, setFiles] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [showProgress, setShowProgress] = useState(false);
   const [filesIsValid, setFilesIsValid] = useState();
 
-  const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [fileList, setFileList] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
 
-  const uploadExamSchedulesFilesHandler = async () => {
-    try {
-      const formData = new FormData();
-      files.map((fileObject, i) => formData.append("file", fileObject.file));
-      formData.append("term", fileFilterTerm);
-      formData.append("schoolYear", `${fileFilterYear}-${fileFilterYear + 1}`);
-
-      const response = await toast.promise(
-        () => uploadExamSchedulesExcelFiles(formData, "examSchedules"),
-        {
-          pending: "Đang tải lên...",
-          error: {
-            render: ({ data }) => {
-              return `${data.message}`;
-            },
-          },
-          success: {
-            render: ({ data }) => {
-              return <span>Upload file thành công!</span>;
-            },
-          },
-        }
-      );
-      if (response) {
-        getUploadedFiles();
-        toggleFileUploadModal();
-      }
-    } catch (err) {
-      console.log("upload file: ", err);
+  const handleUploadProgress = ({ loaded, total }) => {
+    setFiles((prev) => {
+      const newFiles = [...prev];
+      newFiles[0].loading = Math.floor((loaded / total) * 100);
+      return newFiles;
+    });
+    if (loaded === total) {
+      deleteDraftFile(0);
     }
+  };
+
+  const uploadExamSchedulesFilesHandler = async () => {
+    for (let i = 0; i < files.length; i++) {
+      console.log("tải file ", files[i].file);
+      const file = files[i].file;
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("term", fileFilterTerm);
+        formData.append(
+          "schoolYear",
+          `${fileFilterYear}-${fileFilterYear + 1}`
+        );
+
+        const response = await uploadExamSchedulesExcelFiles(
+          formData,
+          handleUploadProgress,
+          "examSchedules"
+        );
+
+        if (response) {
+          const fileSize =
+            file.size < 1024
+              ? `${file.size} KB`
+              : `${(file.size / (1024 * 1024)).toFixed(2)} MB`;
+          if (response.uploaded_files.length > 0) {
+            const uploadedFile = response.uploaded_files[0];
+            setUploadedFiles((prev) => [
+              {
+                _id: uploadedFile._id,
+                name: uploadedFile.file_name,
+                size: fileSize,
+              },
+              ...prev,
+            ]);
+          }
+        }
+      } catch (err) {
+        console.log("upload file: ", err);
+      }
+    }
+    setShowProgress(false);
   };
 
   const {
@@ -303,14 +327,14 @@ function ExamSchedules() {
     handleDeselectOne,
     handleSelectAll,
     handleSelectOne,
-  } = useSelection(useItemIds(uploadedFiles), setSelectedFiles);
+  } = useSelection(useItemIds(fileList), setSelectedFiles);
 
   const selectedSome =
-    selectedFiles.length > 0 && selectedFiles.length < uploadedFiles.length;
+    selectedFiles.length > 0 && selectedFiles.length < fileList.length;
   const selectedAll =
-    uploadedFiles.length > 0 && selectedFiles.length === uploadedFiles.length;
+    fileList.length > 0 && selectedFiles.length === fileList.length;
 
-  const getUploadedFiles = useCallback(async () => {
+  const getExamCheduleFileList = useCallback(async () => {
     try {
       const response = await getExamFilesUploaded(
         fileFilterTerm,
@@ -319,7 +343,7 @@ function ExamSchedules() {
         rowsPerPage
       );
       if (response) {
-        setUploadedFiles(response.files);
+        setFileList(response.files);
         setTotalRecords(response.total_files);
         setTotalPages(response.total_pages);
       }
@@ -330,7 +354,7 @@ function ExamSchedules() {
 
   useEffect(() => {
     if (modal) {
-      getUploadedFiles();
+      getExamCheduleFileList();
     }
   }, [modal, fileFilterYear, fileFilterTerm, page, rowsPerPage]);
 
@@ -430,7 +454,7 @@ function ExamSchedules() {
           (fileId) => !failedDeletionFileIds.includes(fileId)
         );
 
-        setUploadedFiles((prev) =>
+        setFileList((prev) =>
           prev.filter((file) => !deletedFileIds.includes(file._id))
         );
         handleDeselectAll?.();
@@ -448,6 +472,7 @@ function ExamSchedules() {
   };
 
   const toggleFileUploadModal = () => {
+    if (fileUploadModal) getExamCheduleFileList();
     removeFiles();
     setFileUploadModal(!fileUploadModal);
   };
@@ -508,10 +533,12 @@ function ExamSchedules() {
             name: dragFiles[i].name,
             url: URL.createObjectURL(dragFiles[i]),
             file: dragFiles[i],
+            loading: 0,
           },
         ]);
       }
     }
+    setShowProgress(true);
   };
 
   const selectFiles = () => {
@@ -530,17 +557,28 @@ function ExamSchedules() {
             name: selectfiles[i].name,
             url: URL.createObjectURL(selectfiles[i]),
             file: selectfiles[i],
+            loading: 0,
           },
         ]);
       }
     }
+    setShowProgress(true);
   };
+
+  useEffect(() => {
+    if (showProgress && files.length > 0) {
+      uploadExamSchedulesFilesHandler();
+    }
+  }, [showProgress]);
 
   return (
     <>
       <Box className={cx("schedulePage")}>
         <div className={cx("schedulePage__content")}>
-          <div className={cx3("title")} style={{ width: "92%", margin: "24px 0 15px" }}>
+          <div
+            className={cx3("title")}
+            style={{ width: "92%", margin: "24px 0 15px" }}
+          >
             <h6 className={cx3("text")}>Lịch thi</h6>
           </div>
           <div style={{ width: "92%", marginBottom: 15 }}>
@@ -731,7 +769,7 @@ function ExamSchedules() {
             <div className={cx2("modal-header")}>Đổ dữ liệu lịch thi</div>
             <div
               className={cx2("modal-main")}
-              style={{ display: "flex", padding: "10px 0 15px 0px"}}
+              style={{ display: "flex", padding: "10px 0 15px 0px" }}
             >
               <div
                 style={{
@@ -853,9 +891,9 @@ function ExamSchedules() {
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {uploadedFiles &&
-                            uploadedFiles.length > 0 &&
-                            uploadedFiles.map((row) => {
+                          {fileList &&
+                            fileList.length > 0 &&
+                            fileList.map((row) => {
                               const isSelected = selectedFiles.includes(
                                 row._id
                               );
@@ -991,10 +1029,7 @@ function ExamSchedules() {
               }}
             />
           </div>
-          <div
-            className={cx2("modal-navbar-content")}
-            style={{ width: "50%"}}
-          >
+          <div className={cx2("modal-navbar-content")} style={{ width: "50%" }}>
             <div className={cx2("modal-header")}>Tải lên file</div>
             <div
               className={cx2("modal-main")}
@@ -1014,80 +1049,14 @@ function ExamSchedules() {
                   ...(isDragging && { opacity: 0.6 }),
                 }}
               >
-                {files.length === 0 ? (
-                  <>
-                  <div className={cx("modal-image")}>
-                    <UploadFileIcon className={cx("modal-logo")} />
-                  </div>
-                  {isDragging ? (
-                    <div className={cx("modal-text")}>Thả file tại đây</div>
-                  ) : (
-                    <div className={cx("modal-text")}>Kéo thả file vào đây</div>
-                  )}</>
+                <div className={cx("modal-image")}>
+                  <UploadFileIcon className={cx("modal-logo")} />
+                </div>
+                {isDragging ? (
+                  <div className={cx("modal-text")}>Thả file tại đây</div>
                 ) : (
-                  <div style={{ display: "flex", flexDirection: "column", paddingTop: 30, width: "90%" }}>
-                    {files.map((objectFile, i) => (
-                      <>
-                      <section className={cx("loading-area")}>
-                        <div className={cx("row")}>
-                          <DescriptionIcon style={{color: "#0086fe"}}/>
-                          <div className={cx("content-file")}>
-                            <div className={cx("details-file")}>
-                              <span className={cx("name")} >{objectFile.name}</span>
-                              <span className={cx("percent")} style={{marginLeft: 10, marginRight: 3}}>90%</span>
-                              <div className={cx("loading-bar")}>
-                                <div className={cx("loading")}></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </section>
-                      <section className={cx("uploaded-area")}>
-                        <div className={cx("row")}>
-                          <DescriptionIcon style={{color: "#0086fe"}}/>
-                          <div className={cx("content-file")}>
-                            <div className={cx("details-file")}>
-                              <span className={cx("name")}>{objectFile.name}</span>
-                              <span className={cx("size")}>size file</span>
-                            </div>
-                          </div>
-                          <CheckIcon style={{color: "#0086fe"}}/>
-                        </div>
-                      </section>
-
-                      <section className={cx("uploaded-area")}>
-                        <div className={cx("row")}>
-                          <DescriptionIcon style={{color: "#0086fe"}}/>
-                          <div className={cx("content-file")}>
-                            <div className={cx("details-file")}>
-                              <span className={cx("name")}>{objectFile.name}</span>
-                              <span className={cx("size")}>size file</span>
-                            </div>
-                          </div>
-                          <DeleteIcon style={{color: "rgb(232 56 75 / 77%)", cursor: "pointer"}} onClick={() => deleteDraftFile(i)}/>
-                        </div>
-                      </section>
-                      {/* <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          width: 400,
-                        }}
-                      >
-                        <span>{objectFile.name}</span>
-                        <div
-                          onClick={() => deleteDraftFile(i)}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <DeleteIcon />
-                        </div>
-                      </div> */}
-                      </>
-                    ))}
-                  </div>
+                  <div className={cx("modal-text")}>Kéo thả file vào đây</div>
                 )}
-                
-
                 <div className={cx("modal-input")}>
                   <input
                     type="file"
@@ -1105,6 +1074,66 @@ function ExamSchedules() {
                   >
                     Chọn từ thư mục
                   </label>
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    paddingTop: 10,
+                    width: "90%",
+                    overflow: "visible",
+                  }}
+                >
+                  <section className={cx("loading-area")}>
+                    {files.map((objectFile, i) => (
+                      <div className={cx("row")} key={i}>
+                        <DescriptionIcon style={{ color: "#0086fe" }} />
+                        <div className={cx("content-file")}>
+                          <div className={cx("details-file")}>
+                            <span className={cx("name")}>
+                              {`${objectFile.name} - đang tải`}
+                            </span>
+                            <span
+                              className={cx("percent")}
+                              style={{ marginLeft: 10, marginRight: 3 }}
+                            >
+                              {`${objectFile.loading}%`}
+                            </span>
+                            <div className={cx("loading-bar")}>
+                              <div
+                                className={cx("loading")}
+                                style={{ width: `${objectFile.loading}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </section>
+
+                  <section className={cx("uploaded-area")}>
+                    {uploadedFiles.map((objectFile, i) => (
+                      <div className={cx("row")} key={i}>
+                        <DescriptionIcon style={{ color: "#0086fe" }} />
+                        <div className={cx("content-file")}>
+                          <div className={cx("details-file")}>
+                            <span className={cx("name")}>
+                              {objectFile.name}
+                            </span>
+                            <span className={cx("size")}>
+                              {objectFile.size}
+                            </span>
+                          </div>
+                        </div>
+                        <CheckIcon className={cx("check-icon")} />
+                        <DeleteIcon
+                          className={cx("del-icon")}
+                          onClick={() => deleteDraftFile(i)}
+                        />
+                      </div>
+                    ))}
+                  </section>
                 </div>
               </div>
               <div
