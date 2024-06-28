@@ -686,6 +686,13 @@ const StudentsManage = () => {
                   />
                 </div>
                 <div className={cx2("info")}>
+                  <div className={cx2("title")}></div>
+                  <span
+                    className={cx2("input-span")}
+                    style={{ color: "red", border: "none", marginLeft: -2, padding: 0, fontWeight: 600 }}
+                   >Lỗi nè </span>
+                </div>
+                <div className={cx2("info")}>
                   <div className={cx2("title")}>CMND/CCCD:</div>
                   <input
                     id="citizen_identification_number"
