@@ -1062,14 +1062,14 @@ function HomePage() {
       // DRAW YOU FACE IN WEBCAM
       canvasRef.current.innerHTML = faceapi.createCanvas(videoRef.current);
       faceapi.matchDimensions(canvasRef.current, {
-        width: videoRef.current ? videoRef.current.offsetWidth : 0,
-        height: videoRef.current ? videoRef.current.offsetHeight : 0,
+        width: videoRef.current ? videoRef.current?.offsetWidth : 10,
+        height: videoRef.current ? videoRef.current?.offsetHeight : 10,
         // screenWidth < 720 ? (screenWidth < 527 ? 225 : 300) : 480,
       });
 
       const resized = faceapi.resizeResults(detections, {
-        width: videoRef.current ? videoRef.current.offsetWidth : 0,
-        height: videoRef.current ? videoRef.current.offsetHeight : 0,
+        width: videoRef.current ? videoRef.current?.offsetWidth : 10,
+        height: videoRef.current ? videoRef.current?.offsetHeight : 10,
         // screenWidth < 720 ? (screenWidth < 527 ? 225 : 300) : 480,
       });
 
@@ -1198,7 +1198,7 @@ function HomePage() {
           if(container && image){
             const canvas = faceapi.createCanvasFromMedia(image);
             canvas.style.width = 'auto';
-            canvas.style.height = image.height;
+            canvas.style.height = image?.height;
             canvas.style.left = 'auto';
             container.innerHTML = '';
             container.append(images[i]);
@@ -1210,13 +1210,13 @@ function HomePage() {
               .withFaceDescriptors();
 
             faceapi.matchDimensions(canvas, {
-              width: image && image.width,
-              height: image && image.height,
+              width: image ? image?.width : 10,
+              height: image ? image?.height : 10,
             });
     
             const resized = faceapi.resizeResults(detections, {
-              width: image && image.width,
-              height: image && image.height,
+              width: image ? image?.width : 10,
+              height: image ? image?.height : 10,
             });
             
             for (const detection of resized) {

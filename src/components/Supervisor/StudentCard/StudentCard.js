@@ -182,14 +182,14 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
       // DRAW YOU FACE IN WEBCAM
       canvasRef.current.innerHTML = faceapi.createCanvas(videoRef.current);
       faceapi.matchDimensions(canvasRef.current, {
-        width: videoRef.current ? videoRef.current.offsetWidth : 0,
-        height: videoRef.current ? videoRef.current.offsetHeight : 0,
+        width: videoRef.current ? videoRef.current?.offsetWidth : 10,
+        height: videoRef.current ? videoRef.current?.offsetHeight : 10,
         // screenWidth < 720 ? (screenWidth < 527 ? 225 : 300) : 480,
       });
 
       const resized = faceapi.resizeResults(detections, {
-        width: videoRef.current ? videoRef.current.offsetWidth : 0,
-        height: videoRef.current ? videoRef.current.offsetHeight : 0,
+        width: videoRef.current ? videoRef.current?.offsetWidth : 10,
+        height: videoRef.current ? videoRef.current?.offsetHeight : 10,
         // screenWidth < 720 ? (screenWidth < 527 ? 225 : 300) : 480,
       });
 
@@ -280,6 +280,10 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
     if (container) {
       const container = document.querySelector(`#imgDiv`);
       const canvas = faceapi.createCanvasFromMedia(image);
+      canvas.width = image?.width;
+      canvas.height = image?.height;
+      canvas.style.width = 'auto';
+      canvas.style.left = 'auto';
       container.innerHTML = '';
       container.append(image);
       container.append(canvas);
@@ -290,13 +294,13 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
         .withFaceDescriptors();
 
       faceapi.matchDimensions(canvas, {
-        width: image && image.width,
-        height: image && image.height,
+        width: image ? image?.width : 10,
+        height: image ? image?.height : 10,
       });
 
       const resized = faceapi.resizeResults(detections, {
-        width: image && image.width,
-        height: image && image.height,
+        width: image ? image?.width : 10,
+        height: image ? image?.height : 10,
       });
 
       for (const detection of resized) {
@@ -368,8 +372,8 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
     if (container && image) {
       const container = document.querySelector(`#imgDiv`);
       const canvas = faceapi.createCanvasFromMedia(image);
-      canvas.width = image.width;
-      canvas.height = image.height;
+      canvas.width = image?.width;
+      canvas.height = image?.height;
       canvas.style.width = 'auto';
       canvas.style.left = 'auto';
       container.innerHTML = '';
@@ -382,13 +386,13 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
         .withFaceDescriptors();
 
       faceapi.matchDimensions(canvas, {
-        width: image && image.width,
-        height: image && image.height,
+        width: image ? image?.width : 10,
+        height: image ? image?.height : 10,
       });
 
       const resized = faceapi.resizeResults(detections, {
-        width: image && image.width,
-        height: image && image.height,
+        width: image ? image?.width : 10,
+        height: image ? image?.height : 10,
       });
 
       for (const detection of resized) {
