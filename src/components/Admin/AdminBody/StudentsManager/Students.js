@@ -72,7 +72,137 @@ const StudentsManage = () => {
     school_year: "",
     current_address: "",
     education_program: "",
+    major: "",
+    faculty: "",
   });
+  const [errors, setErrors] = useState({
+    _id: "",
+    student_id: "",
+    fullname: "",
+    citizen_identification_number: "",
+    gender: "",
+    date_of_birth: "",
+    place_of_birth: "",
+    city_or_province: "",
+    district: "",
+    address: "",
+    nationality: "",
+    class: "",
+    school_year: "",
+    current_address: "",
+    education_program: "",
+    major: "",
+    faculty: "",
+  });
+
+  const validateModalData = (data) => {
+    let validationErrors = {};
+
+    // Validate student_id
+    if (!data.student_id) {
+      validationErrors.student_id = "MSSV là bắt buộc.";
+    } else if (data.student_id.length < 8 || data.student_id.length > 12) {
+      validationErrors.student_id = "MSSV phải có độ dài từ 8 đến 12 ký tự.";
+    }
+    // Validate citizen_identification_number
+    if (!data.citizen_identification_number) {
+      validationErrors.citizen_identification_number =
+        "Số CCCD/CMND là bắt buộc.";
+    } else if (
+      data.citizen_identification_number.length < 9 ||
+      data.citizen_identification_number.length > 12
+    ) {
+      validationErrors.citizen_identification_number =
+        "Số CCCD/CMND phải có độ dài từ 9 đến 12 ký tự.";
+    } else if (!/^\d+$/.test(data.citizen_identification_number)) {
+      validationErrors.citizen_identification_number =
+        "Số CCCD/CMND chỉ được chứa các ký tự số.";
+    }
+    // Validate fullname
+    if (!data.fullname) {
+      validationErrors.fullname = "Họ và tên là bắt buộc.";
+    } else if (!/^[a-zA-Z\s]+$/.test(data.fullname)) {
+      validationErrors.fullname = "Họ và tên chỉ được chứa các chữ cái.";
+    }
+    // Validate first_name, middle_name, last_name (extracted from fullname)
+    const nameParts = data.fullname ? data.fullname.split(" ") : [];
+    if (nameParts.length < 3) {
+      validationErrors.fullname = "Họ và tên không hợp lệ.";
+    } else {
+      const first_name = nameParts[nameParts.length - 1];
+      const last_name = nameParts[0];
+      const middle_name = nameParts.slice(1, nameParts.length - 1).join(" ");
+
+      if (first_name.length < 1 || first_name.length > 10) {
+        validationErrors.fullname = "Tên phải có độ dài từ 1 đến 10 ký tự.";
+      }
+      if (last_name.length < 2 || last_name.length > 12) {
+        validationErrors.fullname = "Họ phải có độ dài từ 2 đến 12 ký tự.";
+      }
+      if (middle_name.length < 2) {
+        validationErrors.fullname = "Tên đệm phải có ít nhất 2 ký tự.";
+      }
+    }
+    // Validate gender
+    if (!data.gender) {
+      validationErrors.gender = "Giới tính là bắt buộc.";
+    }
+    // Validate date_of_birth
+    if (!data.date_of_birth) {
+      validationErrors.date_of_birth = "Ngày sinh là bắt buộc.";
+    }
+    // Validate place_of_birth
+    if (!data.place_of_birth) {
+      validationErrors.place_of_birth = "Nơi sinh là bắt buộc.";
+    }
+    // Validate city_or_province
+    if (!data.city_or_province) {
+      validationErrors.city_or_province = "Tỉnh/Thành phố là bắt buộc.";
+    }
+    // Validate district
+    if (!data.district) {
+      validationErrors.district = "Quận/Huyện là bắt buộc.";
+    }
+    // Validate address
+    if (!data.address) {
+      validationErrors.address = "Địa chỉ là bắt buộc.";
+    }
+    // Validate nationality
+    if (!data.nationality) {
+      validationErrors.nationality = "Quốc tịch là bắt buộc.";
+    }
+    // Validate class
+    if (!data.class) {
+      validationErrors.class = "Lớp học là bắt buộc.";
+    } else if (data.class.length < 6) {
+      validationErrors.class = "Lớp học phải có ít nhất 6 ký tự.";
+    }
+    // Validate school_year
+    if (!data.school_year) {
+      validationErrors.school_year = "Năm học là bắt buộc.";
+    }
+    // Validate current_address
+    if (!data.current_address) {
+      validationErrors.current_address = "Địa chỉ hiện tại là bắt buộc.";
+    }
+    // Validate education_program
+    if (!data.education_program) {
+      validationErrors.education_program = "Chương trình học là bắt buộc.";
+    } else if (data.education_program.length < 6) {
+      validationErrors.education_program =
+        "Chương trình học phải có ít nhất 6 ký tự.";
+    }
+    // Validate major
+    if (!data.major) {
+      validationErrors.major = "Ngành học là bắt buộc.";
+    }
+    // Validate faculty
+    if (!data.faculty) {
+      validationErrors.faculty = "Khoa là bắt buộc.";
+    }
+
+    return validationErrors;
+  };
 
   const clearModalData = () => {
     setModalData({
@@ -91,6 +221,30 @@ const StudentsManage = () => {
       school_year: "",
       current_address: "",
       education_program: "",
+      major: "",
+      faculty: "",
+    });
+  };
+
+  const clearValidateErrors = () => {
+    setErrors({
+      _id: "",
+      student_id: "",
+      fullname: "",
+      citizen_identification_number: "",
+      gender: "",
+      date_of_birth: "",
+      place_of_birth: "",
+      city_or_province: "",
+      district: "",
+      address: "",
+      nationality: "",
+      class: "",
+      school_year: "",
+      current_address: "",
+      education_program: "",
+      major: "",
+      faculty: "",
     });
   };
 
@@ -156,6 +310,11 @@ const StudentsManage = () => {
   };
 
   const changeHandler = (e) => {
+    if (e.target.value.trim() !== "")
+      setErrors((prev) => ({
+        ...prev,
+        [e.target.id]: "",
+      }));
     setModalData((prev) => ({
       ...prev,
       [e.target.id]: e.target.value,
@@ -204,6 +363,15 @@ const StudentsManage = () => {
   const handleCreateStudent = async () => {
     try {
       setModifyDataLoading(true);
+
+      const validationErrors = validateModalData(modalData);
+
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        setModifyDataLoading(false);
+        return;
+      }
+
       const formData = new FormData();
       formData.append("image", portraitImgFile);
       formData.append("student_id", modalData?.student_id);
@@ -222,6 +390,8 @@ const StudentsManage = () => {
       formData.append("education_program", modalData?.education_program);
       formData.append("school_year", modalData?.school_year);
       formData.append("current_address", modalData?.current_address);
+      formData.append("major", modalData?.major);
+      formData.append("faculty", modalData?.faculty);
 
       const fullname = modalData?.fullname; // Lấy fullname từ nguồn dữ liệu
 
@@ -316,6 +486,7 @@ const StudentsManage = () => {
 
   const [modal, setModal] = useState(false);
   const toggleModal = () => {
+    clearValidateErrors();
     if (isEdit) setIsEdit(false);
     if (isCreateNew) setIsCreateNew(false);
     setModal(!modal);
@@ -345,6 +516,8 @@ const StudentsManage = () => {
         education_program: item?.education_program,
         current_address: item?.current_address,
         school_year: item?.school_year.from + " - " + item?.school_year.to,
+        major: item?.major,
+        faculty: item?.faculty,
       });
     }
   };
@@ -352,6 +525,15 @@ const StudentsManage = () => {
   const handleUpdateStudent = async () => {
     try {
       setModifyDataLoading(true);
+
+      const validationErrors = validateModalData(modalData);
+
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        setModifyDataLoading(false);
+        return;
+      }
+
       const formData = new FormData();
       formData.append("image", portraitImgFile);
       formData.append("student_id", modalData?.student_id);
@@ -370,6 +552,8 @@ const StudentsManage = () => {
       formData.append("education_program", modalData?.education_program);
       formData.append("school_year", modalData?.school_year);
       formData.append("current_address", modalData?.current_address);
+      formData.append("major", modalData?.major);
+      formData.append("faculty", modalData?.faculty);
 
       const fullname = modalData?.fullname; // Lấy fullname từ nguồn dữ liệu
 
@@ -426,8 +610,8 @@ const StudentsManage = () => {
     try {
       toast.promise(trainStudentImages, {
         pending: "Đang train dữ liệu...",
-        success: "Đã train xong 👌",
-        error: "Có lỗi xảy ra 🤯",
+        success: "Đã train xong!",
+        error: "Có lỗi xảy ra!",
       });
     } catch (err) {}
   };
@@ -665,11 +849,35 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
-                    style={{ border: !isEdit && !isCreateNew && "none" }}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.student_id.trim() !== "" && {
+                        borderColor: "red",
+                      }),
+                    }}
                     value={modalData?.student_id}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.student_id}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Họ và tên:</div>
@@ -679,18 +887,35 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
-                    style={{ border: !isEdit && !isCreateNew && "none" }}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.fullname.trim() !== "" && {
+                        borderColor: "red",
+                      }),
+                    }}
                     value={modalData?.fullname}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
                 </div>
                 <div className={cx2("info")}>
-                  <div className={cx2("title")}></div>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
                   <span
-                    className={cx2("input-span")}
-                    style={{ color: "red", border: "none", marginLeft: -2, padding: 0, fontWeight: 600 }}
-                   >Lỗi nè </span>
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.fullname}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>CMND/CCCD:</div>
@@ -700,11 +925,36 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
-                    style={{ border: !isEdit && !isCreateNew && "none" }}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.citizen_identification_number.trim() !==
+                        "" && {
+                        borderColor: "red",
+                      }),
+                    }}
                     value={modalData?.citizen_identification_number}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.citizen_identification_number}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Niên khóa:</div>
@@ -714,11 +964,35 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
-                    style={{ border: !isEdit && !isCreateNew && "none" }}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.school_year.trim() !== "" && {
+                        borderColor: "red",
+                      }),
+                    }}
                     value={modalData?.school_year}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.school_year}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Giới tính:</div>
@@ -772,6 +1046,25 @@ const StudentsManage = () => {
                     </RadioGroup>
                   </FormControl>
                 </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.gender}
+                  </span>
+                </div>
                 <div className={cx2("info")} style={{ marginTop: 0 }}>
                   <div className={cx2("title")} style={{ marginTop: 5 }}>
                     Ngày sinh:
@@ -800,6 +1093,10 @@ const StudentsManage = () => {
                       format="DD/MM/YYYY"
                       readOnly={!isEdit && !isCreateNew}
                       onChange={(value) => {
+                        setErrors((prev) => ({
+                          ...prev,
+                          date_of_birth: "",
+                        }));
                         setModalData((prev) => ({
                           ...prev,
                           date_of_birth: value,
@@ -809,6 +1106,25 @@ const StudentsManage = () => {
                   </LocalizationProvider>
                 </div>
                 <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.date_of_birth}
+                  </span>
+                </div>
+                <div className={cx2("info")}>
                   <div className={cx2("title")}>Nơi sinh:</div>
                   <input
                     id="place_of_birth"
@@ -816,11 +1132,35 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
-                    style={{ border: !isEdit && !isCreateNew && "none" }}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.place_of_birth.trim() !== "" && {
+                        borderColor: "red",
+                      }),
+                    }}
                     value={modalData?.place_of_birth}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.place_of_birth}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Tỉnh/TP:</div>
@@ -830,11 +1170,35 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
-                    style={{ border: !isEdit && !isCreateNew && "none" }}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.city_or_province.trim() !== "" && {
+                        borderColor: "red",
+                      }),
+                    }}
                     value={modalData?.city_or_province}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.city_or_province}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Quận/huyện:</div>
@@ -844,11 +1208,35 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
-                    style={{ border: !isEdit && !isCreateNew && "none" }}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.district.trim() !== "" && {
+                        borderColor: "red",
+                      }),
+                    }}
                     value={modalData?.district}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.district}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Địa chỉ thường trú:</div>
@@ -858,11 +1246,35 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
-                    style={{ border: !isEdit && !isCreateNew && "none" }}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.address.trim() !== "" && {
+                        borderColor: "red",
+                      }),
+                    }}
                     value={modalData?.address}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.address}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Quốc tịch:</div>
@@ -872,11 +1284,35 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
-                    style={{ border: !isEdit && !isCreateNew && "none" }}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.nationality.trim() !== "" && {
+                        borderColor: "red",
+                      }),
+                    }}
                     value={modalData?.nationality}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.nationality}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Nơi ở hiện tại:</div>
@@ -886,11 +1322,35 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
-                    style={{ border: !isEdit && !isCreateNew && "none" }}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.current_address.trim() !== "" && {
+                        borderColor: "red",
+                      }),
+                    }}
                     value={modalData?.current_address}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.current_address}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Lớp học phần:</div>
@@ -900,11 +1360,35 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
-                    style={{ border: !isEdit && !isCreateNew && "none" }}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.class.trim() !== "" && {
+                        borderColor: "red",
+                      }),
+                    }}
                     value={modalData?.class}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.class}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Chương trình học:</div>
@@ -914,11 +1398,111 @@ const StudentsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
-                    style={{ border: !isEdit && !isCreateNew && "none" }}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.education_program.trim() !== "" && {
+                        borderColor: "red",
+                      }),
+                    }}
                     value={modalData?.education_program}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.education_program}
+                  </span>
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Ngành:</div>
+                  <input
+                    id="major"
+                    className={cx2(
+                      "input-span",
+                      !isEdit && !isCreateNew && "input-span-focus"
+                    )}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.major.trim() !== "" && {
+                        borderColor: "red",
+                      }),
+                    }}
+                    value={modalData?.major}
+                    readOnly={!isEdit && !isCreateNew}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.major}
+                  </span>
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Khoa:</div>
+                  <input
+                    id="faculty"
+                    className={cx2(
+                      "input-span",
+                      !isEdit && !isCreateNew && "input-span-focus"
+                    )}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.faculty.trim() !== "" && {
+                        borderColor: "red",
+                      }),
+                    }}
+                    value={modalData?.faculty}
+                    readOnly={!isEdit && !isCreateNew}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.faculty}
+                  </span>
                 </div>
 
                 <div
