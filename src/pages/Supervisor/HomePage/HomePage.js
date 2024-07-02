@@ -43,6 +43,7 @@ import "slick-carousel/slick/slick-theme.css";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
+import { getStudentsImageSource } from "../../../untils/getImageSource";
 
 const cx = classNames.bind(styles);
 
@@ -50,7 +51,7 @@ function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { privateRequest } = usePrivateHttpClient();
-  const { getStudents, attendanceStudent, noteReport, getExamReport, deleteExamReport, getRoomInfo, writeExcel } =
+  const { getStudents, attendanceStudent, noteReport, updateReport, getExamReport, deleteExamReport, getRoomInfo, writeExcel } =
     useExamScheduleServices();
 
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -208,6 +209,8 @@ function HomePage() {
   //reports
   const [modal, setModal] = useState(false);
   const [modalCreate, setModalCreate] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [reportCurrent, setReportCurrent] = useState("false");
   const currentTitle = roomName;
 
   const [reportType, setReportType] = useState("");
@@ -237,7 +240,19 @@ function HomePage() {
     setReportType("");
     setImageModals([]);
     setModalCreate(!modalCreate);
+    setIsEdit(false);
   };
+
+  const updateReportModal = (r) => {
+    document.title = "Sửa báo cáo";
+    setIsEdit(true);
+    setReportCurrent(r._id)
+    setNote(r.note);
+    setReportType(r.report_type);
+    setImageModals(r.images);
+    console.log(r.images);
+    setModalCreate(!modalCreate);
+  }
 
   function onFileModalSelect(event) {
     const files = event.target.files;
@@ -313,6 +328,66 @@ function HomePage() {
           setSnackBarNotif({
             severity: "success",
             message: reportType == "REPORT" ? "Tạo biên bản thành công" : "Tạo sự cố thành công",
+          });
+          setSnackBarOpen(true);
+        }
+      }
+    } catch (err) {
+      toggleModalCreate();
+      console.log("get students error: ", err);
+    } finally {
+      setCreatingReport(false);
+    }
+  };
+
+  const handleUpdateReport = async () => {
+    try {
+      setCreatingReport(true);
+      if (reportType == "") {
+        setSnackBarNotif({
+          severity: "error",
+          message: "Vui lòng chọn loại biên bản",
+        });
+        setSnackBarOpen(true);
+      } else if(imageModals.length == 0){
+        setSnackBarNotif({
+          severity: "error",
+          message: reportType == "REPORT" ? "Vui lòng cung cấp ảnh cho biên bản" : "Vui lòng cung cấp ảnh cho sự cố",
+        });
+        setSnackBarOpen(true);
+      } else {
+        const formData = new FormData();
+        formData.append("note", note);
+        formData.append("reportType", reportType);
+        formData.append("reportId", reportCurrent);
+
+        imageModals.map((imageModal, i) => {
+          formData.append("image", imageModal.file);
+        });
+
+        const response = await updateReport(time, room, formData);
+        if (response) {
+          const newReport = {
+            _id: reportCurrent,
+            report_type: reportType,
+            note: note,
+            images: imageModals,
+            date: time,
+            room: room,
+          };
+
+          setReport((prev) =>
+            prev.map((report) =>
+              report._id === newReport._id
+                ? newReport
+                : report
+            )
+          );
+
+          toggleModalCreate();
+          setSnackBarNotif({
+            severity: "success",
+            message: reportType == "REPORT" ? "Sửa biên bản thành công" : "Sửa sự cố thành công",
           });
           setSnackBarOpen(true);
         }
@@ -1400,6 +1475,7 @@ function HomePage() {
                     {report.length > 0 ? (
                       report.map((r, index) => (
                         <ListItem
+                          onClick={() => updateReportModal(r)}
                           key={r._id}
                           disablePadding
                           secondaryAction={
@@ -1465,7 +1541,7 @@ function HomePage() {
             />
           </div>
           <div className={cx("modal-navbar-content")} style={{ width: "80%" }}>
-            <div className={cx("modal-header")}>Tạo báo cáo</div>
+            <div className={cx("modal-header")}>{isEdit ? "Sửa báo cáo" : "Tạo báo cáo"}</div>
             <div className={cx("modal-main")}>
               <div
                 style={{
@@ -1522,7 +1598,7 @@ function HomePage() {
                   placeholder="Ghi chú..."
                 ></textarea>
               </div>
-              <div className={cx("modal-input")}>
+              <div className={cx("modal-input")} style={{display: "flex", alignItems: "center"}}>
                 <div
                   className={cx("modal-main-title")}
                   style={{ width: "auto", margin: "4%" }}
@@ -1550,11 +1626,8 @@ function HomePage() {
                 {imageModals.map((item, index) => (
                   <ImageListItem key={item.url}>
                     <img
-                      // srcSet={`${item.url}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                      // src={`${item.url}?w=248&fit=crop&auto=format`}
-                      src={item.url}
+                      src={item.url ? item.url : getStudentsImageSource(item)}
                       alt={item.name}
-                      // loading="lazy"
                     />
                     <ImageListItemBar
                       subtitle={item.name}
@@ -1586,16 +1659,17 @@ function HomePage() {
                     },
                     opacity: creatingReport ? 0.5 : 1,
                   }}
-                  onClick={handleCreateReport}
+                  onClick={isEdit ? handleUpdateReport : handleCreateReport}
                   disabled={creatingReport}
                 >
-                  Tạo báo cáo
+                  {isEdit ? "Sửa báo cáo" : "Tạo báo cáo"}
                 </Button>
               </div>
             </div>
           </div>
         </div>
       )}
+
       {modalAttendance && (
         <div className={cx("modal active-modal")}>
           <div

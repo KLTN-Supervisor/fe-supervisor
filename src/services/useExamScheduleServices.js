@@ -124,6 +124,20 @@ const useExamScheduleServices = () => {
     }
   };
 
+  const updateReport = async (date, room, formData) => {
+    try {
+      const response = await privateRequest(
+        `/examSchedule/updateReport?date=${date}&room=${room}`,
+        "put",
+        formData
+      );
+
+      return response.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   const getExamReport = async (date, room) => {
     try {
       const response = await privateRequest(
@@ -184,6 +198,7 @@ const useExamScheduleServices = () => {
     getSuspiciousStudents,
     attendanceStudent,
     noteReport,
+    updateReport,
     getExamReport,
     deleteExamReport,
     getRoomInfo,
