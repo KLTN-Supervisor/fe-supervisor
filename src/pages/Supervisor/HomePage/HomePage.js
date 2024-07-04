@@ -1,4 +1,10 @@
-import React, { useRef, useEffect, useState, useCallback, useContext } from "react";
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+  useContext,
+} from "react";
 import classNames from "classnames/bind";
 import styles from "./HomePage.module.scss";
 import Sidenav from "../../../components/Sidenav";
@@ -11,7 +17,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import CloseIcon from "@mui/icons-material/Close";
-import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import ImageList from "@mui/material/ImageList";
 import ImageListItem from "@mui/material/ImageListItem";
 import ImageListItemBar from "@mui/material/ImageListItemBar";
@@ -21,14 +27,19 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import WarningAmberRoundedIcon from '@mui/icons-material/WarningAmberRounded';
-import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import WarningAmberRoundedIcon from "@mui/icons-material/WarningAmberRounded";
+import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CancelRoundedIcon from "@mui/icons-material/CancelRounded";
 import useExamScheduleServices from "../../../services/useExamScheduleServices";
-import { formatDate, formatHour, formatDateExtend, formatHourExtend } from "../../../untils/format-date";
+import {
+  formatDate,
+  formatHour,
+  formatDateExtend,
+  formatHourExtend,
+} from "../../../untils/format-date";
 import usePrivateHttpClient from "../../../hooks/http-hook/private-http-hook";
 import * as XLSX from "xlsx";
 import * as xlsxPopulate from "xlsx-populate/browser/xlsx-populate";
@@ -38,11 +49,11 @@ import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import { StateContext } from "../../../context/StateContext";
 import Slider from "react-slick";
-import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
+import CameraswitchIcon from "@mui/icons-material/Cameraswitch";
 import { getStudentsImageSource } from "../../../untils/getImageSource";
 
 const cx = classNames.bind(styles);
@@ -51,17 +62,27 @@ function HomePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { privateRequest } = usePrivateHttpClient();
-  const { getStudents, attendanceStudent, noteReport, updateReport, getExamReport, deleteExamReport, getRoomInfo, writeExcel } =
-    useExamScheduleServices();
+  const {
+    getStudents,
+    attendanceStudent,
+    noteReport,
+    updateReport,
+    getExamReport,
+    deleteExamReport,
+    getRoomInfo,
+    writeExcel,
+  } = useExamScheduleServices();
 
   const [currentSlide, setCurrentSlide] = useState(0);
-  const sliderRef = useRef()
+  const sliderRef = useRef();
   const NextArrow = () => {
     return (
       <button
         type="button"
         className={cx("slick-next")}
-        style={{display: currentSlide === images.length - 1 ? 'none' : 'flex'}}
+        style={{
+          display: currentSlide === images.length - 1 ? "none" : "flex",
+        }}
         onClick={() => sliderRef.current.slickNext()}
       >
         <ArrowForwardIosIcon
@@ -70,7 +91,7 @@ function HomePage() {
             height: "16px",
             // marginBottom: "2px",
             marginLeft: "3px",
-            color: "white"
+            color: "white",
           }}
           aria-hidden
         />
@@ -83,7 +104,7 @@ function HomePage() {
       <button
         type="button"
         className={cx("slick-prev")}
-        style={{display: currentSlide === 0 ? 'none' : 'flex'}}
+        style={{ display: currentSlide === 0 ? "none" : "flex" }}
         onClick={() => sliderRef.current.slickPrev()}
       >
         <ArrowBackIosNewIcon
@@ -92,7 +113,7 @@ function HomePage() {
             height: "16px",
             // marginBottom: "2px",
             marginRight: "3px",
-            color: "white"
+            color: "white",
           }}
           aria-hidden
         />
@@ -107,21 +128,21 @@ function HomePage() {
   //   }}
   //   aria-hidden
   // />
-  
+
   const settings = {
-      dots: true,
-      centerMode: true,
-      speed: 500,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      infinite: false,
-      initialSlide: 0,
-      autoplay: true,
-      autoplaySpeed: 3000,
-      nextArrow: <NextArrow/>,
-      prevArrow: <BackArrow/>,
-      afterChange: (index) => setCurrentSlide(index),
-    };
+    dots: true,
+    centerMode: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    infinite: false,
+    initialSlide: 0,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    nextArrow: <NextArrow />,
+    prevArrow: <BackArrow />,
+    afterChange: (index) => setCurrentSlide(index),
+  };
   // Lưu giá trị vào localStorage khi trang được tải
   useEffect(() => {
     if (location.state) {
@@ -177,12 +198,11 @@ function HomePage() {
     }
   };
 
-  
   useEffect(() => {
     document.title = currentTitle;
     getInfo();
     getStudentsExam();
-    getReportsExam()
+    getReportsExam();
   }, [time, room]);
 
   const fileInputRef = useRef(null);
@@ -219,6 +239,7 @@ function HomePage() {
   };
   const [note, setNote] = useState("");
   const [imageModals, setImageModals] = useState([]);
+  const [removedModalImages, setRemovedModalImages] = useState([]);
 
   const toggleModal = () => {
     if (document.body.style.overflow !== "hidden") {
@@ -232,10 +253,8 @@ function HomePage() {
   };
 
   const toggleModalCreate = () => {
-    if(modalCreate)
-      document.title = "Tạo báo cáo";
-    else
-      document.title = currentTitle;
+    if (modalCreate) document.title = "Tạo báo cáo";
+    else document.title = currentTitle;
     setNote("");
     setReportType("");
     setImageModals([]);
@@ -246,13 +265,13 @@ function HomePage() {
   const updateReportModal = (r) => {
     document.title = "Sửa báo cáo";
     setIsEdit(true);
-    setReportCurrent(r._id)
+    setReportCurrent(r._id);
     setNote(r.note);
     setReportType(r.report_type);
     setImageModals(r.images);
     console.log(r.images);
     setModalCreate(!modalCreate);
-  }
+  };
 
   function onFileModalSelect(event) {
     const files = event.target.files;
@@ -273,7 +292,19 @@ function HomePage() {
   }
 
   function deleteImage(index) {
-    setImageModals((prevImages) => prevImages.filter((_, i) => i !== index));
+    setImageModals((prevImages) => {
+      const updatedImages = prevImages.slice(); // Create a shallow copy of the array
+      const [removedImage] = updatedImages.splice(index, 1); // Remove the image at the specified index
+
+      if (
+        typeof removedImage === "string" &&
+        removedImage.startsWith("report-images")
+      ) {
+        setRemovedModalImages((prev) => [...prev, removedImage]);
+      }
+
+      return updatedImages;
+    });
   }
 
   const [report, setReport] = useState([]);
@@ -297,10 +328,13 @@ function HomePage() {
           message: "Vui lòng chọn loại biên bản",
         });
         setSnackBarOpen(true);
-      } else if(imageModals.length == 0){
+      } else if (imageModals.length == 0) {
         setSnackBarNotif({
           severity: "error",
-          message: reportType == "REPORT" ? "Vui lòng cung cấp ảnh cho biên bản" : "Vui lòng cung cấp ảnh cho sự cố",
+          message:
+            reportType == "REPORT"
+              ? "Vui lòng cung cấp ảnh cho biên bản"
+              : "Vui lòng cung cấp ảnh cho sự cố",
         });
         setSnackBarOpen(true);
       } else {
@@ -327,7 +361,10 @@ function HomePage() {
           toggleModalCreate();
           setSnackBarNotif({
             severity: "success",
-            message: reportType == "REPORT" ? "Tạo biên bản thành công" : "Tạo sự cố thành công",
+            message:
+              reportType == "REPORT"
+                ? "Tạo biên bản thành công"
+                : "Tạo sự cố thành công",
           });
           setSnackBarOpen(true);
         }
@@ -349,10 +386,13 @@ function HomePage() {
           message: "Vui lòng chọn loại biên bản",
         });
         setSnackBarOpen(true);
-      } else if(imageModals.length == 0){
+      } else if (imageModals.length == 0) {
         setSnackBarNotif({
           severity: "error",
-          message: reportType == "REPORT" ? "Vui lòng cung cấp ảnh cho biên bản" : "Vui lòng cung cấp ảnh cho sự cố",
+          message:
+            reportType == "REPORT"
+              ? "Vui lòng cung cấp ảnh cho biên bản"
+              : "Vui lòng cung cấp ảnh cho sự cố",
         });
         setSnackBarOpen(true);
       } else {
@@ -362,8 +402,13 @@ function HomePage() {
         formData.append("reportId", reportCurrent);
 
         imageModals.map((imageModal, i) => {
-          formData.append("image", imageModal.file);
+          if (imageModal?.file) {
+            formData.append("image", imageModal.file);
+          }
         });
+
+        // Serialize the removedImages array into a JSON string
+        formData.append("removed_images", JSON.stringify(removedModalImages));
 
         const response = await updateReport(time, room, formData);
         if (response) {
@@ -378,16 +423,17 @@ function HomePage() {
 
           setReport((prev) =>
             prev.map((report) =>
-              report._id === newReport._id
-                ? newReport
-                : report
+              report._id === newReport._id ? newReport : report
             )
           );
 
           toggleModalCreate();
           setSnackBarNotif({
             severity: "success",
-            message: reportType == "REPORT" ? "Sửa biên bản thành công" : "Sửa sự cố thành công",
+            message:
+              reportType == "REPORT"
+                ? "Sửa biên bản thành công"
+                : "Sửa sự cố thành công",
           });
           setSnackBarOpen(true);
         }
@@ -403,14 +449,13 @@ function HomePage() {
   const deleteReport = async (index, r) => {
     try {
       const response = await deleteExamReport(r._id);
-      if(response){
+      if (response) {
         setReport((prev) => prev.filter((_, i) => i !== index));
       }
     } catch (err) {
       console.log("get time error: ", err);
     }
-    
-  }
+  };
 
   const updateAttendance = async (studentId) => {
     const updatedStudents = await Promise.all(
@@ -447,22 +492,27 @@ function HomePage() {
 
   const printHandle = () => {
     handleExport().then((url) => {
-      const downloadAnchorNode = document.createElement('a');
+      const downloadAnchorNode = document.createElement("a");
       downloadAnchorNode.href = url;
-      downloadAnchorNode.setAttribute('download', `DSSVDuThi_${formatDateExtend(info.start_time)}_${formatHourExtend(info.start_time)}_${info.room_name}.xlsx`);
+      downloadAnchorNode.setAttribute(
+        "download",
+        `DSSVDuThi_${formatDateExtend(info.start_time)}_${formatHourExtend(
+          info.start_time
+        )}_${info.room_name}.xlsx`
+      );
       downloadAnchorNode.click();
       downloadAnchorNode.remove();
     });
-  }
+  };
 
-  const s2ab = (s) =>{
+  const s2ab = (s) => {
     const buf = new ArrayBuffer(s.length);
     const view = new Uint8Array(buf);
-    for(let i=0; i!== s.length; ++i){
-      view[i] = s.charCodeAt(i)
+    for (let i = 0; i !== s.length; ++i) {
+      view[i] = s.charCodeAt(i);
     }
-    return buf; 
-  }
+    return buf;
+  };
 
   const workbook2blob = (workbook) => {
     const wopts = {
@@ -473,11 +523,11 @@ function HomePage() {
     const wbout = XLSX.write(workbook, wopts);
 
     const blob = new Blob([s2ab(wbout)], {
-      type: "application/octet-stream"
+      type: "application/octet-stream",
     });
 
-    return blob
-  }
+    return blob;
+  };
 
   function countObjectsWithAttendanceTrue(data) {
     let count = 0;
@@ -488,77 +538,94 @@ function HomePage() {
     }
     return count;
   }
-  
+
   const handleExport = () => {
-    let table = []
-    for(let i=1; i<= students.length; ++i){
+    let table = [];
+    for (let i = 1; i <= students.length; ++i) {
       table.push({
-        B: i, 
-        C: students[i-1].student.student_id, 
-        D: students[i-1].student.last_name +
+        B: i,
+        C: students[i - 1].student.student_id,
+        D:
+          students[i - 1].student.last_name +
           " " +
-          students[i-1].student.middle_name,
-        E: students[i-1].student.first_name,
-        F: formatDate(students[i-1].student.date_of_birth),
+          students[i - 1].student.middle_name,
+        E: students[i - 1].student.first_name,
+        F: formatDate(students[i - 1].student.date_of_birth),
         G: "",
         H: "",
         I: "",
         J: "",
-        K: students[i-1].student.class,
-        L: students[i-1].attendance ? "Có mặt" : "Vắng thi",
-      })
+        K: students[i - 1].student.class,
+        L: students[i - 1].attendance ? "Có mặt" : "Vắng thi",
+      });
     }
-    const tableTitle = [{B: "STT", C: "Mã SV", D: "Họ và tên", E: "Ngày sinh", F: "Số tờ", G: "Điểm số", H: "Điểm chữ", I: "Chữ ký", J: "Tên lớp", K: "Điểm danh"}];
+    const tableTitle = [
+      {
+        B: "STT",
+        C: "Mã SV",
+        D: "Họ và tên",
+        E: "Ngày sinh",
+        F: "Số tờ",
+        G: "Điểm số",
+        H: "Điểm chữ",
+        I: "Chữ ký",
+        J: "Tên lớp",
+        K: "Điểm danh",
+      },
+    ];
 
-    const finalData = [...tableTitle, ...table]
+    const finalData = [...tableTitle, ...table];
     const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(finalData, { origin: 'B20', skipHeader: true });
+    const worksheet = XLSX.utils.json_to_sheet(finalData, {
+      origin: "B20",
+      skipHeader: true,
+    });
 
     XLSX.utils.book_append_sheet(workbook, worksheet, `${info.room_name}`);
 
-    const workbookBlob = workbook2blob(workbook)
+    const workbookBlob = workbook2blob(workbook);
 
-    return addStyles(workbookBlob, finalData)
-  }
+    return addStyles(workbookBlob, finalData);
+  };
 
-  const addStyles = (workbookBlob, finalData) =>{
+  const addStyles = (workbookBlob, finalData) => {
     return xlsxPopulate.fromDataAsync(workbookBlob).then((workbook) => {
       workbook.sheets().forEach((sheet) => {
-        sheet.gridLinesVisible(false) 
-        sheet.column('A').width(1.4);
-        sheet.column('B').width(1.3);
-        sheet.column('C').width(2.4);
-        sheet.column('D').width(8.1);
-        sheet.column('E').width(0.4);
-        sheet.column('F').width(2.5);
-        sheet.column('G').width(6.1);
-        sheet.column('H').width(3.6);
-        sheet.column('I').width(2.5);
-        sheet.column('J').width(3.4);
-        sheet.column('K').width(2.5);
-        sheet.column('L').width(3.9);
-        sheet.column('M').width(4.2);
-        sheet.column('N').width(1);
-        sheet.column('O').width(0.3);
-        sheet.column('P').width(0.6);
-        sheet.column('Q').width(8.7);
-        sheet.column('R').width(6.1);
-        sheet.column('S').width(4.3);
-        sheet.column('T').width(2.4);
-        sheet.column('U').width(4.9);
-        sheet.column('V').width(0.1);
-        sheet.column('W').width(4);
-        sheet.column('X').width(0.9);
-        sheet.column('Y').width(2.4);
-        sheet.column('Z').width(1.5);
-        sheet.column('AA').width(2.4);
-        sheet.column('AB').width(2.5);
-        sheet.column('AC').width(3.3);
-        sheet.column('AD').width(1.2);
-        sheet.column('AE').width(3.7);
-        sheet.column('AF').width(4.3);
-        sheet.column('AG').width(0.4);
-        sheet.column('AH').width(0.1);
+        sheet.gridLinesVisible(false);
+        sheet.column("A").width(1.4);
+        sheet.column("B").width(1.3);
+        sheet.column("C").width(2.4);
+        sheet.column("D").width(8.1);
+        sheet.column("E").width(0.4);
+        sheet.column("F").width(2.5);
+        sheet.column("G").width(6.1);
+        sheet.column("H").width(3.6);
+        sheet.column("I").width(2.5);
+        sheet.column("J").width(3.4);
+        sheet.column("K").width(2.5);
+        sheet.column("L").width(3.9);
+        sheet.column("M").width(4.2);
+        sheet.column("N").width(1);
+        sheet.column("O").width(0.3);
+        sheet.column("P").width(0.6);
+        sheet.column("Q").width(8.7);
+        sheet.column("R").width(6.1);
+        sheet.column("S").width(4.3);
+        sheet.column("T").width(2.4);
+        sheet.column("U").width(4.9);
+        sheet.column("V").width(0.1);
+        sheet.column("W").width(4);
+        sheet.column("X").width(0.9);
+        sheet.column("Y").width(2.4);
+        sheet.column("Z").width(1.5);
+        sheet.column("AA").width(2.4);
+        sheet.column("AB").width(2.5);
+        sheet.column("AC").width(3.3);
+        sheet.column("AD").width(1.2);
+        sheet.column("AE").width(3.7);
+        sheet.column("AF").width(4.3);
+        sheet.column("AG").width(0.4);
+        sheet.column("AH").width(0.1);
 
         sheet.row(1).height(7.2);
         sheet.row(4).height(1.2);
@@ -575,14 +642,13 @@ function HomePage() {
         sheet.row(16).height(4.8);
         sheet.row(19).height(9);
         sheet.row(20).height(18);
-        sheet.row(21+finalData.length).height(6.6);
-        sheet.row(22+finalData.length).height(6.6);
-        sheet.row(23+finalData.length).height(7.2);
-        sheet.row(24+finalData.length).height(7.8);
-        sheet.row(25+finalData.length).height(0.6);
-        sheet.row(26+finalData.length).height(1.2);
-        sheet.row(28+finalData.length).height(26.4);
-
+        sheet.row(21 + finalData.length).height(6.6);
+        sheet.row(22 + finalData.length).height(6.6);
+        sheet.row(23 + finalData.length).height(7.2);
+        sheet.row(24 + finalData.length).height(7.8);
+        sheet.row(25 + finalData.length).height(0.6);
+        sheet.row(26 + finalData.length).height(1.2);
+        sheet.row(28 + finalData.length).height(26.4);
 
         const schollName = sheet.range("A2:O2").merged(true).style({
           bold: true,
@@ -590,18 +656,21 @@ function HomePage() {
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
           horizontalAlignment: "center",
-          wrapText: true
-        })
+          wrapText: true,
+        });
         schollName.value("TRƯỜNG ĐẠI HỌC SPKT TP.HCM");
 
-        const pdt = sheet.range("A3:N3").merged(true).style({
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          underline: (cell, ri, ci, range) => true,
-          wrapText: true
-        })
+        const pdt = sheet
+          .range("A3:N3")
+          .merged(true)
+          .style({
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            underline: (cell, ri, ci, range) => true,
+            wrapText: true,
+          });
         pdt.value("PHÒNG ĐÀO TẠO");
 
         const title = sheet.range("A6:AI6").merged(true).style({
@@ -610,8 +679,8 @@ function HomePage() {
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
           horizontalAlignment: "center",
-          wrapText: true
-        })
+          wrapText: true,
+        });
         title.value("DANH SÁCH SINH VIÊN DỰ THI");
 
         const title2 = sheet.range("A7:AI7").merged(true).style({
@@ -619,39 +688,41 @@ function HomePage() {
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
           horizontalAlignment: "center",
-          wrapText: true
-        })
-        title2.value(`Học kỳ 0${info.term} - Năm học ${info.year.from}-${info.year.to}`);
+          wrapText: true,
+        });
+        title2.value(
+          `Học kỳ 0${info.term} - Năm học ${info.year.from}-${info.year.to}`
+        );
 
         const subject = sheet.range("C10:D13").merged(true).style({
           fontSize: 10,
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
-          wrapText: true
-        })
+          wrapText: true,
+        });
         subject.value(`Môn học: `);
         const subjectId = sheet.range("C14:D16").merged(true).style({
           fontSize: 10,
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
-          wrapText: true
-        })
+          wrapText: true,
+        });
         subjectId.value(`Mã Môn học: `);
 
         const subjectGroup = sheet.range("C17:D17").merged(true).style({
           fontSize: 10,
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
-          wrapText: true
-        })
+          wrapText: true,
+        });
         subjectGroup.value(`Nhóm thi: `);
 
         const examDate = sheet.range("C18:D18").merged(true).style({
           fontSize: 10,
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
-          wrapText: true
-        })
+          wrapText: true,
+        });
         examDate.value(`Nhóm thi: `);
 
         const subjectValue = sheet.range("E10:S13").merged(true).style({
@@ -659,354 +730,485 @@ function HomePage() {
           fontSize: 10,
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
-          wrapText: true
-        })
-        subjectValue.value(`${info.subject_name} - Số Tín Chỉ: ${info.subject_credit}`);
+          wrapText: true,
+        });
+        subjectValue.value(
+          `${info.subject_name} - Số Tín Chỉ: ${info.subject_credit}`
+        );
         const subjectIdValue = sheet.range("E14:S16").merged(true).style({
           bold: true,
           fontSize: 10,
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
-          wrapText: true
-        })
+          wrapText: true,
+        });
         subjectIdValue.value(`${info.subject_id}`);
 
         const subjectGroupValue = sheet.range("E17:W17").merged(true).style({
           fontSize: 10,
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
-          wrapText: true
-        })
+          wrapText: true,
+        });
         subjectGroupValue.value(`Tổ 1 - AnhVan_DHCQ`);
 
         const examDateValue = sheet.range("E18:W18").merged(true).style({
           fontSize: 10,
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
-          wrapText: true
-        })
-        examDateValue.value(`${formatDate(info.start_time)} - Giờ Thi: ${formatHour(info.start_time)}  -   phút - Số Tiết 2 - Phòng thi: ${info.room_name}`);
+          wrapText: true,
+        });
+        examDateValue.value(
+          `${formatDate(info.start_time)} - Giờ Thi: ${formatHour(
+            info.start_time
+          )}  -   phút - Số Tiết 2 - Phòng thi: ${info.room_name}`
+        );
 
         const inpector = sheet.range("T9:X12").merged(true).style({
           fontSize: 10,
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
-          wrapText: true
-        })
+          wrapText: true,
+        });
         inpector.value(`Cán bộ coi thi 1:`);
 
-        const line1 = sheet.range("Y9:AI12").merged(true).style({
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          underline: (cell, ri, ci, range) => true,
-          wrapText: true
-        })
-        line1.value("                                                                             ");
+        const line1 = sheet
+          .range("Y9:AI12")
+          .merged(true)
+          .style({
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            underline: (cell, ri, ci, range) => true,
+            wrapText: true,
+          });
+        line1.value(
+          "                                                                             "
+        );
 
         const inpector2 = sheet.range("T14:X16").merged(true).style({
           fontSize: 10,
           fontFamily: "Times New Roman",
           verticalAlignment: "center",
-          wrapText: true
-        })
+          wrapText: true,
+        });
         inpector2.value(`Cán bộ coi thi 2:`);
 
-        const line2 = sheet.range("Y14:AI16").merged(true).style({
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          underline: (cell, ri, ci, range) => true,
-          wrapText: true
-        })
-        line2.value("                                                                             ");
+        const line2 = sheet
+          .range("Y14:AI16")
+          .merged(true)
+          .style({
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            underline: (cell, ri, ci, range) => true,
+            wrapText: true,
+          });
+        line2.value(
+          "                                                                             "
+        );
 
-        sheet.range("B20:C20").merged(true).style({
-          border: true,
-          bold: true,
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true
-        }).value("STT");
-        sheet.range("D20:E20").merged(true).style({
-          border: true,
-          bold: true,
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true
-        }).value("Mã SV");
-        sheet.range("F20:M20").merged(true).style({
-          border: true,
-          bold: true,
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true
-        }).value("Họ và tên");
-        sheet.range("N20:Q20").merged(true).style({
-          border: true,
-          bold: true,
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true
-        }).value("Ngày sinh");
-        sheet.cell("R20").style({
-          border: true,
-          bold: true,
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true
-        }).value("Số tờ");
-        sheet.range("S20:T20").merged(true).style({
-          border: true,
-          bold: true,
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true
-        }).value("Điểm số");
-        sheet.range("U20:Y20").merged(true).style({
-          border: true,
-          bold: true,
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true
-        }).value("Điểm chữ");
-        sheet.range("Z20:AC20").merged(true).style({
-          border: true,
-          bold: true,
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true
-        }).value("Chữ ký");
-        sheet.range("AD20:AH20").merged(true).style({
-          border: true,
-          bold: true,
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true
-        }).value("Tên lớp");
-        sheet.cell("AI20").style({
-          border: true,
-          bold: true,
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true
-        }).value("Điểm danh");
-        
+        sheet
+          .range("B20:C20")
+          .merged(true)
+          .style({
+            border: true,
+            bold: true,
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          })
+          .value("STT");
+        sheet
+          .range("D20:E20")
+          .merged(true)
+          .style({
+            border: true,
+            bold: true,
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          })
+          .value("Mã SV");
+        sheet
+          .range("F20:M20")
+          .merged(true)
+          .style({
+            border: true,
+            bold: true,
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          })
+          .value("Họ và tên");
+        sheet
+          .range("N20:Q20")
+          .merged(true)
+          .style({
+            border: true,
+            bold: true,
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          })
+          .value("Ngày sinh");
+        sheet
+          .cell("R20")
+          .style({
+            border: true,
+            bold: true,
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          })
+          .value("Số tờ");
+        sheet
+          .range("S20:T20")
+          .merged(true)
+          .style({
+            border: true,
+            bold: true,
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          })
+          .value("Điểm số");
+        sheet
+          .range("U20:Y20")
+          .merged(true)
+          .style({
+            border: true,
+            bold: true,
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          })
+          .value("Điểm chữ");
+        sheet
+          .range("Z20:AC20")
+          .merged(true)
+          .style({
+            border: true,
+            bold: true,
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          })
+          .value("Chữ ký");
+        sheet
+          .range("AD20:AH20")
+          .merged(true)
+          .style({
+            border: true,
+            bold: true,
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          })
+          .value("Tên lớp");
+        sheet
+          .cell("AI20")
+          .style({
+            border: true,
+            bold: true,
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          })
+          .value("Điểm danh");
 
-        for(let i=1; i<finalData.length; ++i){
-          sheet.range(`B${i+20}:C${i+20}`).merged(true).style({
-            border: true,
-            fontSize: 10,
-            fontFamily: "Times New Roman",
-            verticalAlignment: "center",
-            horizontalAlignment: "center",
-            wrapText: true
-          }).value(finalData[i].B);
-          sheet.range(`D${i+20}:E${i+20}`).merged(true).style({
-            border: true,
-            fontSize: 10,
-            fontFamily: "Times New Roman",
-            verticalAlignment: "center",
-            horizontalAlignment: "center",
-            wrapText: true
-          }).value(finalData[i].C);
-          sheet.range(`F${i+20}:K${i+20}`).merged(true).style({
-            border: true,
-            rightBorder: false,
-            fontSize: 10,
-            fontFamily: "Times New Roman",
-            verticalAlignment: "center",
-            wrapText: true
-          }).value(finalData[i].D);
-          sheet.range(`L${i+20}:M${i+20}`).merged(true).style({
-            border: true,
-            leftBorder: false,
-            fontSize: 10,
-            fontFamily: "Times New Roman",
-            verticalAlignment: "center",
-            wrapText: true
-          }).value(finalData[i].E);
-          sheet.range(`N${i+20}:Q${i+20}`).merged(true).style({
-            border: true,
-            fontSize: 10,
-            fontFamily: "Times New Roman",
-            verticalAlignment: "center",
-            horizontalAlignment: "center",
-            wrapText: true
-          }).value(finalData[i].F);
-          sheet.cell(`R${i+20}`).style({
-            border: true,
-            fontSize: 10,
-            fontFamily: "Times New Roman",
-            verticalAlignment: "center",
-            horizontalAlignment: "center",
-            wrapText: true
-          }).value(finalData[i].G);
-          sheet.range(`S${i+20}:T${i+20}`).merged(true).style({
-            border: true,
-            fontSize: 10,
-            fontFamily: "Times New Roman",
-            verticalAlignment: "center",
-            horizontalAlignment: "center",
-            wrapText: true
-          }).value(finalData[i].H);
-          sheet.range(`U${i+20}:Y${i+20}`).merged(true).style({
-            border: true,
-            fontSize: 10,
-            fontFamily: "Times New Roman",
-            verticalAlignment: "center",
-            horizontalAlignment: "center",
-            wrapText: true
-          }).value(finalData[i].I);
-          sheet.range(`Z${i+20}:AC${i+20}`).merged(true).style({
-            border: true,
-            fontSize: 10,
-            fontFamily: "Times New Roman",
-            verticalAlignment: "center",
-            horizontalAlignment: "center",
-            wrapText: true
-          }).value(finalData[i].J);
-          sheet.range(`AD${i+20}:AH${i+20}`).merged(true).style({
-            border: true,
-            fontSize: 10,
-            fontFamily: "Times New Roman",
-            verticalAlignment: "center",
-            horizontalAlignment: "center",
-            wrapText: true
-          }).value(finalData[i].K);
+        for (let i = 1; i < finalData.length; ++i) {
+          sheet
+            .range(`B${i + 20}:C${i + 20}`)
+            .merged(true)
+            .style({
+              border: true,
+              fontSize: 10,
+              fontFamily: "Times New Roman",
+              verticalAlignment: "center",
+              horizontalAlignment: "center",
+              wrapText: true,
+            })
+            .value(finalData[i].B);
+          sheet
+            .range(`D${i + 20}:E${i + 20}`)
+            .merged(true)
+            .style({
+              border: true,
+              fontSize: 10,
+              fontFamily: "Times New Roman",
+              verticalAlignment: "center",
+              horizontalAlignment: "center",
+              wrapText: true,
+            })
+            .value(finalData[i].C);
+          sheet
+            .range(`F${i + 20}:K${i + 20}`)
+            .merged(true)
+            .style({
+              border: true,
+              rightBorder: false,
+              fontSize: 10,
+              fontFamily: "Times New Roman",
+              verticalAlignment: "center",
+              wrapText: true,
+            })
+            .value(finalData[i].D);
+          sheet
+            .range(`L${i + 20}:M${i + 20}`)
+            .merged(true)
+            .style({
+              border: true,
+              leftBorder: false,
+              fontSize: 10,
+              fontFamily: "Times New Roman",
+              verticalAlignment: "center",
+              wrapText: true,
+            })
+            .value(finalData[i].E);
+          sheet
+            .range(`N${i + 20}:Q${i + 20}`)
+            .merged(true)
+            .style({
+              border: true,
+              fontSize: 10,
+              fontFamily: "Times New Roman",
+              verticalAlignment: "center",
+              horizontalAlignment: "center",
+              wrapText: true,
+            })
+            .value(finalData[i].F);
+          sheet
+            .cell(`R${i + 20}`)
+            .style({
+              border: true,
+              fontSize: 10,
+              fontFamily: "Times New Roman",
+              verticalAlignment: "center",
+              horizontalAlignment: "center",
+              wrapText: true,
+            })
+            .value(finalData[i].G);
+          sheet
+            .range(`S${i + 20}:T${i + 20}`)
+            .merged(true)
+            .style({
+              border: true,
+              fontSize: 10,
+              fontFamily: "Times New Roman",
+              verticalAlignment: "center",
+              horizontalAlignment: "center",
+              wrapText: true,
+            })
+            .value(finalData[i].H);
+          sheet
+            .range(`U${i + 20}:Y${i + 20}`)
+            .merged(true)
+            .style({
+              border: true,
+              fontSize: 10,
+              fontFamily: "Times New Roman",
+              verticalAlignment: "center",
+              horizontalAlignment: "center",
+              wrapText: true,
+            })
+            .value(finalData[i].I);
+          sheet
+            .range(`Z${i + 20}:AC${i + 20}`)
+            .merged(true)
+            .style({
+              border: true,
+              fontSize: 10,
+              fontFamily: "Times New Roman",
+              verticalAlignment: "center",
+              horizontalAlignment: "center",
+              wrapText: true,
+            })
+            .value(finalData[i].J);
+          sheet
+            .range(`AD${i + 20}:AH${i + 20}`)
+            .merged(true)
+            .style({
+              border: true,
+              fontSize: 10,
+              fontFamily: "Times New Roman",
+              verticalAlignment: "center",
+              horizontalAlignment: "center",
+              wrapText: true,
+            })
+            .value(finalData[i].K);
 
-          sheet.cell(`AI${i+20}`).style({
-            border: true,
-            fill: finalData[i].L === "Vắng thi" ? (
-              {type: "solid",
-              color: {
-                  rgb: "ffff00"
-              }
-            }) : ({type: "solid", color: {
-              rgb: "FFFFFF"
-            }}),
-            fontSize: 10,
-            fontFamily: "Times New Roman",
-            verticalAlignment: "center",
-            horizontalAlignment: "center",
-            wrapText: true
-          }).value(finalData[i].L);
+          sheet
+            .cell(`AI${i + 20}`)
+            .style({
+              border: true,
+              fill:
+                finalData[i].L === "Vắng thi"
+                  ? {
+                      type: "solid",
+                      color: {
+                        rgb: "ffff00",
+                      },
+                    }
+                  : {
+                      type: "solid",
+                      color: {
+                        rgb: "FFFFFF",
+                      },
+                    },
+              fontSize: 10,
+              fontFamily: "Times New Roman",
+              verticalAlignment: "center",
+              horizontalAlignment: "center",
+              wrapText: true,
+            })
+            .value(finalData[i].L);
         }
 
-        const studentTotal = sheet.range(`C${23+finalData.length}:G${25+finalData.length}`).merged(true).style({
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true
-        })
+        const studentTotal = sheet
+          .range(`C${23 + finalData.length}:G${25 + finalData.length}`)
+          .merged(true)
+          .style({
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          });
         studentTotal.value("Sinh viên trong danh sách");
 
-        const studentTotalValue = sheet.range(`H${23+finalData.length}:H${25+finalData.length}`).merged(true).style({
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true
-        })
+        const studentTotalValue = sheet
+          .range(`H${23 + finalData.length}:H${25 + finalData.length}`)
+          .merged(true)
+          .style({
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          });
         studentTotalValue.value(finalData.length - 1);
 
-        const studentTotalAttend = sheet.range(`I${22+finalData.length}:L${25+finalData.length}`).merged(true).style({
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          wrapText: true
-        })
+        const studentTotalAttend = sheet
+          .range(`I${22 + finalData.length}:L${25 + finalData.length}`)
+          .merged(true)
+          .style({
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            wrapText: true,
+          });
         studentTotalAttend.value(".Số S/V Dự Thi:");
 
-        const studentTotalAttendValue = sheet.range(`M${22+finalData.length}:P${25+finalData.length}`).merged(true).style({
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          wrapText: true,
-          underline: (cell, ri, ci, range) => true,
-        })
-        studentTotalAttendValue.value(`   ${countObjectsWithAttendanceTrue(finalData)}   `);
+        const studentTotalAttendValue = sheet
+          .range(`M${22 + finalData.length}:P${25 + finalData.length}`)
+          .merged(true)
+          .style({
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            wrapText: true,
+            underline: (cell, ri, ci, range) => true,
+          });
+        studentTotalAttendValue.value(
+          `   ${countObjectsWithAttendanceTrue(finalData)}   `
+        );
 
-        const date = sheet.range(`X${23+finalData.length}:Z${25+finalData.length}`).merged(true).style({
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true,
-        })
+        const date = sheet
+          .range(`X${23 + finalData.length}:Z${25 + finalData.length}`)
+          .merged(true)
+          .style({
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          });
         date.value("Ngày");
-        const month = sheet.range(`AB${23+finalData.length}:AD${25+finalData.length}`).merged(true).style({
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true,
-        })
+        const month = sheet
+          .range(`AB${23 + finalData.length}:AD${25 + finalData.length}`)
+          .merged(true)
+          .style({
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          });
         month.value("tháng");
-        const year = sheet.range(`AF${23+finalData.length}:AH${25+finalData.length}`).merged(true).style({
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true,
-        })
+        const year = sheet
+          .range(`AF${23 + finalData.length}:AH${25 + finalData.length}`)
+          .merged(true)
+          .style({
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          });
         year.value("năm");
-        const signSubject = sheet.range(`C${27+finalData.length}:J${27+finalData.length}`).merged(true).style({
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true,
-        })
+        const signSubject = sheet
+          .range(`C${27 + finalData.length}:J${27 + finalData.length}`)
+          .merged(true)
+          .style({
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          });
         signSubject.value("Xác nhận của Bộ môn");
 
-        const signInpector = sheet.range(`V${27+finalData.length}:AI${27+finalData.length}`).merged(true).style({
-          fontSize: 10,
-          fontFamily: "Times New Roman",
-          verticalAlignment: "center",
-          horizontalAlignment: "center",
-          wrapText: true,
-        })
+        const signInpector = sheet
+          .range(`V${27 + finalData.length}:AI${27 + finalData.length}`)
+          .merged(true)
+          .style({
+            fontSize: 10,
+            fontFamily: "Times New Roman",
+            verticalAlignment: "center",
+            horizontalAlignment: "center",
+            wrapText: true,
+          });
         signInpector.value("Cán bộ chấm thi");
       });
-      return workbook.outputAsync().then((workbookBlob) => URL.createObjectURL(workbookBlob));
+      return workbook
+        .outputAsync()
+        .then((workbookBlob) => URL.createObjectURL(workbookBlob));
     });
   };
-
 
   const [modalAttendance, setModalAttendance] = useState(false);
 
   const toggleModalAttendance = async () => {
-    if(!modalAttendance ){
+    if (!modalAttendance) {
       setModalAttendance(!modalAttendance);
       setState(0);
       isLoadCanvasRef.current = true;
       await startVideo();
       videoRef?.current &&
         (intervalRef.current = setInterval(runFaceDetection, 2000));
-    } else{
-      if(videoRef?.current){
+    } else {
+      if (videoRef?.current) {
         await clear();
       }
       imageRef.current = null;
@@ -1016,20 +1218,19 @@ function HomePage() {
   };
 
   const [state, setState] = useState(0);
-  const [cameraIds, setCameraIds] = useState('');
-  const [currentCameraIndex , setCurrentCameraIndex ] = useState(0);
+  const [cameraIds, setCameraIds] = useState("");
+  const [currentCameraIndex, setCurrentCameraIndex] = useState(0);
   const videoRef = useRef();
   const canvasRef = useRef();
   const isLoadCanvasRef = useRef(true);
   const intervalRef = useRef(null);
   const { faceMatcher } = useContext(StateContext);
 
-
   // STOP VIDEO STREAM
   const clear = async () => {
     isLoadCanvasRef.current = false;
     // Stop the video stream
-    if(videoRef.current !== null){
+    if (videoRef.current !== null) {
       await stopVideoStream();
     }
     // Stop the interval if it's running
@@ -1037,7 +1238,6 @@ function HomePage() {
       clearInterval(intervalRef.current);
     }
   };
-
 
   // STOP VIDEO STREAM FUNCTION
   const stopVideoStream = async () => {
@@ -1057,43 +1257,44 @@ function HomePage() {
   const getNumberOfCameras = async () => {
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
-      const cameras = devices.filter((device) => device.kind === 'videoinput');
+      const cameras = devices.filter((device) => device.kind === "videoinput");
       setCameraIds(cameras.map((camera) => camera.deviceId));
     } catch (error) {
-      console.error('Lỗi khi lấy danh sách thiết bị:', error);
+      console.error("Lỗi khi lấy danh sách thiết bị:", error);
     }
-  }
+  };
 
   // Hàm switch camera
   async function switchCamera() {
     try {
       // Lấy ID của camera tiếp theo
-      const nextCameraId = currentCameraIndex == 0 ? 'user' : "environment";
+      const nextCameraId = currentCameraIndex == 0 ? "user" : "environment";
       // Gọi getUserMedia với deviceId tương ứng
-      await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { exact: nextCameraId } }
-      }).then((currentStream) => {
-        videoRef.current.srcObject = currentStream;
-        setIsAttending(true);
-        setCurrentCameraIndex(0);
-      })
-      .catch((err) => {
-        console.error('Error accessing camera:', err);
-        setSnackBarNotif({
-          severity: "error",
-          message:
-            "Xảy ra lỗi khi sử dụng camera"
+      await navigator.mediaDevices
+        .getUserMedia({
+          video: { facingMode: { exact: nextCameraId } },
+        })
+        .then((currentStream) => {
+          videoRef.current.srcObject = currentStream;
+          setIsAttending(true);
+          setCurrentCameraIndex(0);
+        })
+        .catch((err) => {
+          console.error("Error accessing camera:", err);
+          setSnackBarNotif({
+            severity: "error",
+            message: "Xảy ra lỗi khi sử dụng camera",
+          });
+          setIsAttending(false);
+          setSnackBarOpen(true);
         });
-        setIsAttending(false);
-        setSnackBarOpen(true);
-      });;
     } catch (error) {
-      console.error('Lỗi khi switch camera:', error);
+      console.error("Lỗi khi switch camera:", error);
     }
   }
-  
+
   const startVideo = () => {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia ) {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
         .getUserMedia({ video: true })
         .then((currentStream) => {
@@ -1103,28 +1304,25 @@ function HomePage() {
           setCurrentCameraIndex(1);
         })
         .catch((err) => {
-          console.error('Error accessing camera:', err);
+          console.error("Error accessing camera:", err);
           setSnackBarNotif({
             severity: "error",
-            message:
-              "Xảy ra lỗi khi sử dụng camera"
+            message: "Xảy ra lỗi khi sử dụng camera",
           });
           setIsAttending(false);
           setSnackBarOpen(true);
         });
     } else {
       videoRef.current = null;
-      console.error('Trình duyệt không hỗ trợ camera');
+      console.error("Trình duyệt không hỗ trợ camera");
       // Xử lý trường hợp trình duyệt không hỗ trợ API
       setSnackBarNotif({
         severity: "error",
-        message:
-          "Trình duyệt không hỗ trợ camera"
+        message: "Trình duyệt không hỗ trợ camera",
       });
       setSnackBarOpen(true);
     }
   };
-
 
   const runFaceDetection = useCallback(async () => {
     if (isLoadCanvasRef.current && faceMatcher && videoRef?.current) {
@@ -1151,13 +1349,23 @@ function HomePage() {
       for (const detection of resized) {
         const box = detection.detection.box;
         const studentName = await faceMatcher
-        .findBestMatch(detection.descriptor)
-        .toString();
-        const student = students.find(s => s.student.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label)
+          .findBestMatch(detection.descriptor)
+          .toString();
+        const student = students.find(
+          (s) =>
+            s.student.student_id.toString().trim() ===
+            faceMatcher.findBestMatch(detection.descriptor)._label
+        );
         const drawBox = new faceapi.draw.DrawBox(box, {
-          label: student ? ( student.attendance ? "Đã điểm danh" : studentName) : "unknown",
+          label: student
+            ? student.attendance
+              ? "Đã điểm danh"
+              : studentName
+            : "unknown",
         });
-        if ( student && !student.attendance &&
+        if (
+          student &&
+          !student.attendance &&
           faceMatcher.findBestMatch(detection.descriptor)._label != "unknown"
         ) {
           await updateAttendanceTrue(student.student.student_id);
@@ -1171,28 +1379,26 @@ function HomePage() {
           videoRef.current.pause();
           // Sau 3 giây tắt video
           setTimeout(() => {
-            if(videoRef?.current)
-              videoRef?.current.play();
+            if (videoRef?.current) videoRef?.current.play();
           }, 3000);
         }
         drawBox.draw(canvasRef.current);
       }
       setIsAttending(false);
     }
-  },[students]);
+  }, [students]);
 
   useEffect(() => {
     if (videoRef?.current) {
       isLoadCanvasRef.current = true;
       intervalRef.current = setInterval(runFaceDetection, 2000);
     }
-  
+
     return () => {
       isLoadCanvasRef.current = false;
       clearInterval(intervalRef.current);
     };
   }, [runFaceDetection]);
-
 
   //Hinh anh
   const [images, setImages] = useState([]);
@@ -1211,11 +1417,11 @@ function HomePage() {
     event.preventDefault();
     setIsDragging(false);
   }
-  
-  const onDrop = async(event) => {
+
+  const onDrop = async (event) => {
     event.preventDefault();
     setIsDragging(false);
-    setIsDropping(true); 
+    setIsDropping(true);
     const files = event.dataTransfer.files;
     const newImages = [];
 
@@ -1232,9 +1438,9 @@ function HomePage() {
       newImages.push(image);
     }
     setImages(newImages);
-  }
+  };
 
-  function selectAttendFiles() { 
+  function selectAttendFiles() {
     fileInputAttendRef.current.click();
   }
 
@@ -1255,30 +1461,30 @@ function HomePage() {
 
       const image = await faceapi.bufferToImage(file);
       newImages.push(image);
-    } 
+    }
     setImages(newImages);
   };
 
   const [attended, setAttended] = useState();
-  const doneAttended = useRef()
+  const doneAttended = useRef();
 
   useEffect(() => {
     const detectImage = async () => {
       setIsAttending(true);
       doneAttended.current = false;
-      if(images.length > 0){
-        for(let i = 0; i< images.length; ++i){
+      if (images.length > 0) {
+        for (let i = 0; i < images.length; ++i) {
           const container = document.querySelector(`#imgDiv${i}`);
           const image = images[i];
-          if(container && image){
+          if (container && image) {
             const canvas = faceapi.createCanvasFromMedia(image);
-            canvas.style.width = 'auto';
+            canvas.style.width = "auto";
             canvas.style.height = image?.height;
-            canvas.style.left = 'auto';
-            container.innerHTML = '';
+            canvas.style.left = "auto";
+            container.innerHTML = "";
             container.append(images[i]);
             container.append(canvas);
-    
+
             const detections = await faceapi
               .detectAllFaces(image)
               .withFaceLandmarks()
@@ -1288,56 +1494,67 @@ function HomePage() {
               width: image ? image?.width : 10,
               height: image ? image?.height : 10,
             });
-    
+
             const resized = faceapi.resizeResults(detections, {
               width: image ? image?.width : 10,
               height: image ? image?.height : 10,
             });
-            
+
             for (const detection of resized) {
               const box = detection.detection.box;
               const studentName = await faceMatcher
                 .findBestMatch(detection.descriptor)
                 .toString();
-              const student = students.find(s => s?.student?.student_id.toString().trim() === faceMatcher.findBestMatch(detection.descriptor)._label)
+              const student = students.find(
+                (s) =>
+                  s?.student?.student_id.toString().trim() ===
+                  faceMatcher.findBestMatch(detection.descriptor)._label
+              );
               const drawBox = new faceapi.draw.DrawBox(box, {
-                label: student ? ( student.attendance ? "Đã điểm danh" : studentName) : "unknown",
+                label: student
+                  ? student.attendance
+                    ? "Đã điểm danh"
+                    : studentName
+                  : "unknown",
               });
-              if ( student && !student.attendance
-                && faceMatcher.findBestMatch(detection.descriptor)._label != "unknown"
+              if (
+                student &&
+                !student.attendance &&
+                faceMatcher.findBestMatch(detection.descriptor)._label !=
+                  "unknown"
               ) {
                 // const promise = updateAttendanceTrue(student.student.student_id).then(() => {
-                  setAttended(student.student.student_id);
-                  setSnackBarNotif({
-                    severity: "success",
-                    message: `Điểm danh thành công ${faceMatcher.findBestMatch(detection.descriptor)._label}`,
-                  });
-                  setSnackBarOpen(true);
+                setAttended(student.student.student_id);
+                setSnackBarNotif({
+                  severity: "success",
+                  message: `Điểm danh thành công ${
+                    faceMatcher.findBestMatch(detection.descriptor)._label
+                  }`,
+                });
+                setSnackBarOpen(true);
                 // });
                 // promises.push(promise);
-                
               }
               drawBox.draw(canvas);
             }
           }
         }
-        doneAttended.current=true;
+        doneAttended.current = true;
         setIsAttending(false);
       }
-    }
+    };
     detectImage();
-    
-  },[images])
+  }, [images]);
 
-  const updateAttend = () =>{
+  const updateAttend = () => {
     updateAttendanceTrue(attended);
     setAttended("");
-  }
+  };
   useEffect(() => {
-    if(attended){
+    if (attended) {
       updateAttend();
     }
-  },[attended])
+  }, [attended]);
 
   return (
     <div className={cx("homepage")}>
@@ -1353,43 +1570,77 @@ function HomePage() {
               top: "40px",
             }}
           >
-            <div style={{
-              display: "flex",
-              marginBottom: 10
-            }}>
-              <div onClick={toggleModalAttendance} style={{backgroundColor: "#0095f6",
-                padding: "10px",
-                color: "white",
-                borderRadius: "10px",
-                cursor: "pointer", marginRight: 10}}>Điểm danh</div>
+            <div
+              style={{
+                display: "flex",
+                marginBottom: 10,
+              }}
+            >
+              <div
+                onClick={toggleModalAttendance}
+                style={{
+                  backgroundColor: "#0095f6",
+                  padding: "10px",
+                  color: "white",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                  marginRight: 10,
+                }}
+              >
+                Điểm danh
+              </div>
 
-              <div onClick={toggleModal} style={{backgroundColor: "#0095f6",
-                padding: "10px",
-                color: "white",
-                borderRadius: "10px",
-                cursor: "pointer",}}>Báo cáo {report.length > 0 && `(${report.length})`}</div>
+              <div
+                onClick={toggleModal}
+                style={{
+                  backgroundColor: "#0095f6",
+                  padding: "10px",
+                  color: "white",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                }}
+              >
+                Báo cáo {report.length > 0 && `(${report.length})`}
+              </div>
             </div>
-            <div onClick={printHandle} style={{backgroundColor: "#0095f6",
+            <div
+              onClick={printHandle}
+              style={{
+                backgroundColor: "#0095f6",
                 padding: "10px",
                 color: "white",
                 borderRadius: "10px",
-                cursor: "pointer", textAlign: "center"}}>Xuất file excel</div>
+                cursor: "pointer",
+                textAlign: "center",
+              }}
+            >
+              Xuất file excel
+            </div>
           </div>
           <div className={cx("all-title")}>
             <div>
-              <KeyboardBackspaceIcon style={{ marginRight: 20, width: 30, height: 30}} onClick={()=> navigate(-1)}/>
+              <KeyboardBackspaceIcon
+                style={{ marginRight: 20, width: 30, height: 30 }}
+                onClick={() => navigate(-1)}
+              />
             </div>
             <div className={cx("title")}>
               <h6 className={cx("text")}>{roomName}</h6>
             </div>
           </div>
-          <div style={{display: "flex", justifyContent:"center", marginTop: 20 }}>
-            <span style={{fontFamily: "Tahoma",
-                          fontSize: "14px",
-                          fontWeight: "bold",
-                          color: "#0051C6",
-            }}>
-              Môn thi: {info.subject_name}, Ngày thi: {formatDate(info.start_time)}, Số lượng: {info.quantity}
+          <div
+            style={{ display: "flex", justifyContent: "center", marginTop: 20 }}
+          >
+            <span
+              style={{
+                fontFamily: "Tahoma",
+                fontSize: "14px",
+                fontWeight: "bold",
+                color: "#0051C6",
+              }}
+            >
+              Môn thi: {info.subject_name}, Ngày thi:{" "}
+              {formatDate(info.start_time)}, Số lượng: {info.quantity}
             </span>
           </div>
           <div className={cx("page_content__body")}>
@@ -1479,22 +1730,37 @@ function HomePage() {
                           key={r._id}
                           disablePadding
                           secondaryAction={
-                            <IconButton edge="end" aria-label="delete" onClick={() => deleteReport(index, r)} >
+                            <IconButton
+                              edge="end"
+                              aria-label="delete"
+                              onClick={() => deleteReport(index, r)}
+                            >
                               <DeleteIcon />
                             </IconButton>
                           }
                         >
                           <ListItemButton>
-                            <ListItemIcon sx={{ minWidth: '40px' }}>
-                             {r.report_type !== "REPORT" ? <WarningAmberRoundedIcon /> : <AssignmentOutlinedIcon/>}
+                            <ListItemIcon sx={{ minWidth: "40px" }}>
+                              {r.report_type !== "REPORT" ? (
+                                <WarningAmberRoundedIcon />
+                              ) : (
+                                <AssignmentOutlinedIcon />
+                              )}
                             </ListItemIcon>
-                            <ListItemText primary={(r.report_type === "REPORT" ? "Biên bản: " : "Sự cố: ") + r.note} primaryTypographyProps={{
-                              style: {
-                                overflow: 'hidden',
-                                whiteSpace: 'nowrap',
-                                textOverflow: 'ellipsis',
-                              },
-                            }}/>
+                            <ListItemText
+                              primary={
+                                (r.report_type === "REPORT"
+                                  ? "Biên bản: "
+                                  : "Sự cố: ") + r.note
+                              }
+                              primaryTypographyProps={{
+                                style: {
+                                  overflow: "hidden",
+                                  whiteSpace: "nowrap",
+                                  textOverflow: "ellipsis",
+                                },
+                              }}
+                            />
                           </ListItemButton>
                         </ListItem>
                       ))
@@ -1541,7 +1807,9 @@ function HomePage() {
             />
           </div>
           <div className={cx("modal-navbar-content")} style={{ width: "80%" }}>
-            <div className={cx("modal-header")}>{isEdit ? "Sửa báo cáo" : "Tạo báo cáo"}</div>
+            <div className={cx("modal-header")}>
+              {isEdit ? "Sửa báo cáo" : "Tạo báo cáo"}
+            </div>
             <div className={cx("modal-main")}>
               <div
                 style={{
@@ -1598,7 +1866,10 @@ function HomePage() {
                   placeholder="Ghi chú..."
                 ></textarea>
               </div>
-              <div className={cx("modal-input")} style={{display: "flex", alignItems: "center"}}>
+              <div
+                className={cx("modal-input")}
+                style={{ display: "flex", alignItems: "center" }}
+              >
                 <div
                   className={cx("modal-main-title")}
                   style={{ width: "auto", margin: "4%" }}
@@ -1691,246 +1962,286 @@ function HomePage() {
             />
           </div>
           <div className={cx("modal-navbar-content")} style={{ width: "80%" }}>
-            <div className={cx("modal-header")}>Điểm danh
-            </div>
-            <div className={cx("modal-main")} style={{flexDirection: "column", padding: "0px 0 30px 0px"}}>
-            <div className={cx("home__tag")}>
-            <a>
-              <div
-                className={cx("choose")}
-                style={
-                  state === 0
-                    ? {
-                        color: "#00558d",
-                        borderBottom: "#00558d solid 1px",
-                        marginRight: "25px",
-                      }
-                    : { marginRight: "25px" }
-                }
-                onClick={async () => {
-                  isLoadCanvasRef.current = true;
-                  setState(0);
-                  await startVideo();
-                  videoRef?.current !== null &&
-                    (intervalRef.current = setInterval(runFaceDetection, 2000));
-                  
-                }}
-              >
-                <CameraAltOutlinedIcon className={cx("icon")} />
-                <span
-                  className={cx("span")}
-                  style={{ textTransform: "uppercase" }}
-                >
-                  Camera
-                </span>
-              </div>
-            </a>
-            <a>
-              <div
-                className={cx("choose")}
-                style={
-                  state === 1
-                    ? {
-                        color: "#00558d",
-                        borderBottom: "#00558d solid 1px",
-                        marginLeft: "25px",
-                      }
-                    : { marginLeft: "25px" }
-                }
-                onClick={async () => {
-                  if(videoRef.current !== null){
-                    await clear();
-                  }
-                  imageRef.current = null;
-                  setIsDropping(false);
-                  setState(1);
-                }}
-              >
-                <ImageOutlinedIcon className={cx("icon")} />
-                <span
-                  className={cx("span")}
-                  style={{ textTransform: "uppercase" }}
-                >
-                  Hình ảnh
-                </span>
-              </div>
-            </a>
-          </div>
-          {state === 0 ? (
-            <>
-              <div className={cx("appvide")}>
-                <video
-                  crossOrigin="anonymous"
-                  ref={videoRef}
-                  autoPlay
-                  playsInline 
-                  style={{ borderRadius: cameraIds.length > 1 ? "2% 2% 0 0" : "2% 2% 2% 2%" }}
-                  className={cx("video")}
-                ></video>
-              </div>
-              {cameraIds.length > 1 &&
-                <div onClick={currentCameraIndex === 0 ? startVideo : switchCamera} className={cx("switch-video")} 
-                  style={{padding: "15px 0", display: "flex", justifyContent: "center", backgroundColor: "rgb(173 173 173)", 
-                  borderRadius: "0px 0 10px 10px", cursor: "pointer", width: videoRef?.current && videoRef?.current.offsetWidth}}
-                  >
-                    <CameraswitchIcon style={{color: "#00558d"}}/>
-                </div>
-              }
-              <canvas
-                ref={canvasRef}
-                width={videoRef?.current && videoRef?.current.offsetWidth}
-                height={videoRef?.current && videoRef?.current.height}
-                className={cx("appcanvas")}
-              />
-              <div
-                style={{
-                  display: isAttending ? "block" : "none",
-                  position: "absolute",
-                  zIndex: 5,
-                  top: "102px",
-                  width: "100%",
-                  height: "82%",
-                  backgroundColor: "white",
-                  textAlign: "center",
-                  fontWeight: 600,
-                  fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                Helvetica, Arial, sans-serif`,
-                  color: "rgb(61 60 60)",
-                }}
-              >
-                <CircularProgress size={25} style={{marginTop: 10}}/>
-                <br/>
-                Đang chuẩn bị camera ...
-              </div>
-            </>
-          ) : (
+            <div className={cx("modal-header")}>Điểm danh</div>
             <div
-              style={{ width: "100%", height: "90%" }}
-              onDragOver={isDropping ? null : onDragOver}
-              onDragLeave={isDropping ? null : onDragLeave}
-              onDrop={isDropping ? null : onDrop}
+              className={cx("modal-main")}
+              style={{ flexDirection: "column", padding: "0px 0 30px 0px" }}
             >
-              {isDropping ? (
-                <div className={cx("content")} style={{flexDirection: "column"}}>
+              <div className={cx("home__tag")}>
+                <a>
                   <div
-                    className={cx("main")}
-                    style={isDragging ? { backgroundColor: "black", height: "80%" } : { height: "80%" }}
+                    className={cx("choose")}
+                    style={
+                      state === 0
+                        ? {
+                            color: "#00558d",
+                            borderBottom: "#00558d solid 1px",
+                            marginRight: "25px",
+                          }
+                        : { marginRight: "25px" }
+                    }
+                    onClick={async () => {
+                      isLoadCanvasRef.current = true;
+                      setState(0);
+                      await startVideo();
+                      videoRef?.current !== null &&
+                        (intervalRef.current = setInterval(
+                          runFaceDetection,
+                          2000
+                        ));
+                    }}
                   >
-                    <div
-                      className={cx("container")}
+                    <CameraAltOutlinedIcon className={cx("icon")} />
+                    <span
+                      className={cx("span")}
+                      style={{ textTransform: "uppercase" }}
+                    >
+                      Camera
+                    </span>
+                  </div>
+                </a>
+                <a>
+                  <div
+                    className={cx("choose")}
+                    style={
+                      state === 1
+                        ? {
+                            color: "#00558d",
+                            borderBottom: "#00558d solid 1px",
+                            marginLeft: "25px",
+                          }
+                        : { marginLeft: "25px" }
+                    }
+                    onClick={async () => {
+                      if (videoRef.current !== null) {
+                        await clear();
+                      }
+                      imageRef.current = null;
+                      setIsDropping(false);
+                      setState(1);
+                    }}
+                  >
+                    <ImageOutlinedIcon className={cx("icon")} />
+                    <span
+                      className={cx("span")}
+                      style={{ textTransform: "uppercase" }}
+                    >
+                      Hình ảnh
+                    </span>
+                  </div>
+                </a>
+              </div>
+              {state === 0 ? (
+                <>
+                  <div className={cx("appvide")}>
+                    <video
+                      crossOrigin="anonymous"
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
                       style={{
-                        borderRadius: "10px 10px 10px 10px",
+                        borderRadius:
+                          cameraIds.length > 1 ? "2% 2% 0 0" : "2% 2% 2% 2%",
+                      }}
+                      className={cx("video")}
+                    ></video>
+                  </div>
+                  {cameraIds.length > 1 && (
+                    <div
+                      onClick={
+                        currentCameraIndex === 0 ? startVideo : switchCamera
+                      }
+                      className={cx("switch-video")}
+                      style={{
+                        padding: "15px 0",
                         display: "flex",
+                        justifyContent: "center",
+                        backgroundColor: "rgb(173 173 173)",
+                        borderRadius: "0px 0 10px 10px",
+                        cursor: "pointer",
+                        width:
+                          videoRef?.current && videoRef?.current.offsetWidth,
                       }}
                     >
+                      <CameraswitchIcon style={{ color: "#00558d" }} />
+                    </div>
+                  )}
+                  <canvas
+                    ref={canvasRef}
+                    width={videoRef?.current && videoRef?.current.offsetWidth}
+                    height={videoRef?.current && videoRef?.current.height}
+                    className={cx("appcanvas")}
+                  />
+                  <div
+                    style={{
+                      display: isAttending ? "block" : "none",
+                      position: "absolute",
+                      zIndex: 5,
+                      top: "102px",
+                      width: "100%",
+                      height: "82%",
+                      backgroundColor: "white",
+                      textAlign: "center",
+                      fontWeight: 600,
+                      fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                Helvetica, Arial, sans-serif`,
+                      color: "rgb(61 60 60)",
+                    }}
+                  >
+                    <CircularProgress size={25} style={{ marginTop: 10 }} />
+                    <br />
+                    Đang chuẩn bị camera ...
+                  </div>
+                </>
+              ) : (
+                <div
+                  style={{ width: "100%", height: "90%" }}
+                  onDragOver={isDropping ? null : onDragOver}
+                  onDragLeave={isDropping ? null : onDragLeave}
+                  onDrop={isDropping ? null : onDrop}
+                >
+                  {isDropping ? (
+                    <div
+                      className={cx("content")}
+                      style={{ flexDirection: "column" }}
+                    >
                       <div
-                        className={cx("image")}
-                        style={{
-                          display: !isAttending ? "flex" : "none",
-                          width: "100%",
-                          display: "flex",
-                          justifyContent: "center",
-                          overflow: "hidden",
-                        }}
+                        className={cx("main")}
+                        style={
+                          isDragging
+                            ? { backgroundColor: "black", height: "80%" }
+                            : { height: "80%" }
+                        }
                       >
-                        <div className={cx("image-slider-container")}>
-                          <Slider ref={sliderRef}  {...settings}>
-                            {images.map((image, index) => (
-                              <div
-                                id={`imgDiv${index}`}
-                                className={cx("image-slider")}
-                                key={index}
-                                style={{ display: "flex !important", justifyContent: "center", alignItems: "center" }}
-                              ></div>
-                            ))}
-                          </Slider>
-                        </div>
                         <div
+                          className={cx("container")}
                           style={{
-                            display: isAttending ? "block" : "none",
-                            position: "absolute",
-                            zIndex: 5,
-                            width: "100%",
-                            height: "80%",
-                            backgroundColor: "white",
-                            textAlign: "center",
-                            fontWeight: 600,
-                            fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-                          Helvetica, Arial, sans-serif`,
-                            color: "rgb(61 60 60)",
+                            borderRadius: "10px 10px 10px 10px",
+                            display: "flex",
                           }}
                         >
-                          <CircularProgress size={25}/>
-                          <br/>
-                          Đang kiểm tra hình ảnh
+                          <div
+                            className={cx("image")}
+                            style={{
+                              display: !isAttending ? "flex" : "none",
+                              width: "100%",
+                              display: "flex",
+                              justifyContent: "center",
+                              overflow: "hidden",
+                            }}
+                          >
+                            <div className={cx("image-slider-container")}>
+                              <Slider ref={sliderRef} {...settings}>
+                                {images.map((image, index) => (
+                                  <div
+                                    id={`imgDiv${index}`}
+                                    className={cx("image-slider")}
+                                    key={index}
+                                    style={{
+                                      display: "flex !important",
+                                      justifyContent: "center",
+                                      alignItems: "center",
+                                    }}
+                                  ></div>
+                                ))}
+                              </Slider>
+                            </div>
+                            <div
+                              style={{
+                                display: isAttending ? "block" : "none",
+                                position: "absolute",
+                                zIndex: 5,
+                                width: "100%",
+                                height: "80%",
+                                backgroundColor: "white",
+                                textAlign: "center",
+                                fontWeight: 600,
+                                fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                          Helvetica, Arial, sans-serif`,
+                                color: "rgb(61 60 60)",
+                              }}
+                            >
+                              <CircularProgress size={25} />
+                              <br />
+                              Đang kiểm tra hình ảnh
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                  {!isAttending && 
-                  <div className={cx("modal-input")} style={{marginTop: 0}}>
-                    <input
-                      type="file"
-                      accept="image/jpg,image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
-                      multiple
-                      ref={fileInputAttendRef}
-                      onChange={onFileSelect}
-                      id="myFileInput"
-                      style={{ display: "none" }}
-                    />
-                    <label
-                      style={{marginBottom: 0}}
-                      role="button"
-                      onClick={selectAttendFiles}
-                      className={cx("modal-upload")}
-                    >
-                      Select from device
-                    </label>
-                  </div>}
-                </div>
-              ) : (
-                <div className={cx("content")} style={{display: "flex", backgroundColor: isDragging && "#0094f61b"}}>
-                  <div
-                    style={{height: "auto"}}
-                    className={cx("main")}
-                  >
-                    <div>
-                      <div className={cx("modal-image")}>
-                        <CollectionsOutlinedIcon className={cx("modal-logo")} />
-                      </div>
-                      {isDragging ? (
-                        <div className={cx("modal-text")}>
-                          Thả hình ảnh vào đây
-                        </div>
-                      ) : (
-                        <div className={cx("modal-text")}>
-                          Kéo hình ảnh vào đây
+                      {!isAttending && (
+                        <div
+                          className={cx("modal-input")}
+                          style={{ marginTop: 0 }}
+                        >
+                          <input
+                            type="file"
+                            accept="image/jpg,image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+                            multiple
+                            ref={fileInputAttendRef}
+                            onChange={onFileSelect}
+                            id="myFileInput"
+                            style={{ display: "none" }}
+                          />
+                          <label
+                            style={{ marginBottom: 0 }}
+                            role="button"
+                            onClick={selectAttendFiles}
+                            className={cx("modal-upload")}
+                          >
+                            Select from device
+                          </label>
                         </div>
                       )}
+                    </div>
+                  ) : (
+                    <div
+                      className={cx("content")}
+                      style={{
+                        display: "flex",
+                        backgroundColor: isDragging && "#0094f61b",
+                      }}
+                    >
+                      <div style={{ height: "auto" }} className={cx("main")}>
+                        <div>
+                          <div className={cx("modal-image")}>
+                            <CollectionsOutlinedIcon
+                              className={cx("modal-logo")}
+                            />
+                          </div>
+                          {isDragging ? (
+                            <div className={cx("modal-text")}>
+                              Thả hình ảnh vào đây
+                            </div>
+                          ) : (
+                            <div className={cx("modal-text")}>
+                              Kéo hình ảnh vào đây
+                            </div>
+                          )}
 
-                      <div className={cx("modal-input")}>
-                        <input
-                          type="file"
-                          accept="image/jpg,image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
-                          multiple
-                          ref={fileInputAttendRef}
-                          onChange={onFileSelect}
-                          id="myFileInput"
-                          style={{ display: "none" }}
-                        />
-                        <label
-                          role="button"
-                          onClick={selectAttendFiles}
-                          className={cx("modal-upload")}
-                        >
-                          Select from device
-                        </label>
+                          <div className={cx("modal-input")}>
+                            <input
+                              type="file"
+                              accept="image/jpg,image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+                              multiple
+                              ref={fileInputAttendRef}
+                              onChange={onFileSelect}
+                              id="myFileInput"
+                              style={{ display: "none" }}
+                            />
+                            <label
+                              role="button"
+                              onClick={selectAttendFiles}
+                              className={cx("modal-upload")}
+                            >
+                              Select from device
+                            </label>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
-              )}</div>
-            )}
+              )}
             </div>
           </div>
         </div>
