@@ -171,7 +171,7 @@ const UsersManage = () => {
         }}
       >
         <Container maxWidth="xl">
-          <div className={cx("title")} style={{margin: 0}}>
+          <div className={cx("title")} style={{ margin: 0 }}>
             <h6 className={cx("text")}>Báo cáo sự cố</h6>
           </div>
           <Stack spacing={3}>
@@ -182,7 +182,6 @@ const UsersManage = () => {
               spacing={4}
             >
               <Stack spacing={1}>
-                
                 {/* <ImportInput
                   file={file}
                   fileIsValid={fileIsValid}
@@ -262,7 +261,7 @@ const UsersManage = () => {
                   displayEmpty
                   disableUnderline
                   inputProps={{ "aria-label": "Without label" }}
-                  sx={{ height: "100%", marginRight: 0, }}
+                  sx={{ height: "100%", marginRight: 0 }}
                 >
                   <MenuItem value="">
                     <em>Chọn năm</em>
@@ -291,7 +290,7 @@ const UsersManage = () => {
                   displayEmpty
                   disableUnderline
                   inputProps={{ "aria-label": "Without label" }}
-                  sx={{ height: "100%", marginRight: 0, }}
+                  sx={{ height: "100%", marginRight: 0 }}
                 >
                   <MenuItem value="">
                     <em>Chọn học kỳ</em>
@@ -344,107 +343,106 @@ const UsersManage = () => {
               }}
             />
           </div>
-          <div
-            className={cx("modal-content")}
-          >
+          <div className={cx("modal-content")}>
             <div className={cx("modal-header")}>Chi tiết</div>
             <div
               className={cx("modal-main")}
               style={{ display: "flex" }} //padding: "20px 0 30px 0px"
             >
-            <div className={cx("container")}>
-              <div
-                className={cx("image")}
-                style={{
-                  minHeight: "300px",
-                  width: "100%",
-                  display: "flex",
-                  overflow: "hidden",
-                }}
-              >
-                {modalData.images.map((image, index) => (
-                  <div
-                    key={index}
-                    className={cx("img-slider")}
-                    style={{
-                      width: "100%",
-                      transform: `translateX(-${100 * imageIndex}%)`,
-                      transition: "transform 0.2s",
-                      display: "flex",
-                      flexShrink: "0",
-                      flexGrow: "0",
-                      borderRadius: "0px 0px 10px 10px",
-                    }}
-                    aria-hidden={imageIndex !== index}
-                  >
-                    <img
+              <div className={cx("container")}>
+                <div
+                  className={cx("image")}
+                  style={{
+                    minHeight: "300px",
+                    width: "100%",
+                    display: "flex",
+                    overflow: "hidden",
+                  }}
+                >
+                  {modalData.images.map((image, index) => (
+                    <div
+                      key={index}
+                      className={cx("img-slider")}
                       style={{
                         width: "100%",
-                        objectFit: "contain",
-                        height: "auto",
-                        display: "block",
+                        transform: `translateX(-${100 * imageIndex}%)`,
+                        transition: "transform 0.2s",
+                        display: "flex",
                         flexShrink: "0",
                         flexGrow: "0",
+                        borderRadius: "0px 0px 10px 10px",
                       }}
-                      src={getStudentsImageSource(image)}
-                      alt={"Ảnh đính kèm"}
-                    />
+                      aria-hidden={imageIndex !== index}
+                    >
+                      <img
+                        style={{
+                          width: "100%",
+                          objectFit: "contain",
+                          height: "auto",
+                          display: "block",
+                          flexShrink: "0",
+                          flexGrow: "0",
+                        }}
+                        src={getStudentsImageSource(image)}
+                        alt={"Ảnh đính kèm"}
+                      />
 
-                    {isFirstImage === true ||
-                    modalData.images.length === 1 ? null : (
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                      >
-                        <button
-                          onClick={showPrevImage}
-                          className={cx("img-slider-btn")}
-                          style={{ left: 10 }}
-                          aria-label="View Previous Image"
+                      {isFirstImage === true ||
+                      modalData.images.length === 1 ? null : (
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
                         >
-                          <ArrowBackIosNewIcon
-                            style={{
-                              width: "16px",
-                              height: "16px",
-                              marginBottom: "2px",
-                            }}
-                            aria-hidden
-                          />
-                        </button>
-                      </div>
-                    )}
-                    {isLastImage === true ? null : (
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                      >
-                        <button
-                          onClick={showNextImage}
-                          className={cx("img-slider-btn")}
-                          style={{ right: 10 }}
-                          aria-label="View Next Image"
+                          <button
+                            onClick={showPrevImage}
+                            className={cx("img-slider-btn")}
+                            style={{ left: 10 }}
+                            aria-label="View Previous Image"
+                          >
+                            <ArrowBackIosNewIcon
+                              style={{
+                                width: "16px",
+                                height: "16px",
+                                marginBottom: "2px",
+                              }}
+                              aria-hidden
+                            />
+                          </button>
+                        </div>
+                      )}
+                      {isLastImage === true ||
+                      modalData.images.length === 1 ? null : (
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
                         >
-                          <ArrowForwardIosIcon
-                            style={{
-                              width: "16px",
-                              height: "16px",
-                              marginBottom: "2px",
-                            }}
-                            aria-hidden
-                          />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-              <div
+                          <button
+                            onClick={showNextImage}
+                            className={cx("img-slider-btn")}
+                            style={{ right: 10 }}
+                            aria-label="View Next Image"
+                          >
+                            <ArrowForwardIosIcon
+                              style={{
+                                width: "16px",
+                                height: "16px",
+                                marginBottom: "2px",
+                              }}
+                              aria-hidden
+                            />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div
                   className={cx("post-caption")}
                   style={{ position: "relative" }}
                 >
@@ -460,7 +458,7 @@ const UsersManage = () => {
                       {modalData?.time.subject.subject_id}
                     </span>
                   </div>
-                  
+
                   <div className={cx("info")}>
                     <div className={cx("title")}>Loại báo cáo:</div>
                     <span id="inspector_id" className={cx("input-span")}>
@@ -479,9 +477,16 @@ const UsersManage = () => {
                       {formatDate(modalData?.time.start_time)}
                     </span>
                   </div>
-                  <div className={cx("info")} style={{flexDirection: "column"}}>
+                  <div
+                    className={cx("info")}
+                    style={{ flexDirection: "column" }}
+                  >
                     <div className={cx("title")}>Ghi chú:</div>
-                    <textarea readOnly value={modalData?.note} id="inspector_id">
+                    <textarea
+                      readOnly
+                      value={modalData?.note}
+                      id="inspector_id"
+                    >
                       {modalData?.note}
                     </textarea>
                   </div>

@@ -264,6 +264,7 @@ function HomePage() {
 
   const updateReportModal = (r) => {
     document.title = "Sửa báo cáo";
+    setRemovedModalImages([]);
     setIsEdit(true);
     setReportCurrent(r._id);
     setNote(r.note);
@@ -352,7 +353,7 @@ function HomePage() {
             _id: response.new_report._id,
             report_type: reportType,
             note: note,
-            images: imageModals,
+            images: response.new_report.images,
             date: time,
             room: room,
           };
@@ -412,11 +413,12 @@ function HomePage() {
 
         const response = await updateReport(time, room, formData);
         if (response) {
+          setRemovedModalImages([]);
           const newReport = {
             _id: reportCurrent,
             report_type: reportType,
             note: note,
-            images: imageModals,
+            images: response.report.images,
             date: time,
             room: room,
           };

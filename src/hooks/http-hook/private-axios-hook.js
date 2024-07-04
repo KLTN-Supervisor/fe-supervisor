@@ -13,6 +13,7 @@ const axiosPrivate = axios.create({
 });
 
 const useAxiosPrivate = () => {
+  //const { logout } = useLogout();
   useEffect(() => {
     const requestIntercept = axiosPrivate.interceptors.request.use(
       (config) => {
@@ -27,13 +28,11 @@ const useAxiosPrivate = () => {
     const responseIntercept = axiosPrivate.interceptors.response.use(
       (response) => response,
       (err) => {
-        const prevRequest = err?.config;
-        if (err?.response?.status === 403 && !prevRequest?.sent) {
-          prevRequest.sent = true;
-          // const newAccessToken = await refresh();
-          // prevRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-          return axiosPrivate(prevRequest);
+        if (err?.response?.status === 401) {
+          // Xử lý logout ở đây
+          //logout(); // Gọi hàm logout từ hook useAuth để thực hiện logout
         }
+        return Promise.reject(err);
       }
     );
 

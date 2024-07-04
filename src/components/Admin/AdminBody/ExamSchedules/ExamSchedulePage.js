@@ -271,14 +271,14 @@ function ExamSchedules() {
   const handleUploadProgress = ({ loaded, total }) => {
     setFiles((prev) => {
       const newFiles = [...prev];
-      newFiles[0].loading = Math.floor((loaded / total) * 100);
+      newFiles[0].loading = Math.floor((loaded / total) * 100 - 0.01);
       return newFiles;
     });
   };
 
   const uploadExamSchedulesFilesHandler = async () => {
     for (let i = 0; i < files.length; i++) {
-      console.log("tải file ", files[i].file);
+      //console.log("tải file ", files[i].file);
       const file = files[i].file;
       try {
         const formData = new FormData();
@@ -409,6 +409,43 @@ function ExamSchedules() {
     } catch (err) {
       console.log("Đổ dữ liệu: ", err);
       setImportLoading(false);
+    }
+  };
+
+  const removeFile = async (fileId) => {
+    try {
+      const response = await toast.promise(
+        () => deleteSelectedFiles([fileId]),
+        {
+          pending: "Đang xóa...",
+          error: {
+            render: ({ data }) => {
+              return `${data.message}`;
+            },
+          },
+          success: {
+            render: ({ data }) => {
+              if (data.failed_deletion_files.length > 0)
+                return (
+                  <div>
+                    Có lỗi không xóa được file:
+                    {data.failed_deletion_files[0].file_name}
+                  </div>
+                );
+            },
+          },
+        }
+      );
+
+      // Xóa file khỏi fileList nếu xóa thành công
+      if (response) {
+        if (response.failed_deletion_files.length === 0)
+          setUploadedFiles((prev) =>
+            prev.filter((file) => file._id !== fileId)
+          );
+      }
+    } catch (err) {
+      console.log(`Lỗi xóa file có ID ${fileId}: `, err);
     }
   };
 
@@ -1133,7 +1170,7 @@ function ExamSchedules() {
                         <CheckIcon className={cx("check-icon")} />
                         <DeleteIcon
                           className={cx("del-icon")}
-                          onClick={() => deleteDraftFile(i)}
+                          onClick={() => removeFile(objectFile._id)}
                         />
                       </div>
                     ))}
