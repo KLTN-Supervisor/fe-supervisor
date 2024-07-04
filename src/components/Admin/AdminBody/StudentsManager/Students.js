@@ -121,8 +121,9 @@ const StudentsManage = () => {
     // Validate fullname
     if (!data.fullname) {
       validationErrors.fullname = "Họ và tên là bắt buộc.";
-    } else if (!/^[a-zA-Z\s]+$/.test(data.fullname)) {
-      validationErrors.fullname = "Họ và tên chỉ được chứa các chữ cái.";
+    } else if (/[0-9!@#$%^&*(),.?":{}|<>]/.test(data.fullname)) {
+      validationErrors.fullname =
+        "Họ và tên không được chứa số hoặc ký tự đặc biệt.";
     }
     // Validate first_name, middle_name, last_name (extracted from fullname)
     const nameParts = data.fullname ? data.fullname.split(" ") : [];
@@ -449,7 +450,10 @@ const StudentsManage = () => {
   }, []);
 
   const handleEditClick = () => {
-    if (isEdit) clearPortrailImg();
+    if (isEdit) {
+      clearPortrailImg();
+      clearValidateErrors();
+    }
     setIsEdit(!isEdit);
   };
 
@@ -851,9 +855,10 @@ const StudentsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.student_id.trim() !== "" && {
-                        borderColor: "red",
-                      }),
+                      ...(errors?.student_id &&
+                        errors?.student_id.trim() !== "" && {
+                          borderColor: "red",
+                        }),
                     }}
                     value={modalData?.student_id}
                     readOnly={!isEdit && !isCreateNew}
@@ -927,10 +932,10 @@ const StudentsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.citizen_identification_number.trim() !==
-                        "" && {
-                        borderColor: "red",
-                      }),
+                      ...(errors?.citizen_identification_number &&
+                        errors?.citizen_identification_number.trim() !== "" && {
+                          borderColor: "red",
+                        }),
                     }}
                     value={modalData?.citizen_identification_number}
                     readOnly={!isEdit && !isCreateNew}
@@ -966,9 +971,10 @@ const StudentsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.school_year.trim() !== "" && {
-                        borderColor: "red",
-                      }),
+                      ...(errors?.school_year &&
+                        errors?.school_year.trim() !== "" && {
+                          borderColor: "red",
+                        }),
                     }}
                     value={modalData?.school_year}
                     readOnly={!isEdit && !isCreateNew}
@@ -1134,9 +1140,10 @@ const StudentsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.place_of_birth.trim() !== "" && {
-                        borderColor: "red",
-                      }),
+                      ...(errors?.place_of_birth &&
+                        errors?.place_of_birth.trim() !== "" && {
+                          borderColor: "red",
+                        }),
                     }}
                     value={modalData?.place_of_birth}
                     readOnly={!isEdit && !isCreateNew}
@@ -1172,9 +1179,10 @@ const StudentsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.city_or_province.trim() !== "" && {
-                        borderColor: "red",
-                      }),
+                      ...(errors?.city_or_province &&
+                        errors?.city_or_province.trim() !== "" && {
+                          borderColor: "red",
+                        }),
                     }}
                     value={modalData?.city_or_province}
                     readOnly={!isEdit && !isCreateNew}
@@ -1210,9 +1218,10 @@ const StudentsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.district.trim() !== "" && {
-                        borderColor: "red",
-                      }),
+                      ...(errors?.district &&
+                        errors?.district.trim() !== "" && {
+                          borderColor: "red",
+                        }),
                     }}
                     value={modalData?.district}
                     readOnly={!isEdit && !isCreateNew}
@@ -1248,9 +1257,10 @@ const StudentsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.address.trim() !== "" && {
-                        borderColor: "red",
-                      }),
+                      ...(errors?.address &&
+                        errors?.address.trim() !== "" && {
+                          borderColor: "red",
+                        }),
                     }}
                     value={modalData?.address}
                     readOnly={!isEdit && !isCreateNew}
@@ -1286,9 +1296,10 @@ const StudentsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.nationality.trim() !== "" && {
-                        borderColor: "red",
-                      }),
+                      ...(errors?.nationality &&
+                        errors?.nationality.trim() !== "" && {
+                          borderColor: "red",
+                        }),
                     }}
                     value={modalData?.nationality}
                     readOnly={!isEdit && !isCreateNew}
@@ -1324,9 +1335,10 @@ const StudentsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.current_address.trim() !== "" && {
-                        borderColor: "red",
-                      }),
+                      ...(errors?.current_address &&
+                        errors?.current_address.trim() !== "" && {
+                          borderColor: "red",
+                        }),
                     }}
                     value={modalData?.current_address}
                     readOnly={!isEdit && !isCreateNew}
@@ -1362,9 +1374,10 @@ const StudentsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.class.trim() !== "" && {
-                        borderColor: "red",
-                      }),
+                      ...(errors?.class &&
+                        errors?.class.trim() !== "" && {
+                          borderColor: "red",
+                        }),
                     }}
                     value={modalData?.class}
                     readOnly={!isEdit && !isCreateNew}
@@ -1400,9 +1413,10 @@ const StudentsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.education_program.trim() !== "" && {
-                        borderColor: "red",
-                      }),
+                      ...(errors?.education_program &&
+                        errors?.education_program.trim() !== "" && {
+                          borderColor: "red",
+                        }),
                     }}
                     value={modalData?.education_program}
                     readOnly={!isEdit && !isCreateNew}
@@ -1438,9 +1452,10 @@ const StudentsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.major.trim() !== "" && {
-                        borderColor: "red",
-                      }),
+                      ...(errors?.major &&
+                        errors?.major.trim() !== "" && {
+                          borderColor: "red",
+                        }),
                     }}
                     value={modalData?.major}
                     readOnly={!isEdit && !isCreateNew}
@@ -1476,9 +1491,10 @@ const StudentsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.faculty.trim() !== "" && {
-                        borderColor: "red",
-                      }),
+                      ...(errors?.faculty &&
+                        errors?.faculty.trim() !== "" && {
+                          borderColor: "red",
+                        }),
                     }}
                     value={modalData?.faculty}
                     readOnly={!isEdit && !isCreateNew}
