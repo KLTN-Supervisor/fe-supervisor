@@ -101,7 +101,7 @@ function ExamSchedulePage() {
       }
     };
     getDatesExam();
-  }, [term]);
+  }, [term, year]);
 
   useEffect(() => {
     const getBuildingsExam = async () => {
@@ -118,7 +118,7 @@ function ExamSchedulePage() {
       }
     };
     getBuildingsExam();
-  }, [date]);
+  }, [date, term, year]);
 
   return (
     <div className={cx("schedulePage")}>

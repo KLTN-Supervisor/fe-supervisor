@@ -241,7 +241,7 @@ function ExamSchedules() {
       }
     };
     getDatesExam();
-  }, [term]);
+  }, [term, year]);
 
   useEffect(() => {
     const getBuildingsExam = async () => {
@@ -258,7 +258,7 @@ function ExamSchedules() {
       }
     };
     getBuildingsExam();
-  }, [date]);
+  }, [date, year, term]);
 
   const [files, setFiles] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
