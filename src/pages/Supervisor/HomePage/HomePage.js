@@ -278,7 +278,14 @@ function HomePage() {
     const files = event.target.files;
     if (files.length === 0) return;
     for (let i = 0; i < files.length; i++) {
-      if (notValidFile(files[i])) continue;
+      if (notValidFile(files[i])) {
+        setSnackBarNotif({
+          severity: "error",
+          message: "Chọn file không đúng định dạng",
+        });
+        setSnackBarOpen(true);
+        continue;
+      }
       if (!imageModals.some((e) => e.name === files[i].name)) {
         setImageModals((prevImages) => [
           ...prevImages,
@@ -327,6 +334,12 @@ function HomePage() {
         setSnackBarNotif({
           severity: "error",
           message: "Vui lòng chọn loại biên bản",
+        });
+        setSnackBarOpen(true);
+      } if (note.trim() == "") {
+        setSnackBarNotif({
+          severity: "error",
+          message: "Vui lòng ghi chú thông tin",
         });
         setSnackBarOpen(true);
       } else if (imageModals.length == 0) {
@@ -386,6 +399,12 @@ function HomePage() {
           severity: "error",
           message: "Vui lòng chọn loại biên bản",
         });
+        setSnackBarOpen(true);
+      } if (note.trim() == "") {
+        setSnackBarNotif({
+          severity: "error",
+          message: "Vui lòng ghi chú thông tin",
+        })
         setSnackBarOpen(true);
       } else if (imageModals.length == 0) {
         setSnackBarNotif({
