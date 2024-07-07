@@ -11,8 +11,9 @@ import List from "@mui/material/List";
 import Floor from "../../../../components/Supervisor/Floor";
 import { useNavigate, useLocation } from "react-router-dom";
 import useAdminServices from "../../../../services/useAdminServices";
+import useExamScheduleServices from "../../../../services/useExamScheduleServices";
 import LoadingCard from "../../../../components/LoadingCard";
-import { formatHour } from "../../../../untils/format-date";
+import { formatHour, formatDate } from "../../../../untils/format-date";
 import { CircularProgress } from "@mui/material";
 
 const cx = classNames.bind(styles);
@@ -21,6 +22,7 @@ function ScheduleDetailPage() {
   const navigate = useNavigate();
   const { building, date } = location.state;
   const { getTimes, getRooms, getStudents } = useAdminServices();
+  const { getRoomInfo } = useExamScheduleServices();
   const [loadMore, setLoadMore] = useState(false);
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [times, setTimes] = useState([]);
@@ -34,6 +36,7 @@ function ScheduleDetailPage() {
   };
   const [room, setRoom] = useState([]);
   const [students, setStudents] = useState([]);
+  const [info, setInfo] = useState({});
 
   useEffect(() => {
     const getTimesExam = async () => {
@@ -80,8 +83,11 @@ function ScheduleDetailPage() {
       setStudentsLoading(true);
       try {
         const response = await getStudents(time, Room);
-        setStudents(response);
-        setStudentsLoading(false);
+        setStudents(response).then(()=>{
+          setStudentsLoading(false);
+        });
+        // setStudentsLoading(false);
+
       } catch (err) {
         setStudentsLoading(false);
         console.log("get time error: ", err);
@@ -90,7 +96,22 @@ function ScheduleDetailPage() {
   };
 
   const handleRoomClick = (Room) => {
+    const getInfo = async () => {
+      try {
+        const response = await getRoomInfo(time, Room);
+        setInfo(response).then(()=>{
+          setStudentsLoading(false);
+        });
+        
+      } catch (err) {
+        setStudentsLoading(false);
+        console.log("get time error: ", err);
+      }
+    };
+
+    getInfo();
     getStudentsExam(Room);
+
   };
   return (
     <div className={cx("schedulePage")}>
@@ -163,13 +184,30 @@ function ScheduleDetailPage() {
               {studentsLoading ? (
                 <LoadingCard />
               ) : students?.length > 0 ? (
-                students.map((student, i) => (
-                  <StudentCard
-                    key={i}
-                    student={student.student}
-                    attendance={student.attendance}
-                  />
-                ))
+                <>
+                  <div
+                    style={{ width: "100%", display: "flex", justifyContent: "center", marginBottom: 20 }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "Tahoma",
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        color: "#0051C6",
+                      }}
+                    >
+                      Môn thi: {info.subject_name}, Ngày thi:{" "}
+                      {formatDate(info.start_time)}, Số lượng: {info.quantity}
+                    </span>
+                  </div>
+                  {students.map((student, i) => (
+                    <StudentCard
+                      key={i}
+                      student={student.student}
+                      attendance={student.attendance}
+                    />
+                  ))}
+                </>
               ) : (
                 <div
                   style={{

@@ -1,5 +1,5 @@
 import classNames from 'classnames/bind';
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import styles from "./Floor.module.scss";
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -10,12 +10,18 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import Room from "../Room"
 const cx = classNames.bind(styles);
-function Floor({room, handleRoomClick, time}) {
+function Floor({room, handleRoomClick, time, roomIdClicked}) {
     const [open, setOpen] = useState(true);
 
     const handleClick = () => {
         setOpen(!open);
     };
+    useEffect(()=>{
+        console.log(roomIdClicked);
+        setOpen(!open);
+    },[roomIdClicked])
+    
+
 
     return (
         <>
@@ -29,7 +35,9 @@ function Floor({room, handleRoomClick, time}) {
             <Collapse in={open} timeout="auto" unmountOnExit>
                 <div className={cx("floor")}>
                 {room.map((r) => (
-                    <Room key={r._id} room={r} 
+                    <Room style={{backgroundColor: roomIdClicked === r._id ? "#11d2ef4a" : "fff"}} 
+                        key={r._id} room={r} 
+                        roomIdClicked={roomIdClicked}
                         handleRoomClick={() => {handleRoomClick(r._id, time, r.room_name)}} />
                 ))}
                 </div>

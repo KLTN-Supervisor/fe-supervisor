@@ -12,7 +12,7 @@ import Floor from "../../../components/Supervisor/Floor";
 import { useNavigate, useLocation } from "react-router-dom";
 import useExamScheduleServices from "../../../services/useExamScheduleServices";
 import LoadingCard from "../../../components/LoadingCard";
-import { formatHour } from "../../../untils/format-date";
+import { formatDate, formatHour } from "../../../untils/format-date";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { CircularProgress } from "@mui/material";
 
@@ -21,7 +21,7 @@ function ScheduleDetailPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { building, date } = location.state;
-  const { getTimes, getRooms, getStudents } = useExamScheduleServices();
+  const { getTimes, getRooms, getStudents, getRoomInfo } = useExamScheduleServices();
   const [loadMore, setLoadMore] = useState(false);
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [times, setTimes] = useState([]);
@@ -34,9 +34,10 @@ function ScheduleDetailPage() {
   };
   const [room, setRoom] = useState([]);
   const [students, setStudents] = useState([]);
+  const [info, setInfo] = useState({});
+  const [roomIdClicked, setRoomIdClicked] = useState("");
 
   useEffect(() => {
-
     const getTimesExam = async () => {
       if (!studentsLoading) {
         setStudentsLoading(true);
@@ -74,7 +75,10 @@ function ScheduleDetailPage() {
       }
     };
     getRoomsExam();
+    setRoomIdClicked("");
   }, [time]);
+
+  
 
   const handleRoomClick = (Room) => {
     const getStudentsExam = async () => {
@@ -90,6 +94,18 @@ function ScheduleDetailPage() {
         }
       }
     };
+    const getInfo = async () => {
+      try {
+        const response = await getRoomInfo(time, Room);
+        setInfo(response);
+      } catch (err) {
+        console.log("get time error: ", err);
+      }
+    };
+    if (!studentsLoading) {
+      setRoomIdClicked(Room);
+    }
+    getInfo();
     getStudentsExam();
   };
   return (
@@ -157,6 +173,7 @@ function ScheduleDetailPage() {
                 {floor.map((f) => (
                   <Floor
                     key={f}
+                    roomIdClicked={roomIdClicked}
                     room={room.filter((r) => r.floor === f)}
                     handleRoomClick={handleRoomClick}
                   />
@@ -165,13 +182,30 @@ function ScheduleDetailPage() {
               {studentsLoading ? (
                 <LoadingCard />
               ) : students?.length > 0 ? (
-                students.map((student, i) => (
-                  <StudentCard
-                    key={i}
-                    student={student.student}
-                    attendance={student.attendance}
-                  />
-                ))
+                <>
+                  <div
+                    style={{ width: "100%", display: "flex", justifyContent: "center", marginBottom: 20 }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "Tahoma",
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        color: "#0051C6",
+                      }}
+                    >
+                      Môn thi: {info.subject_name}, Ngày thi:{" "}
+                      {formatDate(info.start_time)}, Số lượng: {info.quantity}
+                    </span>
+                  </div>
+                  {students.map((student, i) => (
+                    <StudentCard
+                      key={i}
+                      student={student.student}
+                      attendance={student.attendance}
+                    />
+                  ))}
+                </>
               ) : (
                 <div
                   style={{
