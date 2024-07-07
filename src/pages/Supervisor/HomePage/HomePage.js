@@ -339,7 +339,7 @@ function HomePage() {
       } if (note.trim() == "") {
         setSnackBarNotif({
           severity: "error",
-          message: "Vui lòng ghi chú thông tin",
+          message: "Vui lòng ghi chú thông tin như thông tin phòng thi...",
         });
         setSnackBarOpen(true);
       } else if (imageModals.length == 0) {
@@ -403,7 +403,7 @@ function HomePage() {
       } if (note.trim() == "") {
         setSnackBarNotif({
           severity: "error",
-          message: "Vui lòng ghi chú thông tin",
+          message: "Vui lòng ghi chú thông tin như thông tin phòng thi...",
         })
         setSnackBarOpen(true);
       } else if (imageModals.length == 0) {
