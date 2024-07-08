@@ -10,7 +10,7 @@ function Room({room, handleRoomClick, roomIdClicked}) {
     },[roomIdClicked])
 
     return(
-        <div className={cx("room")} onClick={handleRoomClick} style={{backgroundColor: roomIdClicked === room._id ? "#11d2ef4a" : "fff"}}>
+        <div className={cx("room", { "room-active": roomIdClicked === room._id })} onClick={handleRoomClick} >
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginRight: "10px"}}>
                 <MeetingRoomOutlinedIcon style={{color: "rgb(0 36 147 / 83%)"}}/>
             </div>

@@ -96,8 +96,10 @@ function ScheduleDetailPage() {
     };
     const getInfo = async () => {
       try {
-        const response = await getRoomInfo(time, Room);
-        setInfo(response);
+        if (!studentsLoading) {
+          const response = await getRoomInfo(time, Room);
+          setInfo(response);
+        }
       } catch (err) {
         console.log("get time error: ", err);
       }

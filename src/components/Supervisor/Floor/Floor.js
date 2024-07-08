@@ -18,7 +18,7 @@ function Floor({room, handleRoomClick, time, roomIdClicked}) {
     };
     useEffect(()=>{
         console.log(roomIdClicked);
-        setOpen(!open);
+        // setOpen(!open);
     },[roomIdClicked])
     
 
@@ -35,9 +35,9 @@ function Floor({room, handleRoomClick, time, roomIdClicked}) {
             <Collapse in={open} timeout="auto" unmountOnExit>
                 <div className={cx("floor")}>
                 {room.map((r) => (
-                    <Room style={{backgroundColor: roomIdClicked === r._id ? "#11d2ef4a" : "fff"}} 
+                    <Room  
                         key={r._id} room={r} 
-                        roomIdClicked={roomIdClicked}
+                        roomIdClicked={roomIdClicked === r._id ? roomIdClicked : null}
                         handleRoomClick={() => {handleRoomClick(r._id, time, r.room_name)}} />
                 ))}
                 </div>

@@ -37,6 +37,7 @@ function ScheduleDetailPage() {
   const [room, setRoom] = useState([]);
   const [students, setStudents] = useState([]);
   const [info, setInfo] = useState({});
+  const [roomIdClicked, setRoomIdClicked] = useState("");
 
   useEffect(() => {
     const getTimesExam = async () => {
@@ -76,6 +77,7 @@ function ScheduleDetailPage() {
     };
     getRoomsExam();
     getStudentsExam("");
+    setRoomIdClicked("");
   }, [time]);
 
   const getStudentsExam = async (Room) => {
@@ -98,17 +100,17 @@ function ScheduleDetailPage() {
   const handleRoomClick = (Room) => {
     const getInfo = async () => {
       try {
-        const response = await getRoomInfo(time, Room);
-        setInfo(response).then(()=>{
-          setStudentsLoading(false);
-        });
-        
+        if (!studentsLoading) {
+          const response = await getRoomInfo(time, Room);
+          setInfo(response)
+        }
       } catch (err) {
-        setStudentsLoading(false);
         console.log("get time error: ", err);
       }
     };
-
+    if (!studentsLoading) {
+      setRoomIdClicked(Room);
+    }
     getInfo();
     getStudentsExam(Room);
 
@@ -176,6 +178,7 @@ function ScheduleDetailPage() {
                 {floor.map((f) => (
                   <Floor
                     key={f}
+                    roomIdClicked={roomIdClicked}
                     room={room.filter((r) => r.floor === f)}
                     handleRoomClick={handleRoomClick}
                   />
