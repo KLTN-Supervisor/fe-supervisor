@@ -22,8 +22,8 @@ import { UserSearch } from "./UserSeach";
 import { UserTable } from "./UserTable";
 // import { applyPagination } from "../../../../shared/util/apply-pagination";
 // import { useSelection } from "../../../../shared/hook/use-selection";
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import classNames from "classnames/bind";
 import styles from "./UserModal.module.scss";
 import styles2 from "../../../Supervisor/StudentCard/StudentCard.module.scss";
@@ -409,7 +409,6 @@ const UsersManage = () => {
 
   const [showPassword, setShowPassword] = useState(false);
 
-
   const handlePageChange = useCallback((event, value) => {
     setPage(value);
   }, []);
@@ -545,7 +544,7 @@ const UsersManage = () => {
               </div>
             </Stack>
             <UserSearch setSearch={setSearch} />
-            <FormControl
+            {/* <FormControl
               variant="standard"
               className={cx("form__select")}
               sx={{
@@ -575,7 +574,7 @@ const UsersManage = () => {
                     </MenuItem>
                   ))}
               </Select>
-            </FormControl>
+            </FormControl> */}
 
             <UserTable
               isLoading={dataLoading}
@@ -673,7 +672,10 @@ const UsersManage = () => {
                 </div>
               </div>
               <div className={cx2("modal-info")} style={{ width: "90%" }}>
-                <div className={cx2("info")} style={{ marginLeft: 10, marginTop: 10 }}>
+                <div
+                  className={cx2("info")}
+                  style={{ marginLeft: 10, marginTop: 10 }}
+                >
                   <div className={cx2("title")}>Quyền tài khoản:</div>
                   <FormControl
                     variant="standard"
@@ -884,7 +886,7 @@ const UsersManage = () => {
                     <div className={cx2("info")} style={{ marginLeft: 10 }}>
                       <div className={cx2("title")}>Mật khẩu:</div>
                       <input
-                        type={showPassword ? 'text' : 'password'}
+                        type={showPassword ? "text" : "password"}
                         id="password"
                         style={{
                           border: !isEdit && !isCreateNew && "none",
@@ -901,11 +903,17 @@ const UsersManage = () => {
                         readOnly={!isEdit && !isCreateNew}
                         onChange={changeHandler}
                       />
-                      {showPassword ?
-                      <VisibilityIcon className={cx2("password-icon")}  
-                        onClick={()=>setShowPassword(false)}/> :
-                      <VisibilityOffIcon className={cx2("password-icon")}
-                        onClick={()=>setShowPassword(true)}/>}
+                      {showPassword ? (
+                        <VisibilityIcon
+                          className={cx2("password-icon")}
+                          onClick={() => setShowPassword(false)}
+                        />
+                      ) : (
+                        <VisibilityOffIcon
+                          className={cx2("password-icon")}
+                          onClick={() => setShowPassword(true)}
+                        />
+                      )}
                     </div>
                     <div className={cx2("info")}>
                       <div

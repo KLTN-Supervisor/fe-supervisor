@@ -102,6 +102,7 @@ const InspectorsManage = () => {
       );
       if (response) {
         removeFile();
+        getData();
       }
     } catch (err) {
       console.log("upload file: ", err);

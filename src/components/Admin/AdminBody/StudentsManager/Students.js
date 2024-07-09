@@ -280,6 +280,7 @@ const StudentsManage = () => {
       });
       if (response) {
         removeFile();
+        getData();
       }
     } catch (err) {
       console.log("upload file: ", err);
@@ -304,6 +305,7 @@ const StudentsManage = () => {
       );
       if (response) {
         removeArchiveFiles();
+        getData();
       }
     } catch (err) {
       console.log("upload image: ", err);
