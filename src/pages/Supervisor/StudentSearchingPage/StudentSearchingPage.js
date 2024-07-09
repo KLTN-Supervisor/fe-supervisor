@@ -191,7 +191,7 @@ function RoomingListPage() {
                 <LoadingCard />
               ) : students?.length > 0 ? (
                 students.map((student, i) => (
-                  <StudentCard key={i} student={student} />
+                  <StudentCard key={i} student={student} search={true}/>
                 ))
               ) : (
                 <div

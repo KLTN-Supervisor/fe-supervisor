@@ -12,12 +12,13 @@ import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import { Alert, Snackbar, CircularProgress } from "@mui/material";
 import { StateContext } from "../../../context/StateContext";
 import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
+import usePrivateHttpClient from "../../../hooks/http-hook/private-http-hook";
 
 
 const cx = classNames.bind(styles);
 const cx2 = classNames.bind(styles2);
 
-function StudentCard({ student, attendance, home, updateAttendance, updateAttendanceTrue }) {
+function StudentCard({ student, attendance, home, search, updateAttendance, updateAttendanceTrue }) {
   const [modal, setModal] = useState(false);
   const [currentTitle, setCurrentTitle] = useState(document.title);
   const [isAttendance, setIsAttendance] = useState(attendance);
@@ -53,7 +54,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
       setIsAttending(false);
     }
   };
-
+  const { privateRequest } = usePrivateHttpClient();
   const [state, setState] = useState(0);
   const [cameraIds, setCameraIds] = useState('');
   const [currentCameraIndex , setCurrentCameraIndex ] = useState(0);
@@ -62,6 +63,42 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
   const isLoadCanvasRef = useRef(true);
   const intervalRef = useRef(null);
   const { faceMatcher } = useContext(StateContext);
+  const { dispatch } = useContext(StateContext);
+
+  useEffect(()=>{
+    if(!faceMatcher){
+      const loadTrainingData = async () => {
+        try {
+          const response = await privateRequest(`/train/`);
+          const labeledFaceDescriptors = response.data
+            .map((x) => {
+              const descriptors = x.descriptors.map(
+                (descriptor) => new Float32Array(descriptor)
+              );
+              return new faceapi.LabeledFaceDescriptors(x.label, descriptors);
+            })
+            .filter(Boolean);
+          return labeledFaceDescriptors;
+        } catch (err) {
+          throw err;
+        }
+      };
+      
+      Promise.all([
+        // THIS FOR FACE DETECT AND LOAD FROM YOU PUBLIC/MODELS DIRECTORY
+        faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+        faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+        faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+      ]).then(async () => {
+        // Khởi tạo faceMatcher và lưu vào Redux store
+        const trainingData = await loadTrainingData();
+        const faceMatcher = new faceapi.FaceMatcher(trainingData, 0.4);
+        dispatch({ type: "SET_FACE_MATCHER", payload: faceMatcher });
+      });
+
+    }
+    console.log(faceMatcher);
+  },[faceMatcher])
 
   const [snackBarOpen, setSnackBarOpen] = useState(false);
   const [snackBarNotif, setSnackBarNotif] = useState({
@@ -518,7 +555,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                     style={{ width: "100%", maxHeight: "200px", marginBottom: "15px" }}
                     src={getStudentsImageSource(student?.portrait_img)}
                   />
-                  {attendance === true || attendance === false &&
+                  {!search &&
                   (!attendance && !isAttendance ? (
                     <span
                       style={{
