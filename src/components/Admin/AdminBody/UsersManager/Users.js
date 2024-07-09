@@ -738,7 +738,7 @@ const UsersManage = () => {
                       <Autocomplete
                         id="inspector"
                         sx={{
-                          width: "89%",
+                          width: "84%",
                           ":active": { color: "rgba(0, 148, 246, 0.69)" },
                         }}
                         open={open}
