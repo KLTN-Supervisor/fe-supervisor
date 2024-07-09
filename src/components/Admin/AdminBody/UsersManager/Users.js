@@ -201,6 +201,11 @@ const UsersManage = () => {
   };
 
   const changeHandler = (e) => {
+    if (e.target.value.trim() !== "")
+      setErrors((prev) => ({
+        ...prev,
+        [e.target.id]: "",
+      }));
     if (e.target?.name && e.target?.name === "role") {
       setModalData((prev) => ({
         ...prev,
@@ -783,9 +788,10 @@ const UsersManage = () => {
                           }
                         }}
                         {...(!isCreateNew && {
-                          inputValue: modalData?.inspector
-                            ? `${modalData.inspector.inspector_id} - ${modalData.inspector.last_name} ${modalData.inspector.middle_name} ${modalData.inspector.first_name}`
-                            : "",
+                          inputValue: isEdit
+                            ? inspectorSearch
+                            : modalData?.inspector &&
+                              `${modalData.inspector.inspector_id} - ${modalData.inspector.last_name} ${modalData.inspector.middle_name} ${modalData.inspector.first_name}`,
                         })}
                         renderInput={(params) => (
                           <TextField

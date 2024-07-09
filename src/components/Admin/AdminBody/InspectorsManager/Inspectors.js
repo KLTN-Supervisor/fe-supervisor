@@ -122,6 +122,11 @@ const InspectorsManage = () => {
   };
 
   const changeHandler = (e) => {
+    if (e.target.value.trim() !== "")
+      setErrors((prev) => ({
+        ...prev,
+        [e.target.id]: "",
+      }));
     setModalData((prev) => ({
       ...prev,
       [e.target.id]: e.target.value,
@@ -175,6 +180,7 @@ const InspectorsManage = () => {
       inspector_id: "",
       fullname: "",
       citizen_identification_number: "",
+      email: "",
       gender: "",
       date_of_birth: "",
       place_of_birth: "",
@@ -220,6 +226,7 @@ const InspectorsManage = () => {
 
   const [modal, setModal] = useState(false);
   const toggleModal = () => {
+    clearValidateErrors();
     if (isEdit) setIsEdit(false);
     if (isCreateNew) setIsCreateNew(false);
     setModal(!modal);
@@ -233,6 +240,7 @@ const InspectorsManage = () => {
         inspector_id: item?.inspector_id,
         fullname: item?.fullname,
         citizen_identification_number: item?.citizen_identification_number,
+        email: item?.email,
         gender:
           item?.gender === true
             ? "Nam"
@@ -254,10 +262,11 @@ const InspectorsManage = () => {
     let validationErrors = {};
 
     // Validate student_id
-    if (!data.student_id) {
-      validationErrors.student_id = "MSSV là bắt buộc.";
-    } else if (data.student_id.length < 8 || data.student_id.length > 12) {
-      validationErrors.student_id = "MSSV phải có độ dài từ 8 đến 12 ký tự.";
+    if (!data.inspector_id) {
+      validationErrors.inspector_id = "Mã thanh tra là bắt buộc.";
+    } else if (data.inspector_id.length < 8 || data.inspector_id.length > 15) {
+      validationErrors.inspector_id =
+        "Mã thanh tra phải có độ dài từ 8 đến 15 ký tự.";
     }
     // Validate citizen_identification_number
     if (!data.citizen_identification_number) {
@@ -272,6 +281,13 @@ const InspectorsManage = () => {
     } else if (!/^\d+$/.test(data.citizen_identification_number)) {
       validationErrors.citizen_identification_number =
         "Số CCCD/CMND chỉ được chứa các ký tự số.";
+    }
+
+    // Validate email
+    if (!data.email) {
+      validationErrors.email = "Email là bắt buộc";
+    } else if (!/^[a-z0-9.-]+@[a-z.]+\.[a-z]{2,4}$/.test(data.email)) {
+      validationErrors.email = "Email không hợp lệ";
     }
     // Validate fullname
     if (!data.fullname) {
@@ -327,40 +343,17 @@ const InspectorsManage = () => {
     if (!data.nationality) {
       validationErrors.nationality = "Quốc tịch là bắt buộc.";
     }
-    // Validate class
-    if (!data.class) {
-      validationErrors.class = "Lớp học là bắt buộc.";
-    } else if (data.class.length < 6) {
-      validationErrors.class = "Lớp học phải có ít nhất 6 ký tự.";
-    }
-    // Validate school_year
-    if (!data.school_year) {
-      validationErrors.school_year = "Năm học là bắt buộc.";
-    }
+
     // Validate current_address
     if (!data.current_address) {
       validationErrors.current_address = "Địa chỉ hiện tại là bắt buộc.";
-    }
-    // Validate education_program
-    if (!data.education_program) {
-      validationErrors.education_program = "Chương trình học là bắt buộc.";
-    } else if (data.education_program.length < 6) {
-      validationErrors.education_program =
-        "Chương trình học phải có ít nhất 6 ký tự.";
-    }
-    // Validate major
-    if (!data.major) {
-      validationErrors.major = "Ngành học là bắt buộc.";
-    }
-    // Validate faculty
-    if (!data.faculty) {
-      validationErrors.faculty = "Khoa là bắt buộc.";
     }
 
     return validationErrors;
   };
 
   const handleEditClick = () => {
+    clearValidateErrors();
     if (isEdit) clearPortrailImg();
     setIsEdit(!isEdit);
   };
@@ -368,6 +361,15 @@ const InspectorsManage = () => {
   const handleCreateStudent = async () => {
     try {
       setModifyDataLoading(true);
+
+      const validationErrors = validateModalData(modalData);
+
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        setModifyDataLoading(false);
+        return;
+      }
+
       const formData = new FormData();
       formData.append("image", portraitImgFile);
       formData.append("inspector_id", modalData?.inspector_id);
@@ -375,6 +377,7 @@ const InspectorsManage = () => {
         "citizen_identification_number",
         modalData?.citizen_identification_number
       );
+      formData.append("email", modalData?.email);
       formData.append("gender", modalData?.gender === "Nam" ? true : false);
       formData.append("date_of_birth", modalData?.date_of_birth);
       formData.append("place_of_birth", modalData?.place_of_birth);
@@ -431,6 +434,15 @@ const InspectorsManage = () => {
   const handleUpdateStudent = async () => {
     try {
       setModifyDataLoading(true);
+
+      const validationErrors = validateModalData(modalData);
+
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        setModifyDataLoading(false);
+        return;
+      }
+
       const formData = new FormData();
       formData.append("image", portraitImgFile);
       formData.append("inspector_id", modalData?.inspector_id);
@@ -438,6 +450,7 @@ const InspectorsManage = () => {
         "citizen_identification_number",
         modalData?.citizen_identification_number
       );
+      formData.append("email", modalData?.email);
       formData.append("gender", modalData?.gender === "Nam" ? true : false);
       formData.append("date_of_birth", modalData?.date_of_birth);
       formData.append("place_of_birth", modalData?.place_of_birth);
@@ -653,8 +666,8 @@ const InspectorsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.student_id &&
-                        errors?.student_id.trim() !== "" && {
+                      ...(errors?.inspector_id &&
+                        errors?.inspector_id.trim() !== "" && {
                           borderColor: "red",
                         }),
                     }}
@@ -679,7 +692,7 @@ const InspectorsManage = () => {
                       fontSize: 12,
                     }}
                   >
-                    {errors?.faculty}
+                    {errors?.inspector_id}
                   </span>
                 </div>
                 <div className={cx2("info")}>
@@ -692,8 +705,8 @@ const InspectorsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.student_id &&
-                        errors?.student_id.trim() !== "" && {
+                      ...(errors?.fullname &&
+                        errors?.fullname.trim() !== "" && {
                           borderColor: "red",
                         }),
                     }}
@@ -701,6 +714,25 @@ const InspectorsManage = () => {
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.fullname}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>CMND/CCCD:</div>
@@ -712,8 +744,8 @@ const InspectorsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.student_id &&
-                        errors?.student_id.trim() !== "" && {
+                      ...(errors?.citizen_identification_number &&
+                        errors?.citizen_identification_number.trim() !== "" && {
                           borderColor: "red",
                         }),
                     }}
@@ -721,6 +753,64 @@ const InspectorsManage = () => {
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.citizen_identification_number}
+                  </span>
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Email:</div>
+                  <input
+                    id="email"
+                    className={cx2(
+                      "input-span",
+                      !isEdit && !isCreateNew && "input-span-focus"
+                    )}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.email &&
+                        errors?.email.trim() !== "" && {
+                          borderColor: "red",
+                        }),
+                    }}
+                    value={modalData?.email}
+                    readOnly={!isEdit && !isCreateNew}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.email}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Giới tính:</div>
@@ -774,6 +864,25 @@ const InspectorsManage = () => {
                     </RadioGroup>
                   </FormControl>
                 </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.gender}
+                  </span>
+                </div>
                 <div className={cx2("info")} style={{ marginTop: 0 }}>
                   <div className={cx2("title")} style={{ marginTop: 5 }}>
                     Ngày sinh:
@@ -802,6 +911,10 @@ const InspectorsManage = () => {
                       format="DD/MM/YYYY"
                       readOnly={!isEdit && !isCreateNew}
                       onChange={(value) => {
+                        setErrors((prev) => ({
+                          ...prev,
+                          date_of_birth: "",
+                        }));
                         setModalData((prev) => ({
                           ...prev,
                           date_of_birth: value,
@@ -809,6 +922,25 @@ const InspectorsManage = () => {
                       }}
                     />
                   </LocalizationProvider>
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.date_of_birth}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Nơi sinh:</div>
@@ -820,8 +952,8 @@ const InspectorsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.student_id &&
-                        errors?.student_id.trim() !== "" && {
+                      ...(errors?.place_of_birth &&
+                        errors?.place_of_birth.trim() !== "" && {
                           borderColor: "red",
                         }),
                     }}
@@ -829,6 +961,25 @@ const InspectorsManage = () => {
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.place_of_birth}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Tỉnh/TP:</div>
@@ -840,8 +991,8 @@ const InspectorsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.student_id &&
-                        errors?.student_id.trim() !== "" && {
+                      ...(errors?.city_or_province &&
+                        errors?.city_or_province.trim() !== "" && {
                           borderColor: "red",
                         }),
                     }}
@@ -849,6 +1000,25 @@ const InspectorsManage = () => {
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.city_or_province}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Quận/huyện:</div>
@@ -860,8 +1030,8 @@ const InspectorsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.student_id &&
-                        errors?.student_id.trim() !== "" && {
+                      ...(errors?.district &&
+                        errors?.district.trim() !== "" && {
                           borderColor: "red",
                         }),
                     }}
@@ -869,6 +1039,25 @@ const InspectorsManage = () => {
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.district}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Địa chỉ thường trú:</div>
@@ -880,8 +1069,8 @@ const InspectorsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.student_id &&
-                        errors?.student_id.trim() !== "" && {
+                      ...(errors?.address &&
+                        errors?.address.trim() !== "" && {
                           borderColor: "red",
                         }),
                     }}
@@ -889,6 +1078,25 @@ const InspectorsManage = () => {
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.address}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Quốc tịch:</div>
@@ -900,8 +1108,8 @@ const InspectorsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.student_id &&
-                        errors?.student_id.trim() !== "" && {
+                      ...(errors?.nationality &&
+                        errors?.nationality.trim() !== "" && {
                           borderColor: "red",
                         }),
                     }}
@@ -909,6 +1117,25 @@ const InspectorsManage = () => {
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.nationality}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Nơi ở hiện tại:</div>
@@ -920,8 +1147,8 @@ const InspectorsManage = () => {
                     )}
                     style={{
                       border: !isEdit && !isCreateNew && "none",
-                      ...(errors?.student_id &&
-                        errors?.student_id.trim() !== "" && {
+                      ...(errors?.current_address &&
+                        errors?.current_address.trim() !== "" && {
                           borderColor: "red",
                         }),
                     }}
@@ -929,6 +1156,25 @@ const InspectorsManage = () => {
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.current_address}
+                  </span>
                 </div>
                 <div
                   style={{
