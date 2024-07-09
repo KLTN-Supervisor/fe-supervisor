@@ -518,7 +518,8 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                     style={{ width: "100%", maxHeight: "200px", marginBottom: "15px" }}
                     src={getStudentsImageSource(student?.portrait_img)}
                   />
-                  {!attendance && !isAttendance ? (
+                  {attendance === true || attendance === false &&
+                  (!attendance && !isAttendance ? (
                     <span
                       style={{
                         cursor: home ? "pointer" : "default",
@@ -533,7 +534,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                     >
                       Vắng thi
                     </span>
-                  ): (
+                  ) : (
                     <span
                       style={{
                         cursor: home ? "pointer" : "default",
@@ -548,7 +549,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                     >
                       Có mặt
                     </span>
-                  )}
+                  ))}
                   {home && !attendance && !isAttendance &&
                     <div
                       onClick={toggleModalAttendance}

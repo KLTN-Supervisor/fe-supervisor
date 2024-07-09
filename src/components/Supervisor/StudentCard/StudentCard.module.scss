@@ -311,7 +311,8 @@
   font-size: inherit;
   font-weight: 450;
   padding: 6px 8px;
-  width: 85%;
+  width: 80%;
+  padding-right: 30px;
   border-radius: 10px;
   outline: none;
   border: rgb(198, 194, 194) solid 0.2px;
@@ -323,6 +324,13 @@
 .input-span-focus:focus-visible {
   outline: none;
   border: none;
+}
+
+.password-icon{
+  position: absolute; 
+  right: 5.4%;
+  margin-top: 3px;
+  cursor: pointer;
 }
 
 .close-modal {
@@ -369,7 +377,10 @@
     }
   }
   .input-span {
-    width: 45%;
+    width: 80%;
+  }
+  .password-icon{
+    right: 11%;
   }
   .form-control {
     width: 50% !important;
@@ -393,7 +404,8 @@
     }
   }
   .input-span {
-    width: 40%;
+    width: 75%;
+    height: 20px;
   }
   .form-control {
     width: 45% !important;

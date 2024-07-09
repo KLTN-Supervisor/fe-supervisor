@@ -17,19 +17,18 @@ import {
   Stack,
   SvgIcon,
   TextField,
-  Typography,
 } from "@mui/material";
 import { UserSearch } from "./UserSeach";
 import { UserTable } from "./UserTable";
 // import { applyPagination } from "../../../../shared/util/apply-pagination";
 // import { useSelection } from "../../../../shared/hook/use-selection";
-import Modal from "react-bootstrap/Modal";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import classNames from "classnames/bind";
 import styles from "./UserModal.module.scss";
 import styles2 from "../../../Supervisor/StudentCard/StudentCard.module.scss";
 import useAdminServices from "../../../../services/useAdminServices";
 import usePrivateHttpClient from "../../../../hooks/http-hook/private-http-hook";
-import ImportInput from "../UploadFile/ImportInput";
 import CloseIcon from "@mui/icons-material/Close";
 import { getStudentsImageSource } from "../../../../untils/getImageSource";
 import { formatHour, formatDate } from "../../../../untils/format-date";
@@ -408,6 +407,9 @@ const UsersManage = () => {
     }
   };
 
+  const [showPassword, setShowPassword] = useState(false);
+
+
   const handlePageChange = useCallback((event, value) => {
     setPage(value);
   }, []);
@@ -652,7 +654,7 @@ const UsersManage = () => {
                   }}
                 >
                   <img
-                    style={{ width: "100%", maxHeight: "250px" }}
+                    style={{ width: "100%", maxHeight: "200px" }}
                     src={getStudentsImageSource(previewPortraitImg)}
                     alt="Avatar"
                   />
@@ -671,7 +673,7 @@ const UsersManage = () => {
                 </div>
               </div>
               <div className={cx2("modal-info")} style={{ width: "90%" }}>
-                <div className={cx2("info")}>
+                <div className={cx2("info")} style={{ marginLeft: 10, marginTop: 10 }}>
                   <div className={cx2("title")}>Quyền tài khoản:</div>
                   <FormControl
                     variant="standard"
@@ -838,7 +840,7 @@ const UsersManage = () => {
                     </div>
                   </>
                 )}
-                <div className={cx2("info")}>
+                <div className={cx2("info")} style={{ marginLeft: 10 }}>
                   <div className={cx2("title")}>Tên đăng nhập:</div>
                   <input
                     id="username"
@@ -879,9 +881,10 @@ const UsersManage = () => {
                 </div>
                 {isCreateNew && (
                   <>
-                    <div className={cx2("info")}>
+                    <div className={cx2("info")} style={{ marginLeft: 10 }}>
                       <div className={cx2("title")}>Mật khẩu:</div>
                       <input
+                        type={showPassword ? 'text' : 'password'}
                         id="password"
                         style={{
                           border: !isEdit && !isCreateNew && "none",
@@ -898,6 +901,11 @@ const UsersManage = () => {
                         readOnly={!isEdit && !isCreateNew}
                         onChange={changeHandler}
                       />
+                      {showPassword ?
+                      <VisibilityIcon className={cx2("password-icon")}  
+                        onClick={()=>setShowPassword(false)}/> :
+                      <VisibilityOffIcon className={cx2("password-icon")}
+                        onClick={()=>setShowPassword(true)}/>}
                     </div>
                     <div className={cx2("info")}>
                       <div
@@ -920,7 +928,7 @@ const UsersManage = () => {
                     </div>
                   </>
                 )}
-                <div className={cx2("info")}>
+                <div className={cx2("info")} style={{ marginLeft: 10 }}>
                   <div className={cx2("title")}>Tên người dùng:</div>
                   <input
                     id="fullname"
@@ -959,7 +967,7 @@ const UsersManage = () => {
                     {errors?.fullname}
                   </span>
                 </div>
-                <div className={cx2("info")}>
+                <div className={cx2("info")} style={{ marginLeft: 10 }}>
                   <div className={cx2("title")}>Email:</div>
                   <input
                     id="email"
