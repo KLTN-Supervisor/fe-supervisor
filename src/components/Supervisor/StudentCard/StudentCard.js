@@ -17,7 +17,7 @@ import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
 const cx = classNames.bind(styles);
 const cx2 = classNames.bind(styles2);
 
-function StudentCard({ student, attendance, home, updateAttendance, updateAttendanceTrue }) {
+function StudentCard({ student, attendance, home, search, updateAttendance, updateAttendanceTrue }) {
   const [modal, setModal] = useState(false);
   const [currentTitle, setCurrentTitle] = useState(document.title);
   const [isAttendance, setIsAttendance] = useState(attendance);
@@ -518,7 +518,7 @@ function StudentCard({ student, attendance, home, updateAttendance, updateAttend
                     style={{ width: "100%", maxHeight: "200px", marginBottom: "15px" }}
                     src={getStudentsImageSource(student?.portrait_img)}
                   />
-                  {attendance === true || attendance === false &&
+                  {!search &&
                   (!attendance && !isAttendance ? (
                     <span
                       style={{

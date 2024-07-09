@@ -186,13 +186,10 @@ function HomePage() {
 
   const getInfo = async () => {
     if (!studentsLoading) {
-      setStudentsLoading(true);
       try {
         const response = await getRoomInfo(time, room);
         setInfo(response);
-        setStudentsLoading(false);
       } catch (err) {
-        setStudentsLoading(false);
         console.log("get time error: ", err);
       }
     }
