@@ -41,7 +41,9 @@ const UsersManage = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const [data, setData] = useState([]);
+  const [dataLoading, setDataLoading] = useState(false);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const [usersSelected, setUsersSelected] = useState([]);
 
@@ -139,13 +141,17 @@ const UsersManage = () => {
 
   const getData = useCallback(async () => {
     try {
+      setDataLoading(true);
       const response = await getReports(year, term, page, rowsPerPage);
       if (response) {
         setData(response.reports);
         setTotalRecords(response.total_records);
+        setTotalPages(response.total_pages);
+        setDataLoading(false);
       }
     } catch (err) {
       console.log(err);
+      setDataLoading(false);
     }
   }, [year, term, page, rowsPerPage]);
 
@@ -306,8 +312,10 @@ const UsersManage = () => {
             </div>
             {!privateHttpRequest.isLoading && (
               <ReportTable
+                isLoading={dataLoading}
                 count={totalRecords}
                 data={data}
+                totalPages={totalPages}
                 onPageChange={handlePageChange}
                 onRowsPerPageChange={handleRowsPerPageChange}
                 page={page}

@@ -539,7 +539,7 @@ const StudentsManage = () => {
       }
 
       const formData = new FormData();
-      formData.append("image", portraitImgFile);
+      if (portraitImgFile) formData.append("image", portraitImgFile);
       formData.append("student_id", modalData?.student_id);
       formData.append(
         "citizen_identification_number",

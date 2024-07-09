@@ -1,6 +1,6 @@
 import { React, useCallback, useEffect, useRef, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
-import EditIcon from '@mui/icons-material/Edit';
+import EditIcon from "@mui/icons-material/Edit";
 import {
   Box,
   Button,
@@ -53,8 +53,7 @@ const InspectorsManage = () => {
   const [dataLoading, setDataLoading] = useState(true);
   const [modifyDataLoading, setModifyDataLoading] = useState(false);
 
-  const [usersSelected, setUsersSelected] = useState([]);
-  const [modalData, setModalData] = useState({
+  const inspectorInfo = {
     _id: "",
     inspector_id: "",
     fullname: "",
@@ -67,7 +66,15 @@ const InspectorsManage = () => {
     address: "",
     nationality: "",
     current_address: "",
-  });
+  };
+
+  const [usersSelected, setUsersSelected] = useState([]);
+  const [modalData, setModalData] = useState(inspectorInfo);
+  const [errors, setErrors] = useState(inspectorInfo);
+
+  const clearValidateErrors = () => {
+    setErrors(inspectorInfo);
+  };
 
   const [file, setFile] = useState();
   const [fileIsValid, setFileIsValid] = useState();
@@ -243,6 +250,116 @@ const InspectorsManage = () => {
     }
   };
 
+  const validateModalData = (data) => {
+    let validationErrors = {};
+
+    // Validate student_id
+    if (!data.student_id) {
+      validationErrors.student_id = "MSSV là bắt buộc.";
+    } else if (data.student_id.length < 8 || data.student_id.length > 12) {
+      validationErrors.student_id = "MSSV phải có độ dài từ 8 đến 12 ký tự.";
+    }
+    // Validate citizen_identification_number
+    if (!data.citizen_identification_number) {
+      validationErrors.citizen_identification_number =
+        "Số CCCD/CMND là bắt buộc.";
+    } else if (
+      data.citizen_identification_number.length < 9 ||
+      data.citizen_identification_number.length > 12
+    ) {
+      validationErrors.citizen_identification_number =
+        "Số CCCD/CMND phải có độ dài từ 9 đến 12 ký tự.";
+    } else if (!/^\d+$/.test(data.citizen_identification_number)) {
+      validationErrors.citizen_identification_number =
+        "Số CCCD/CMND chỉ được chứa các ký tự số.";
+    }
+    // Validate fullname
+    if (!data.fullname) {
+      validationErrors.fullname = "Họ và tên là bắt buộc.";
+    } else if (/[0-9!@#$%^&*(),.?":{}|<>]/.test(data.fullname)) {
+      validationErrors.fullname =
+        "Họ và tên không được chứa số hoặc ký tự đặc biệt.";
+    }
+    // Validate first_name, middle_name, last_name (extracted from fullname)
+    const nameParts = data.fullname ? data.fullname.split(" ") : [];
+    if (nameParts.length < 3) {
+      validationErrors.fullname = "Họ và tên không hợp lệ.";
+    } else {
+      const first_name = nameParts[nameParts.length - 1];
+      const last_name = nameParts[0];
+      const middle_name = nameParts.slice(1, nameParts.length - 1).join(" ");
+
+      if (first_name.length < 1 || first_name.length > 10) {
+        validationErrors.fullname = "Tên phải có độ dài từ 1 đến 10 ký tự.";
+      }
+      if (last_name.length < 2 || last_name.length > 12) {
+        validationErrors.fullname = "Họ phải có độ dài từ 2 đến 12 ký tự.";
+      }
+      if (middle_name.length < 2) {
+        validationErrors.fullname = "Tên đệm phải có ít nhất 2 ký tự.";
+      }
+    }
+    // Validate gender
+    if (!data.gender) {
+      validationErrors.gender = "Giới tính là bắt buộc.";
+    }
+    // Validate date_of_birth
+    if (!data.date_of_birth) {
+      validationErrors.date_of_birth = "Ngày sinh là bắt buộc.";
+    }
+    // Validate place_of_birth
+    if (!data.place_of_birth) {
+      validationErrors.place_of_birth = "Nơi sinh là bắt buộc.";
+    }
+    // Validate city_or_province
+    if (!data.city_or_province) {
+      validationErrors.city_or_province = "Tỉnh/Thành phố là bắt buộc.";
+    }
+    // Validate district
+    if (!data.district) {
+      validationErrors.district = "Quận/Huyện là bắt buộc.";
+    }
+    // Validate address
+    if (!data.address) {
+      validationErrors.address = "Địa chỉ là bắt buộc.";
+    }
+    // Validate nationality
+    if (!data.nationality) {
+      validationErrors.nationality = "Quốc tịch là bắt buộc.";
+    }
+    // Validate class
+    if (!data.class) {
+      validationErrors.class = "Lớp học là bắt buộc.";
+    } else if (data.class.length < 6) {
+      validationErrors.class = "Lớp học phải có ít nhất 6 ký tự.";
+    }
+    // Validate school_year
+    if (!data.school_year) {
+      validationErrors.school_year = "Năm học là bắt buộc.";
+    }
+    // Validate current_address
+    if (!data.current_address) {
+      validationErrors.current_address = "Địa chỉ hiện tại là bắt buộc.";
+    }
+    // Validate education_program
+    if (!data.education_program) {
+      validationErrors.education_program = "Chương trình học là bắt buộc.";
+    } else if (data.education_program.length < 6) {
+      validationErrors.education_program =
+        "Chương trình học phải có ít nhất 6 ký tự.";
+    }
+    // Validate major
+    if (!data.major) {
+      validationErrors.major = "Ngành học là bắt buộc.";
+    }
+    // Validate faculty
+    if (!data.faculty) {
+      validationErrors.faculty = "Khoa là bắt buộc.";
+    }
+
+    return validationErrors;
+  };
+
   const handleEditClick = () => {
     if (isEdit) clearPortrailImg();
     setIsEdit(!isEdit);
@@ -389,7 +506,7 @@ const InspectorsManage = () => {
         }}
       >
         <Container maxWidth="xl">
-          <div className={cx("title")} style={{margin: "0 0 15px 0"}}>
+          <div className={cx("title")} style={{ margin: "0 0 15px 0" }}>
             <h6 className={cx("text")}>Thanh tra</h6>
           </div>
           <Stack spacing={3}>
@@ -479,10 +596,7 @@ const InspectorsManage = () => {
               }}
             />
           </div>
-          <div
-            className={cx2("modal-navbar-content")}
-            style={{ width: "80%" }}
-          >
+          <div className={cx2("modal-navbar-content")} style={{ width: "80%" }}>
             <div className={cx2("modal-header")}>Thông tin thanh tra</div>
             <div
               className={cx2("modal-main")}
@@ -500,8 +614,11 @@ const InspectorsManage = () => {
               >
                 <div
                   style={{
-                    display:"flex", justifyContent: "center", flexDirection: "column", alignItems: "center",
-                    height: "250px", 
+                    display: "flex",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    height: "250px",
                     cursor: isEdit || isCreateNew ? "pointer" : "",
                   }}
                   onClick={() => {
@@ -513,7 +630,7 @@ const InspectorsManage = () => {
                     src={getStudentsImageSource(previewPortraitImg)}
                     alt="Ảnh thẻ sinh viên"
                   />
-                  <EditIcon style={{color: "#e6e614", marginTop: 10}}/>
+                  <EditIcon style={{ color: "#e6e614", marginTop: 10 }} />
                   <input
                     id="portrait_img"
                     ref={imgRef}
@@ -534,10 +651,36 @@ const InspectorsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.student_id &&
+                        errors?.student_id.trim() !== "" && {
+                          borderColor: "red",
+                        }),
+                    }}
                     value={modalData?.inspector_id}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.faculty}
+                  </span>
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Họ và tên:</div>
@@ -547,6 +690,13 @@ const InspectorsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.student_id &&
+                        errors?.student_id.trim() !== "" && {
+                          borderColor: "red",
+                        }),
+                    }}
                     value={modalData?.fullname}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -560,6 +710,13 @@ const InspectorsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.student_id &&
+                        errors?.student_id.trim() !== "" && {
+                          borderColor: "red",
+                        }),
+                    }}
                     value={modalData?.citizen_identification_number}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -567,7 +724,10 @@ const InspectorsManage = () => {
                 </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Giới tính:</div>
-                  <FormControl sx={{ p: 0.5 }} className={cx2("form-control")}>
+                  <FormControl
+                    sx={{ pt: 0.5, pb: 0.5 }}
+                    className={cx2("form-control")}
+                  >
                     <RadioGroup
                       row
                       value={modalData?.gender}
@@ -614,11 +774,17 @@ const InspectorsManage = () => {
                     </RadioGroup>
                   </FormControl>
                 </div>
-                <div className={cx2("info")} style={{marginTop: 0}}>
-                  <div className={cx2("title")} style={{marginTop: 5}}>Ngày sinh:</div>
-                  <LocalizationProvider dateAdapter={AdapterDayjs} style={{maxWidth: "60%"}} className={cx2("form-control")}>
-                    <DatePicker
+                <div className={cx2("info")} style={{ marginTop: 0 }}>
+                  <div className={cx2("title")} style={{ marginTop: 5 }}>
+                    Ngày sinh:
+                  </div>
+                  <LocalizationProvider
+                    dateAdapter={AdapterDayjs}
+                    style={{ maxWidth: "60%" }}
                     className={cx2("form-control")}
+                  >
+                    <DatePicker
+                      className={cx2("form-control")}
                       slotProps={{
                         textField: {
                           inputProps: {
@@ -652,6 +818,13 @@ const InspectorsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.student_id &&
+                        errors?.student_id.trim() !== "" && {
+                          borderColor: "red",
+                        }),
+                    }}
                     value={modalData?.place_of_birth}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -665,6 +838,13 @@ const InspectorsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.student_id &&
+                        errors?.student_id.trim() !== "" && {
+                          borderColor: "red",
+                        }),
+                    }}
                     value={modalData?.city_or_province}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -678,6 +858,13 @@ const InspectorsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.student_id &&
+                        errors?.student_id.trim() !== "" && {
+                          borderColor: "red",
+                        }),
+                    }}
                     value={modalData?.district}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -691,6 +878,13 @@ const InspectorsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.student_id &&
+                        errors?.student_id.trim() !== "" && {
+                          borderColor: "red",
+                        }),
+                    }}
                     value={modalData?.address}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -704,6 +898,13 @@ const InspectorsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.student_id &&
+                        errors?.student_id.trim() !== "" && {
+                          borderColor: "red",
+                        }),
+                    }}
                     value={modalData?.nationality}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
@@ -717,57 +918,68 @@ const InspectorsManage = () => {
                       "input-span",
                       !isEdit && !isCreateNew && "input-span-focus"
                     )}
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.student_id &&
+                        errors?.student_id.trim() !== "" && {
+                          borderColor: "red",
+                        }),
+                    }}
                     value={modalData?.current_address}
                     readOnly={!isEdit && !isCreateNew}
                     onChange={changeHandler}
                   />
                 </div>
-                <div style={{
-                    width: "100%",display: "flex",
-                    justifyContent: "space-between",}}>
                 <div
                   style={{
-                    width: "80%",
-                    paddingBottom: 20,
-                    margin: "15px auto auto",
-                    flexDirection: "row",
+                    width: "100%",
                     display: "flex",
                     justifyContent: "space-between",
                   }}
                 >
-                  <button
-                    className={cx2("button")}
+                  <div
                     style={{
-                      backgroundColor: "lightpink",
+                      width: "80%",
+                      paddingBottom: 20,
+                      margin: "15px auto auto",
+                      flexDirection: "row",
+                      display: "flex",
+                      justifyContent: "space-between",
                     }}
-                    onClick={isEdit ? handleEditClick : toggleModal}
-                    disabled={modifyDataLoading}
                   >
-                    {isEdit ? "Hủy" : "Đóng"}
-                  </button>
-                  <button
-                    className={cx2("button")}
-                    style={{
-                      backgroundColor: "lightgreen",
-                    }}
-                    onClick={
-                      isEdit
-                        ? handleUpdateStudent
-                        : isCreateNew
-                        ? handleCreateStudent
-                        : handleEditClick
-                    }
-                    disabled={modifyDataLoading}
-                  >
-                    {modifyDataLoading ? (
-                      <CircularProgress size={25} sx={{ mt: 0.5 }} />
-                    ) : isEdit || isCreateNew ? (
-                      "Lưu"
-                    ) : (
-                      "Chỉnh sửa"
-                    )}
-                  </button>
-                </div>
+                    <button
+                      className={cx2("button")}
+                      style={{
+                        backgroundColor: "lightpink",
+                      }}
+                      onClick={isEdit ? handleEditClick : toggleModal}
+                      disabled={modifyDataLoading}
+                    >
+                      {isEdit ? "Hủy" : "Đóng"}
+                    </button>
+                    <button
+                      className={cx2("button")}
+                      style={{
+                        backgroundColor: "lightgreen",
+                      }}
+                      onClick={
+                        isEdit
+                          ? handleUpdateStudent
+                          : isCreateNew
+                          ? handleCreateStudent
+                          : handleEditClick
+                      }
+                      disabled={modifyDataLoading}
+                    >
+                      {modifyDataLoading ? (
+                        <CircularProgress size={25} sx={{ mt: 0.5 }} />
+                      ) : isEdit || isCreateNew ? (
+                        "Lưu"
+                      ) : (
+                        "Chỉnh sửa"
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

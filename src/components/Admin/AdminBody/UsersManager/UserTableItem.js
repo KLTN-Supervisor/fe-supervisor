@@ -17,6 +17,7 @@ import { getInitials } from "../../../../untils/get-initials";
 import { useState } from "react";
 import useAdminServices from "../../../../services/useAdminServices";
 import usePrivateHttpClient from "../../../../hooks/http-hook/private-http-hook";
+import { getStudentsImageSource } from "../../../../untils/getImageSource";
 
 const cx = classNames.bind(styles);
 
@@ -62,7 +63,7 @@ const UserTableItem = (props) => {
   };
 
   const userRole = {
-    USER: "User thường",
+    USER: "Thanh tra",
     ADMIN: "Quản trị",
     ACADEMIC_AFFAIRS_OFFICE: "PĐT",
   };
@@ -88,7 +89,7 @@ const UserTableItem = (props) => {
           }}
         >
           <Stack alignItems="center" direction="row" spacing={2}>
-            <Avatar src={user.profile_picture}>
+            <Avatar src={getStudentsImageSource(user.avatar)}>
               {getInitials(user.username)}
             </Avatar>
           </Stack>
@@ -127,7 +128,7 @@ const UserTableItem = (props) => {
             handleOnClick(user);
           }}
         >
-          {user.banned ? "BANNED" : "ACTIVE"}
+          {user.banned ? "Bị khóa" : "Còn hoạt động"}
         </TableCell>
         {/* <TableCell
           aria-controls={open ? "basic-menu" : undefined}

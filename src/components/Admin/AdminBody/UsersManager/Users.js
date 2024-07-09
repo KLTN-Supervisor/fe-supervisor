@@ -6,14 +6,17 @@ import BlockIcon from "@mui/icons-material/Block";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
+  CircularProgress,
   Container,
   FormControl,
   MenuItem,
   Select,
   Stack,
   SvgIcon,
+  TextField,
   Typography,
 } from "@mui/material";
 import { UserSearch } from "./UserSeach";
@@ -31,6 +34,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { getStudentsImageSource } from "../../../../untils/getImageSource";
 import { formatHour, formatDate } from "../../../../untils/format-date";
 import { toast } from "react-toastify";
+import EditIcon from "@mui/icons-material/Edit";
 
 const cx = classNames.bind(styles);
 const cx2 = classNames.bind(styles2);
@@ -39,13 +43,13 @@ const cx2 = classNames.bind(styles2);
 const UsersManage = () => {
   const privateHttpRequest = usePrivateHttpClient();
   const {
-    uploadImportFile,
     getAdminUsers,
     unBanUsers,
     banUsers,
     createAccount,
     updateAccount,
     resetAccountPassword,
+    getAdminInspectors,
   } = useAdminServices();
 
   const [page, setPage] = useState(1);
@@ -93,36 +97,81 @@ const UsersManage = () => {
     if (imgRef.current) imgRef.current.value = null;
   };
 
-  const [modal, setModal] = useState(false);
-  const [modalData, setModalData] = useState({
+  const accountInfo = {
     _id: "",
     fullname: "",
     username: "",
     password: "",
     email: "",
     role: "",
+    inspector: "",
     banned: "",
     online: "",
     last_online: "",
-  });
+  };
+
+  const [modal, setModal] = useState(false);
+  const [modalData, setModalData] = useState(accountInfo);
+  const [errors, setErrors] = useState(accountInfo);
 
   const clearModalData = () => {
-    setModalData({
-      _id: "",
-      fullname: "",
-      username: "",
-      password: "",
-      email: "",
-      role: "",
-      banned: "",
-      online: "",
-      last_online: "",
-    });
+    setModalData(accountInfo);
+  };
+
+  const clearValidateErrors = () => {
+    setErrors(accountInfo);
+  };
+
+  const validateModalData = (data) => {
+    let validationErrors = {};
+
+    // Validate student_id
+    if (!data.role || data.role === "") {
+      validationErrors.role = "Vui lòng chọn quyền tài khoản";
+    }
+    if (isCreateNew) {
+      // Validate username
+      if (!data.username) {
+        validationErrors.username = "Tên đăng nhập là bắt buộc";
+      } else if (data.username.length < 4 || data.username.length > 15) {
+        validationErrors.username =
+          "Tên đăng nhập phải có độ dài từ 4 đến 15 ký tự";
+      } else if (!/^[a-zA-Z0-9]+$/.test(data.username)) {
+        validationErrors.username =
+          "Tên người dùng không được chứa khoảng trắng hoặc ký tự đặc biệt";
+      }
+    }
+    if (isCreateNew) {
+      if (!data.password) {
+        // Validate password
+        validationErrors.password = "Mật khẩu là bắt buộc";
+      } else if (data.password.length < 6 || data.password.length > 20) {
+        validationErrors.password = "Mật khẩu phải có độ dài từ 6 đến 20 ký tự";
+      } else if (!/^\S+$/.test(data.password)) {
+        validationErrors.password = "Mật khẩu không được chứa khoảng trắng";
+      }
+    }
+    // Validate fullname
+    if (!data.fullname) {
+      validationErrors.fullname = "Tên tài khoản là bắt buộc";
+    } else if (/[0-9!@#$%^&*(),.?":{}|<>]/.test(data.fullname)) {
+      validationErrors.fullname =
+        "Tên tài khoản không được chứa số hoặc ký tự đặc biệt";
+    }
+
+    // Validate email
+    if (!data.email) {
+      validationErrors.email = "Email là bắt buộc";
+    } else if (!/^[a-z0-9.-]+@[a-z.]+\.[a-z]{2,4}$/.test(data.email)) {
+      validationErrors.email = "Email không hợp lệ";
+    }
+
+    return validationErrors;
   };
 
   const setViewItem = (item) => {
     if (!isCreateNew) {
-      setPreviewPortraitImg(item?.portrait_img);
+      setPreviewPortraitImg(item?.avatar);
       setModalData({
         _id: item?._id,
         fullname: item?.full_name,
@@ -130,6 +179,7 @@ const UsersManage = () => {
         password: "",
         email: item?.email,
         role: item?.role,
+        inspector: item?.inspector,
         banned: item?.banned,
         online: item?.online,
         last_online: item?.last_online,
@@ -138,12 +188,14 @@ const UsersManage = () => {
   };
 
   const toggleModal = () => {
+    clearValidateErrors();
     if (isEdit) setIsEdit(false);
     if (isCreateNew) setIsCreateNew(false);
     setModal(!modal);
   };
 
   const handleEditClick = () => {
+    clearValidateErrors();
     if (isEdit) clearPortrailImg();
     setIsEdit(!isEdit);
   };
@@ -246,71 +298,81 @@ const UsersManage = () => {
 
   const handleCreateAccount = async () => {
     try {
-      setDataLoading(true);
+      setModifyDataLoading(true);
+
+      const validationErrors = validateModalData(modalData);
+
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        setModifyDataLoading(false);
+        return;
+      }
+
       const formData = new FormData();
       formData.append("avatar", portraitImgFile);
+      if (modalData.role === "USER" && modalData?.inspector)
+        formData.append("inspectorID", modalData?.inspector);
       formData.append("username", modalData?.username);
       formData.append("password", modalData?.password);
-      formData.append("fullname", modalData?.fullname);
+      formData.append("full_name", modalData?.fullname);
       formData.append("email", modalData?.email);
       formData.append("role", modalData?.role);
 
-      const response = await toast.promise(() => createAccount(formData), {
-        pending: "Đang tạo...",
-        error: {
-          render({ data }) {
-            // When the promise reject, data will contains the error
-            return `${data.message}`;
-          },
-        },
-        success: "Tạo tài khoản mới thành công",
-      });
+      const response = await createAccount(formData);
 
       if (response) {
+        toast.success("Tạo tài khoản mới thành công");
         if (isEdit) setIsEdit(false);
         setIsCreateNew(false);
         setData((prev) => [response.account, ...prev]);
         setTotalRecords((prev) => prev + 1);
-        setDataLoading(false);
+        setModifyDataLoading(false);
+        toggleModal();
       }
     } catch (err) {
-      console.error(err);
-      setDataLoading(false);
+      toast.error(err.message);
+      setModifyDataLoading(false);
     }
   };
 
   const handleUpdateAccount = async () => {
     try {
-      setDataLoading(true);
+      setModifyDataLoading(true);
+
+      const validationErrors = validateModalData(modalData);
+
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        setModifyDataLoading(false);
+        return;
+      }
+
       const formData = new FormData();
-      formData.append("avatar", portraitImgFile);
-      formData.append("username", modalData?.username);
-      formData.append("fullname", modalData?.fullname);
+      if (portraitImgFile) formData.append("avatar", portraitImgFile);
+      if (modalData.role === "USER" && modalData?.inspector)
+        formData.append("inspectorID", modalData?.inspector);
+      formData.append("full_name", modalData?.fullname);
       formData.append("email", modalData?.email);
       formData.append("role", modalData?.role);
 
-      const response = await toast.promise(
-        () => updateAccount(modalData._id, formData),
-        {
-          pending: "Đang cập nhật...",
-          error: {
-            render({ data }) {
-              // When the promise reject, data will contains the error
-              return `${data.message}`;
-            },
-          },
-          success: "Cập nhật tài khoản thành công",
-        }
-      );
+      const response = await updateAccount(modalData._id, formData);
 
       if (response) {
+        toast.success("Cập nhật tài khoản thành công");
         if (isEdit) setIsEdit(false);
+        setData((prev) => {
+          return prev.map((account, i) => {
+            if (account._id === response.account._id) return response.account;
+            return account;
+          });
+        });
         setIsCreateNew(false);
-        setDataLoading(false);
+        setModifyDataLoading(false);
+        toggleModal();
       }
     } catch (err) {
-      console.error(err);
-      setDataLoading(false);
+      toast.error(err.message);
+      setModifyDataLoading(false);
     }
   };
 
@@ -348,10 +410,43 @@ const UsersManage = () => {
     setRowsPerPage(event.target.value);
   }, []);
 
+  const [inspectorSearch, setInspectorSearch] = useState("");
+  const [open, setOpen] = useState(false);
+  const [options, setOptions] = useState([]);
+  const loading = open && options.length === 0;
+
+  useEffect(() => {
+    let active = true;
+
+    if (!loading) {
+      return undefined;
+    }
+
+    (async () => {
+      try {
+        const response = await getAdminInspectors(1, 50, inspectorSearch);
+
+        if (active) {
+          if (response) setOptions([...response.inspectors]);
+        }
+      } catch (err) {}
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, [loading, inspectorSearch]);
+
+  useEffect(() => {
+    if (!open) {
+      setOptions([]);
+    }
+  }, [open]);
+
   const userRole = {
-    USER: "User thường",
+    USER: "Thanh tra",
     ADMIN: "Quản trị",
-    ACADEMIC_AFFAIRS_OFFICE: "PĐT",
+    ACADEMIC_AFFAIRS_OFFICE: "Phòng đào tạo",
   };
 
   return (
@@ -425,6 +520,7 @@ const UsersManage = () => {
                 <Button
                   onClick={() => {
                     clearModalData();
+                    clearPortrailImg();
                     toggleModal();
                     setIsCreateNew(true);
                   }}
@@ -485,9 +581,11 @@ const UsersManage = () => {
               setUsersSelected={setUsersSelected}
               selected={usersSelected}
               handleOnClick={(item) => {
+                clearPortrailImg();
                 setViewItem(item);
                 setModal(true);
               }}
+              setRoleFilter={setRoleFilter}
             />
           </Stack>
         </Container>
@@ -512,10 +610,7 @@ const UsersManage = () => {
               }}
             />
           </div>
-          <div
-            className={cx2("modal-navbar-content")}
-            style={{ width: "80%" }}
-          >
+          <div className={cx2("modal-navbar-content")} style={{ width: "80%" }}>
             <div className={cx2("modal-header")}>Thông tin tài khoản</div>
             <div
               className={cx2("modal-main")}
@@ -535,8 +630,16 @@ const UsersManage = () => {
               >
                 <div
                   style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                    alignItems: "center",
                     height: "250px",
                     cursor: isEdit || isCreateNew ? "pointer" : "",
+                    ...((isEdit || isCreateNew) && {
+                      border: "black solid 1px",
+                      borderRadius: 10,
+                    }),
                   }}
                   onClick={() => {
                     if (isEdit || isCreateNew) imgRef.current.click();
@@ -545,8 +648,11 @@ const UsersManage = () => {
                   <img
                     style={{ width: "100%", maxHeight: "250px" }}
                     src={getStudentsImageSource(previewPortraitImg)}
-                    alt="Ảnh thẻ sinh viên"
+                    alt="Avatar"
                   />
+                  {(isEdit || isCreateNew) && (
+                    <EditIcon style={{ color: "#e6e614", marginTop: 10 }} />
+                  )}
                   <input
                     id="avatar"
                     ref={imgRef}
@@ -559,64 +665,6 @@ const UsersManage = () => {
                 </div>
               </div>
               <div className={cx2("modal-info")} style={{ width: "90%" }}>
-                <div className={cx2("info")}>
-                  <div className={cx2("title")}>Tên đăng nhập:</div>
-                  <input
-                    id="username"
-                    style={{ border: !isEdit && !isCreateNew && "none" }}
-                    className={cx2(
-                      "input-span",
-                      !isEdit && !isCreateNew && "input-span-focus"
-                    )}
-                    value={modalData?.username}
-                    readOnly={!isEdit && !isCreateNew}
-                    onChange={changeHandler}
-                  />
-                </div>
-                {isCreateNew && (
-                  <div className={cx2("info")}>
-                    <div className={cx2("title")}>Mật khẩu:</div>
-                    <input
-                      id="password"
-                      style={{ border: !isEdit && !isCreateNew && "none" }}
-                      className={cx2(
-                        "input-span",
-                        !isEdit && !isCreateNew && "input-span-focus"
-                      )}
-                      value={modalData?.password}
-                      readOnly={!isEdit && !isCreateNew}
-                      onChange={changeHandler}
-                    />
-                  </div>
-                )}
-                <div className={cx2("info")}>
-                  <div className={cx2("title")}>Tên người dùng:</div>
-                  <input
-                    id="fullname"
-                    style={{ border: !isEdit && !isCreateNew && "none" }}
-                    className={cx2(
-                      "input-span",
-                      !isEdit && !isCreateNew && "input-span-focus"
-                    )}
-                    value={modalData?.fullname}
-                    readOnly={!isEdit && !isCreateNew}
-                    onChange={changeHandler}
-                  />
-                </div>
-                <div className={cx2("info")}>
-                  <div className={cx2("title")}>Email:</div>
-                  <input
-                    id="email"
-                    style={{ border: !isEdit && !isCreateNew && "none" }}
-                    className={cx2(
-                      "input-span",
-                      !isEdit && !isCreateNew && "input-span-focus"
-                    )}
-                    value={modalData?.email}
-                    readOnly={!isEdit && !isCreateNew}
-                    onChange={changeHandler}
-                  />
-                </div>
                 <div className={cx2("info")}>
                   <div className={cx2("title")}>Quyền tài khoản:</div>
                   <FormControl
@@ -656,20 +704,307 @@ const UsersManage = () => {
                     </Select>
                   </FormControl>
                 </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.role}
+                  </span>
+                </div>
+                {modalData.role === "USER" && (
+                  <>
+                    <div className={cx2("info")}>
+                      <div className={cx2("title")}>Thanh tra:</div>
+                      <Autocomplete
+                        id="inspector"
+                        sx={{
+                          width: "89%",
+                          ":active": { color: "rgba(0, 148, 246, 0.69)" },
+                        }}
+                        open={open}
+                        onOpen={() => {
+                          setOpen(true);
+                        }}
+                        onClose={() => {
+                          setOpen(false);
+                        }}
+                        isOptionEqualToValue={(option, value) =>
+                          option.inspector_id === value.inspector_id
+                        }
+                        getOptionLabel={(option) =>
+                          `${option.inspector_id} - ${option.last_name} ${option.middle_name} ${option.first_name}`
+                        }
+                        readOnly={!isEdit && !isCreateNew}
+                        getOptionKey={(option) => `${option._id}`}
+                        noOptionsText={"Không tìm thấy thanh tra"}
+                        loadingText={"Đang tìm kiếm..."}
+                        options={options}
+                        loading={loading}
+                        autoHighlight
+                        inputMode="search"
+                        size="small"
+                        onInputChange={(e, value, reason) => {
+                          if (isCreateNew || isEdit) {
+                            setOptions([]);
+                            setInspectorSearch(value);
+
+                            if (reason === "reset") {
+                              const choosedOpt = options.find(
+                                (opt) =>
+                                  opt.inspector_id ===
+                                  value.split("-")[0].trim()
+                              );
+
+                              setModalData((prev) => ({
+                                ...prev,
+                                inspector: choosedOpt?.inspector_id
+                                  ? choosedOpt?.inspector_id
+                                  : prev?.inspector,
+                                fullname: choosedOpt?.inspector_id
+                                  ? `${choosedOpt.last_name} ${choosedOpt.middle_name} ${choosedOpt.first_name}`
+                                  : prev?.fullname,
+                                email: prev?.email
+                                  ? prev.email
+                                  : choosedOpt?.email,
+                              }));
+                            }
+                          }
+                        }}
+                        {...(!isCreateNew && {
+                          inputValue: modalData?.inspector
+                            ? `${modalData.inspector.inspector_id} - ${modalData.inspector.last_name} ${modalData.inspector.middle_name} ${modalData.inspector.first_name}`
+                            : "",
+                        })}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Thanh tra"
+                            InputProps={{
+                              ...params.InputProps,
+                              endAdornment: (
+                                <>
+                                  {loading ? (
+                                    <CircularProgress
+                                      color="inherit"
+                                      size={20}
+                                    />
+                                  ) : null}
+                                  {params.InputProps.endAdornment}
+                                </>
+                              ),
+                              sx: { borderRadius: 3 },
+                            }}
+                          />
+                        )}
+                      />
+                    </div>
+                    <div className={cx2("info")}>
+                      <div
+                        className={cx2("title")}
+                        style={{ marginRight: 5 }}
+                      ></div>
+                      <span
+                        style={{
+                          color: "red",
+                          border: "none",
+                          marginLeft: -2,
+                          padding: 0,
+                          fontWeight: 540,
+                          marginTop: -3,
+                          fontSize: 12,
+                        }}
+                      >
+                        {errors?.inspector}
+                      </span>
+                    </div>
+                  </>
+                )}
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Tên đăng nhập:</div>
+                  <input
+                    id="username"
+                    style={{
+                      border: !isCreateNew && "none",
+                      ...(errors?.username &&
+                        errors?.username.trim() !== "" && {
+                          borderColor: "red",
+                        }),
+                    }}
+                    className={cx2(
+                      "input-span",
+                      !isCreateNew && "input-span-focus"
+                    )}
+                    value={modalData?.username}
+                    readOnly={!isCreateNew}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.username}
+                  </span>
+                </div>
+                {isCreateNew && (
+                  <>
+                    <div className={cx2("info")}>
+                      <div className={cx2("title")}>Mật khẩu:</div>
+                      <input
+                        id="password"
+                        style={{
+                          border: !isEdit && !isCreateNew && "none",
+                          ...(errors?.password &&
+                            errors?.password.trim() !== "" && {
+                              borderColor: "red",
+                            }),
+                        }}
+                        className={cx2(
+                          "input-span",
+                          !isEdit && !isCreateNew && "input-span-focus"
+                        )}
+                        value={modalData?.password}
+                        readOnly={!isEdit && !isCreateNew}
+                        onChange={changeHandler}
+                      />
+                    </div>
+                    <div className={cx2("info")}>
+                      <div
+                        className={cx2("title")}
+                        style={{ marginRight: 5 }}
+                      ></div>
+                      <span
+                        style={{
+                          color: "red",
+                          border: "none",
+                          marginLeft: -2,
+                          padding: 0,
+                          fontWeight: 540,
+                          marginTop: -3,
+                          fontSize: 12,
+                        }}
+                      >
+                        {errors?.password}
+                      </span>
+                    </div>
+                  </>
+                )}
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Tên người dùng:</div>
+                  <input
+                    id="fullname"
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.fullname &&
+                        errors?.fullname.trim() !== "" && {
+                          borderColor: "red",
+                        }),
+                    }}
+                    className={cx2(
+                      "input-span",
+                      !isEdit && !isCreateNew && "input-span-focus"
+                    )}
+                    value={modalData?.fullname}
+                    readOnly={!isEdit && !isCreateNew}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.fullname}
+                  </span>
+                </div>
+                <div className={cx2("info")}>
+                  <div className={cx2("title")}>Email:</div>
+                  <input
+                    id="email"
+                    style={{
+                      border: !isEdit && !isCreateNew && "none",
+                      ...(errors?.email &&
+                        errors?.email.trim() !== "" && {
+                          borderColor: "red",
+                        }),
+                    }}
+                    className={cx2(
+                      "input-span",
+                      !isEdit && !isCreateNew && "input-span-focus"
+                    )}
+                    value={modalData?.email}
+                    readOnly={!isEdit && !isCreateNew}
+                    onChange={changeHandler}
+                  />
+                </div>
+                <div className={cx2("info")}>
+                  <div
+                    className={cx2("title")}
+                    style={{ marginRight: 5 }}
+                  ></div>
+                  <span
+                    style={{
+                      color: "red",
+                      border: "none",
+                      marginLeft: -2,
+                      padding: 0,
+                      fontWeight: 540,
+                      marginTop: -3,
+                      fontSize: 12,
+                    }}
+                  >
+                    {errors?.email}
+                  </span>
+                </div>
                 {!isCreateNew && (
                   <>
                     <div className={cx2("info")}>
-                      <div className={cx2("title")}>Trạng thái:</div>
+                      <div className={cx2("title")}>Tình trạng:</div>
                       <input
                         id="banned"
                         style={{ border: "none" }}
                         className={cx2("input-span", "input-span-focus")}
-                        value={modalData?.banned ? "Bị khóa" : "Bình thường"}
+                        value={modalData?.banned ? "Bị khóa" : "Còn hoạt động"}
                         readOnly
                       />
                     </div>
-                    <div className={cx2("info")}>
-                      <div className={cx2("title")}>Tình trạng:</div>
+                    {/* <div className={cx2("info")}>
+                      <div className={cx2("title")}>Trạng thái</div>
                       <input
                         id="online"
                         style={{ border: "none" }}
@@ -679,7 +1014,7 @@ const UsersManage = () => {
                         }
                         readOnly
                       />
-                    </div>
+                    </div> */}
                     <div className={cx2("info")}>
                       <div className={cx2("title")}>Lần đăng nhập cuối:</div>
                       <input
@@ -718,6 +1053,7 @@ const UsersManage = () => {
                         backgroundColor: "lightpink",
                       }}
                       onClick={isEdit ? handleEditClick : toggleModal}
+                      disabled={modifyDataLoading}
                     >
                       {isEdit ? "Hủy" : "Đóng"}
                     </button>
@@ -725,9 +1061,10 @@ const UsersManage = () => {
                       <button
                         className={cx2("button")}
                         style={{
-                          backgroundColor: "red",
+                          backgroundColor: "#FD661E",
                         }}
                         onClick={handleResetPassword}
+                        disabled={modifyDataLoading}
                       >
                         Đặt lại mật khẩu
                       </button>
@@ -744,8 +1081,15 @@ const UsersManage = () => {
                           ? handleCreateAccount
                           : handleEditClick
                       }
+                      disabled={modifyDataLoading}
                     >
-                      {isEdit || isCreateNew ? "Lưu" : "Chỉnh sửa"}
+                      {modifyDataLoading ? (
+                        <CircularProgress size={25} sx={{ mt: 0.5 }} />
+                      ) : isEdit || isCreateNew ? (
+                        "Lưu"
+                      ) : (
+                        "Chỉnh sửa"
+                      )}
                     </button>
                   </div>
                 </div>

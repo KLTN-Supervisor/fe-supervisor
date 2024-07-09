@@ -4,6 +4,7 @@ import {
   Box,
   Card,
   Checkbox,
+  CircularProgress,
   // Stack,
   Table,
   TableBody,
@@ -42,6 +43,8 @@ export const ReportTable = (props) => {
     setUsersSelected,
     selected = [],
     handleOnClick = () => {},
+    totalPages = 0,
+    isLoading,
   } = props;
 
   const users = data;
@@ -71,18 +74,40 @@ export const ReportTable = (props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {users.map((user) => (
-                <ReportTableItem
-                  key={user._id}
-                  user={user}
-                  onDeselectOne={onDeselectOne}
-                  onSelectOne={onSelectOne}
-                  selected={selected}
-                  handleOnClick={handleOnClick}
-                />
-              ))}
+              {users.length > 0 && !isLoading
+                ? users.map((user) => (
+                    <ReportTableItem
+                      key={user._id}
+                      user={user}
+                      onDeselectOne={onDeselectOne}
+                      onSelectOne={onSelectOne}
+                      selected={selected}
+                      handleOnClick={handleOnClick}
+                    />
+                  ))
+                : null}
             </TableBody>
           </Table>
+          {isLoading && (
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <CircularProgress />
+            </div>
+          )}
+          {!isLoading && data.length === 0 && (
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <span
+                style={{
+                  fontSize: 20,
+                  fontWeight: 550,
+                  fontFamily: "inherit",
+                  marginTop: 20,
+                  marginBottom: 20,
+                }}
+              >
+                Chưa có dữ liệu!
+              </span>
+            </div>
+          )}
         </Box>
       </Scrollbar>
       <TablePagination
@@ -93,6 +118,10 @@ export const ReportTable = (props) => {
         page={page - 1}
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[10, 15, 30]}
+        labelRowsPerPage={"Số dòng mỗi trang"}
+        labelDisplayedRows={({ from, to, count, page }) => {
+          return `Trang ${page + 1}/${totalPages} | Tổng: ${count}`;
+        }}
       />
     </Card>
   );
