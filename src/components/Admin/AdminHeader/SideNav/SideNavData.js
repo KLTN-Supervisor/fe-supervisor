@@ -42,10 +42,12 @@ const SideNavAdminData = ({ handleDrawerClose }) => {
     },
     { label: "Sinh viên", link: "students", icon: <PortraitIcon /> },
     { label: "Thanh tra", link: "inspectors", icon: <SupervisorAccountIcon /> },
+    { label: "Đăng xuất", handleOnClick: logout(), icon: <LogoutIcon /> },
   ];
 
   const pdtListItemData = [
     { label: "Lịch thi", link: "exam-schedules", icon: <ArticleIcon /> },
+    { label: "Đăng xuất", handleOnClick: logout(), icon: <LogoutIcon /> },
   ];
 
   return (
