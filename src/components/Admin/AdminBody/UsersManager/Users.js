@@ -239,6 +239,7 @@ const UsersManage = () => {
   }, [page, rowsPerPage, search, roleFilter]);
 
   useEffect(() => {
+    document.title = "Quản lý tài khoản";
     getData();
   }, [page, rowsPerPage, search, roleFilter]);
 

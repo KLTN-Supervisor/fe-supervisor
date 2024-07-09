@@ -5,7 +5,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import StudentCard from "../../../../components/Supervisor/StudentCard";
-import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import ListSubheader from "@mui/material/ListSubheader";
 import List from "@mui/material/List";
 import Floor from "../../../../components/Supervisor/Floor";
@@ -29,7 +29,7 @@ function ScheduleDetailPage() {
   const [time, setTime] = useState("");
   const [timeClick, setTimeClick] = useState(false);
   const [floor, setFloor] = useState([]);
-  
+
   const handleChange = (event) => {
     setTimeClick(true);
     setTime(event.target.value);
@@ -40,6 +40,7 @@ function ScheduleDetailPage() {
   const [roomIdClicked, setRoomIdClicked] = useState("");
 
   useEffect(() => {
+    document.title = `Lịch thi ${building?.building_name}`;
     const getTimesExam = async () => {
       if (!studentsLoading) {
         setStudentsLoading(true);
@@ -85,11 +86,10 @@ function ScheduleDetailPage() {
       setStudentsLoading(true);
       try {
         const response = await getStudents(time, Room);
-        setStudents(response).then(()=>{
+        setStudents(response).then(() => {
           setStudentsLoading(false);
         });
         // setStudentsLoading(false);
-
       } catch (err) {
         setStudentsLoading(false);
         console.log("get time error: ", err);
@@ -102,7 +102,7 @@ function ScheduleDetailPage() {
       try {
         if (!studentsLoading) {
           const response = await getRoomInfo(time, Room);
-          setInfo(response)
+          setInfo(response);
         }
       } catch (err) {
         console.log("get time error: ", err);
@@ -113,17 +113,19 @@ function ScheduleDetailPage() {
     }
     getInfo();
     getStudentsExam(Room);
-
   };
   return (
     <div className={cx("schedulePage")}>
       <div className={cx("schedulePage__content")}>
         <div className={cx("page_content")} style={{ marginTop: 20 }}>
-          <div style={{display: "flex", margin: "10px 25px 20px 15px"}}>
+          <div style={{ display: "flex", margin: "10px 25px 20px 15px" }}>
             <div>
-              <KeyboardBackspaceIcon style={{ marginRight: 20, width: 30, height: 30}} onClick={()=> navigate(-1)}/>
+              <KeyboardBackspaceIcon
+                style={{ marginRight: 20, width: 30, height: 30 }}
+                onClick={() => navigate(-1)}
+              />
             </div>
-            <div className={cx("title")} style={{margin: 0}}>
+            <div className={cx("title")} style={{ margin: 0 }}>
               <h6 className={cx("text")}>{building?.building_name}</h6>
             </div>
           </div>
@@ -189,7 +191,12 @@ function ScheduleDetailPage() {
               ) : students?.length > 0 ? (
                 <>
                   <div
-                    style={{ width: "100%", display: "flex", justifyContent: "center", marginBottom: 20 }}
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      marginBottom: 20,
+                    }}
                   >
                     <span
                       style={{

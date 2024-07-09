@@ -160,6 +160,7 @@ const UsersManage = () => {
   }, [year, term, page, rowsPerPage]);
 
   useEffect(() => {
+    document.title = "Xem báo cáo";
     getYearExam();
   }, []);
 

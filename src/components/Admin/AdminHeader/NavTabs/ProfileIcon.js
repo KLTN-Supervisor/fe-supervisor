@@ -16,13 +16,15 @@ import {
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
-import image from "./1561280118604-Docker.png";
 import useLogout from "../../../../hooks/auth-hook/logout-hook";
+import useAuth from "../../../../hooks/auth-hook/auth-hook";
+import { getStudentsImageSource } from "../../../../untils/getImageSource";
 
 const cx = classNames.bind(styles);
 
 const ProfileIcon = () => {
   const { logout } = useLogout();
+  const { user } = useAuth();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -45,7 +47,12 @@ const ProfileIcon = () => {
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
         onClick={handleClick}
-        startIcon={<Avatar src={image} className={cx("navAvatar")}></Avatar>}
+        startIcon={
+          <Avatar
+            src={getStudentsImageSource(user.avatar)}
+            className={cx("navAvatar")}
+          ></Avatar>
+        }
       ></Button>
       <Menu
         id="basic-menu"

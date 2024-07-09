@@ -358,6 +358,7 @@ const StudentsManage = () => {
   }, [page, rowsPerPage, search]);
 
   useEffect(() => {
+    document.title = "Quản lý sinh viên";
     getData();
   }, [page, rowsPerPage, search]);
 

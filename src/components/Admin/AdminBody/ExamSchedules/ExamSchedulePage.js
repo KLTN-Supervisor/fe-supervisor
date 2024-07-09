@@ -162,6 +162,7 @@ function ExamSchedules() {
     setDate(event.target.value);
   };
   useEffect(() => {
+    document.title = "Quản lý lịch thi";
     const getYearExam = async () => {
       setStudentsLoading(true);
       try {

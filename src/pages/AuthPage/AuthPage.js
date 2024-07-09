@@ -136,6 +136,7 @@ const AuthPage = () => {
   };
 
   useEffect(() => {
+    document.title = "Đăng nhập";
     (async () => {
       try {
         const userResponse = await getLoginAccount();

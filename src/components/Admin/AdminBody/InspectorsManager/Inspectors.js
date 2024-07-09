@@ -161,6 +161,7 @@ const InspectorsManage = () => {
   }, [page, rowsPerPage, search]);
 
   useEffect(() => {
+    document.title = "Quản lý thanh tra";
     getData();
   }, [page, rowsPerPage, search]);
 
