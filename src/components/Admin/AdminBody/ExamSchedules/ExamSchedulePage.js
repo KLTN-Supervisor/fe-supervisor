@@ -1026,16 +1026,18 @@ function ExamSchedules() {
                       >
                         Xóa
                       </button>
-                      <button
-                        className={cx2("button")}
-                        style={{
-                          backgroundColor: "lightgreen",
-                        }}
-                        onClick={handleImportData}
-                        disabled={importLoading}
-                      >
-                        Đổ dữ liệu
-                      </button>
+                      {user?.role === "ADMIN" && (
+                        <button
+                          className={cx2("button")}
+                          style={{
+                            backgroundColor: "lightgreen",
+                          }}
+                          onClick={handleImportData}
+                          disabled={importLoading}
+                        >
+                          Đổ dữ liệu
+                        </button>
+                      )}
                     </>
                   )}
                 </div>
