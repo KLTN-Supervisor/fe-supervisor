@@ -42,7 +42,7 @@ function App() {
       const faceMatcher = new faceapi.FaceMatcher(trainingData, 0.4);
       dispatch({ type: "SET_FACE_MATCHER", payload: faceMatcher });
     });
-  },[]);
+  }, []);
 
   return (
     <div className="App">

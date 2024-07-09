@@ -1243,6 +1243,42 @@ function HomePage() {
   const isLoadCanvasRef = useRef(true);
   const intervalRef = useRef(null);
   const { faceMatcher } = useContext(StateContext);
+  const { dispatch } = useContext(StateContext);
+
+  useEffect(()=>{
+    if(!faceMatcher){
+      const loadTrainingData = async () => {
+        try {
+          const response = await privateRequest(`/train/`);
+          const labeledFaceDescriptors = response.data
+            .map((x) => {
+              const descriptors = x.descriptors.map(
+                (descriptor) => new Float32Array(descriptor)
+              );
+              return new faceapi.LabeledFaceDescriptors(x.label, descriptors);
+            })
+            .filter(Boolean);
+          return labeledFaceDescriptors;
+        } catch (err) {
+          throw err;
+        }
+      };
+      
+      Promise.all([
+        // THIS FOR FACE DETECT AND LOAD FROM YOU PUBLIC/MODELS DIRECTORY
+        faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+        faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+        faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+      ]).then(async () => {
+        // Khởi tạo faceMatcher và lưu vào Redux store
+        const trainingData = await loadTrainingData();
+        const faceMatcher = new faceapi.FaceMatcher(trainingData, 0.4);
+        dispatch({ type: "SET_FACE_MATCHER", payload: faceMatcher });
+      });
+
+    }
+    console.log(faceMatcher);
+  },[faceMatcher])
 
   // STOP VIDEO STREAM
   const clear = async () => {
@@ -1275,8 +1311,10 @@ function HomePage() {
   const getNumberOfCameras = async () => {
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
+      console.log(devices)
       const cameras = devices.filter((device) => device.kind === "videoinput");
       setCameraIds(cameras.map((camera) => camera.deviceId));
+      console.log(cameras.map((camera) => camera.deviceId))
     } catch (error) {
       console.error("Lỗi khi lấy danh sách thiết bị:", error);
     }
