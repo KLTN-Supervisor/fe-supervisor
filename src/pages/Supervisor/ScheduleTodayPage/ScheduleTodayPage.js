@@ -1031,31 +1031,33 @@ function ExamSchedulePage() {
           </div>
         ) : (
           <div className={cx("page_content")}>
-            <div
-              style={{
-                position: "fixed",
-                right: "5%",
-                display: "flex",
-              }}
-            >
-              {exporting ? (
-                <CircularProgress size={25} />
-              ) : (
-                <div
-                  onClick={printHandle}
-                  style={{
-                    backgroundColor: "#0095f6",
-                    padding: "10px",
-                    color: "white",
-                    borderRadius: "10px",
-                    cursor: "pointer",
-                    marginRight: 10,
-                  }}
-                >
-                  Xuất danh sách
-                </div>
-              )}
-            </div>
+            {building?.length > 0 && 
+              <div
+                style={{
+                  position: "fixed",
+                  right: "5%",
+                  display: "flex",
+                }}
+              >
+                {exporting ? (
+                  <CircularProgress size={25} />
+                ) : (
+                  <div
+                    onClick={printHandle}
+                    style={{
+                      backgroundColor: "#0095f6",
+                      padding: "10px",
+                      color: "white",
+                      borderRadius: "10px",
+                      cursor: "pointer",
+                      marginRight: 10,
+                    }}
+                  >
+                    Xuất danh sách
+                  </div>
+                )}
+              </div>
+            }
             <div className={cx("title")}>
               <h6 className={cx("text")}>Danh sách tòa nhà</h6>
             </div>

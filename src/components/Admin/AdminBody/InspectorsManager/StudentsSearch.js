@@ -20,9 +20,10 @@ export const StudentsSearch = ({ setSearch }) => {
           }
         }}
         startAdornment={
-          <InputAdornment position="start"  sizeSmall>
+          <InputAdornment position="start" >
             <SvgIcon
               color="action"
+              fontSize="small"
             >
               <SearchIcon />
             </SvgIcon>

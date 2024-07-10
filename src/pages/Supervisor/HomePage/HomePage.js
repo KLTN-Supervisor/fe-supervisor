@@ -1670,7 +1670,7 @@ function HomePage() {
                 textAlign: "center",
               }}
             >
-              Xuất file excel
+              Xuất danh sách
             </div>
           </div>
           <div className={cx("all-title")}>

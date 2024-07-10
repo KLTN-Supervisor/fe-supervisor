@@ -615,11 +615,19 @@ const StudentsManage = () => {
 
   const trainData = async () => {
     try {
-      toast.promise(trainStudentImages, {
+      const response = toast.promise(trainStudentImages, {
         pending: "Đang train dữ liệu...",
-        success: "Đã train xong!",
-        error: "Có lỗi xảy ra!",
+        success: "Đã train xong dữ liệu...",
+        error: {
+          render: ({ data }) => {
+            console.log(data)
+            return `${data.message}`;
+          },
+        },
       });
+
+      console.log(response);
+
     } catch (err) {}
   };
 
