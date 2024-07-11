@@ -355,7 +355,9 @@ const UsersManage = () => {
       const formData = new FormData();
       if (portraitImgFile) formData.append("avatar", portraitImgFile);
       if (modalData.role === "USER" && modalData?.inspector)
-        formData.append("inspectorID", modalData?.inspector);
+        modalData?.inspector?.inspector_id
+          ? formData.append("inspectorID", modalData?.inspector?.inspector_id)
+          : formData.append("inspectorID", modalData?.inspector);
       formData.append("full_name", modalData?.fullname);
       formData.append("email", modalData?.email);
       formData.append("role", modalData?.role);
