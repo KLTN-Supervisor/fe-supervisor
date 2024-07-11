@@ -363,7 +363,7 @@ function ExamSchedulePage() {
           verticalAlignment: "center",
           wrapText: true,
         });
-        examDate.value(`Nhóm thi: `);
+        examDate.value(`Ngày thi: `);
 
         const subjectValue = sheet.range("E10:S13").merged(true).style({
           bold: true,
@@ -972,6 +972,7 @@ function ExamSchedulePage() {
                 width: "100%",
                 display: "flex",
                 justifyContent: "end",
+                marginTop: 10,
               }}
             >
               {exporting ? (
@@ -981,7 +982,6 @@ function ExamSchedulePage() {
                 onClick={printHandle}
                 style={{
                   marginRight: "1.8%",
-                  marginTop: 10,
                   backgroundColor: "#0095f6",
                   padding: "10px",
                   color: "white",

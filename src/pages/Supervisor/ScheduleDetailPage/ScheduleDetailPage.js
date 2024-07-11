@@ -347,7 +347,7 @@ function ScheduleDetailPage() {
           verticalAlignment: "center",
           wrapText: true,
         });
-        examDate.value(`Nhóm thi: `);
+        examDate.value(`Ngày thi: `);
 
         const subjectValue = sheet.range("E10:S13").merged(true).style({
           bold: true,
