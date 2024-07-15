@@ -161,37 +161,39 @@ function ExamSchedules() {
   const handleDateChange = (event) => {
     setDate(event.target.value);
   };
+
+  const getYearExam = async () => {
+    setStudentsLoading(true);
+    try {
+      const response = await getYears();
+
+      setYears(response);
+    } catch (err) {
+      console.log("get year error: ", err);
+    }
+  };
+
+  const getAllUploadedFileYears = async () => {
+    try {
+      const currentYear = new Date().getFullYear();
+      const response = await getUploadedFileYears();
+
+      if (response) {
+        if (!response.includes(currentYear) && currentTerm === 1)
+          response.push(currentYear);
+
+        if (!response.includes(currentYear - 1) && currentTerm > 1)
+          response.push(currentYear - 1);
+
+        setAllYears(response);
+      }
+    } catch (err) {
+      console.log("get file year error: ", err);
+    }
+  };
+
   useEffect(() => {
     document.title = "Quản lý lịch thi";
-    const getYearExam = async () => {
-      setStudentsLoading(true);
-      try {
-        const response = await getYears();
-
-        setYears(response);
-      } catch (err) {
-        console.log("get year error: ", err);
-      }
-    };
-
-    const getAllUploadedFileYears = async () => {
-      try {
-        const currentYear = new Date().getFullYear();
-        const response = await getUploadedFileYears();
-
-        if (response) {
-          if (!response.includes(currentYear) && currentTerm === 1)
-            response.push(currentYear);
-
-          if (!response.includes(currentYear - 1) && currentTerm > 1)
-            response.push(currentYear - 1);
-
-          setAllYears(response);
-        }
-      } catch (err) {
-        console.log("get file year error: ", err);
-      }
-    };
 
     getYearExam();
     getAllUploadedFileYears();
@@ -405,6 +407,7 @@ function ExamSchedules() {
         }
       );
       if (response) {
+        getYearExam();
       }
       setImportLoading(false);
     } catch (err) {
