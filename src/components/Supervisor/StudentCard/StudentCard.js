@@ -476,7 +476,12 @@ function StudentCard({ student, attendance, home, search, updateAttendance, upda
   return (
     <>
       <div className={cx("student")} onClick={toggleModal}>
-        <div className={cx("student-image")}>
+        <div className={cx("student-image")} style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          display: "flex",
+        }}>
           <img
             style={{ width: "100%",  objectFit: "contain" }}
             src={getStudentsImageSource(student?.portrait_img)}
