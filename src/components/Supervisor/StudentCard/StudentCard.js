@@ -224,6 +224,7 @@ function StudentCard({ student, attendance, home, search, updateAttendance, upda
             imageRef.current = null;
             setIsDropping(false);
             setModalAttendance(false);
+            document.body.style.overflow = "auto";
             setModal(false);
           }, 3000);
         }
@@ -328,6 +329,7 @@ function StudentCard({ student, attendance, home, search, updateAttendance, upda
           setSnackBarOpen(true);
           setTimeout(() => {
             toggleModalAttendance();
+            document.body.style.overflow = "auto";
             setModal(false);
           }, 3000);
         }
@@ -420,6 +422,7 @@ function StudentCard({ student, attendance, home, search, updateAttendance, upda
           setSnackBarOpen(true);
           setTimeout(() => {
             toggleModalAttendance();
+            document.body.style.overflow = "auto";
             setModal(false);
           }, 3000);
         }
