@@ -119,7 +119,7 @@ function ExamSchedules() {
   };
 
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(6);
   const [totalRecords, setTotalRecords] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
@@ -498,6 +498,7 @@ function ExamSchedules() {
           prev.filter((file) => !deletedFileIds.includes(file._id))
         );
         handleDeselectAll?.();
+        getExamCheduleFileList();
       }
       setImportLoading(false);
     } catch (err) {
@@ -907,7 +908,7 @@ function ExamSchedules() {
                     </Select>
                   </FormControl>
                 </div>
-                <Card sx={{ height: 450 }}>
+                <Card sx={{ height: 430 }}>
                   <Scrollbar>
                     <Box sx={{ minWidth: 800 }}>
                       <Table>
@@ -989,7 +990,7 @@ function ExamSchedules() {
                     onPageChange={handlePageChange}
                     page={page - 1}
                     rowsPerPage={rowsPerPage}
-                    rowsPerPageOptions={[10]}
+                    rowsPerPageOptions={[6]}
                     labelRowsPerPage={"Số dòng mỗi trang"}
                     labelDisplayedRows={({ from, to, count, page }) => {
                       return `Trang ${page + 1}/${totalPages} | Tổng: ${count}`;
