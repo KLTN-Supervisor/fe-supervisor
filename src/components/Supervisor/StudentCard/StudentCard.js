@@ -12,7 +12,6 @@ import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import { Alert, Snackbar, CircularProgress } from "@mui/material";
 import { StateContext } from "../../../context/StateContext";
 import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
-import usePrivateHttpClient from "../../../hooks/http-hook/private-http-hook";
 
 
 const cx = classNames.bind(styles);
@@ -54,7 +53,7 @@ function StudentCard({ student, attendance, home, search, updateAttendance, upda
       setIsAttending(false);
     }
   };
-  const { privateRequest } = usePrivateHttpClient();
+
   const [state, setState] = useState(0);
   const [cameraIds, setCameraIds] = useState('');
   const [currentCameraIndex , setCurrentCameraIndex ] = useState(0);
@@ -63,42 +62,7 @@ function StudentCard({ student, attendance, home, search, updateAttendance, upda
   const isLoadCanvasRef = useRef(true);
   const intervalRef = useRef(null);
   const { faceMatcher } = useContext(StateContext);
-  const { dispatch } = useContext(StateContext);
 
-  useEffect(()=>{
-    if(!faceMatcher){
-      const loadTrainingData = async () => {
-        try {
-          const response = await privateRequest(`/train/`);
-          const labeledFaceDescriptors = response.data
-            .map((x) => {
-              const descriptors = x.descriptors.map(
-                (descriptor) => new Float32Array(descriptor)
-              );
-              return new faceapi.LabeledFaceDescriptors(x.label, descriptors);
-            })
-            .filter(Boolean);
-          return labeledFaceDescriptors;
-        } catch (err) {
-          throw err;
-        }
-      };
-      
-      Promise.all([
-        // THIS FOR FACE DETECT AND LOAD FROM YOU PUBLIC/MODELS DIRECTORY
-        faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
-        faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-        faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-      ]).then(async () => {
-        // Khởi tạo faceMatcher và lưu vào Redux store
-        const trainingData = await loadTrainingData();
-        const faceMatcher = new faceapi.FaceMatcher(trainingData, 0.4);
-        dispatch({ type: "SET_FACE_MATCHER", payload: faceMatcher });
-      });
-
-    }
-    console.log(faceMatcher);
-  },[faceMatcher])
 
   const [snackBarOpen, setSnackBarOpen] = useState(false);
   const [snackBarNotif, setSnackBarNotif] = useState({
@@ -476,7 +440,12 @@ function StudentCard({ student, attendance, home, search, updateAttendance, upda
   return (
     <>
       <div className={cx("student")} onClick={toggleModal}>
-        <div className={cx("student-image")}>
+        <div className={cx("student-image")} style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          display: "flex",
+        }}>
           <img
             style={{ width: "100%",  objectFit: "contain" }}
             src={getStudentsImageSource(student?.portrait_img)}
