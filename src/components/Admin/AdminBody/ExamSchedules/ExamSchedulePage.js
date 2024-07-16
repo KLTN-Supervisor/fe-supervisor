@@ -171,6 +171,7 @@ function ExamSchedules() {
     } catch (err) {
       console.log("get year error: ", err);
     }
+    setStudentsLoading(false);
   };
 
   const getAllUploadedFileYears = async () => {
