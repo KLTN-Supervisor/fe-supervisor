@@ -1312,7 +1312,7 @@ function HomePage() {
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
       console.log(devices)
-      const cameras = devices.filter((device) => device.kind === "videoinput");
+      const cameras = devices.filter((device) => device.kind === "videoinput" && device.label !== "OBS Virtual Camera");
       setCameraIds(cameras.map((camera) => camera.deviceId));
       console.log(cameras.map((camera) => camera.deviceId))
     } catch (error) {
@@ -1431,8 +1431,13 @@ function HomePage() {
               "Điểm danh thành công " +
               faceMatcher.findBestMatch(detection.descriptor)._label,
           });
+          
           setSnackBarOpen(true);
-          videoRef.current.pause();
+          setTimeout(() => {
+            drawBox.draw(canvasRef.current);
+            videoRef.current.pause();
+          }, 300);
+          
           // Sau 3 giây tắt video
           setTimeout(() => {
             if (videoRef?.current) videoRef?.current.play();

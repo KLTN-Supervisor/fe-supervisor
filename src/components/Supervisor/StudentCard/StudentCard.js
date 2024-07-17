@@ -103,7 +103,7 @@ function StudentCard({ student, attendance, home, search, updateAttendance, upda
   const getNumberOfCameras = async () => {
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
-      const cameras = devices.filter((device) => device.kind === 'videoinput');
+      const cameras = devices.filter((device) => device.kind === 'videoinput' && device.label !== "OBS Virtual Camera");
       setCameraIds(cameras.map((camera) => camera.deviceId));
     } catch (error) {
       console.error('Lỗi khi lấy danh sách thiết bị:', error);
@@ -217,7 +217,10 @@ function StudentCard({ student, attendance, home, search, updateAttendance, upda
               faceMatcher.findBestMatch(detection.descriptor)._label,
           });
           setSnackBarOpen(true);
-          videoRef.current.pause();
+          setTimeout(() => {
+            drawBox.draw(canvasRef.current);
+            videoRef.current.pause();
+          }, 300)
           // Sau 3 giây tắt video
           setTimeout(async () => {
             await clear();
