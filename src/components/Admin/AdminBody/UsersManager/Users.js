@@ -49,6 +49,7 @@ const UsersManage = () => {
     updateAccount,
     resetAccountPassword,
     getAdminInspectors,
+    deleteSelectedAccounts,
   } = useAdminServices();
 
   const [page, setPage] = useState(1);
@@ -377,6 +378,32 @@ const UsersManage = () => {
         setModifyDataLoading(false);
         toggleModal();
       }
+    } catch (err) {
+      toast.error(err.message);
+      setModifyDataLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      setModifyDataLoading(true);
+
+      const response = await deleteSelectedAccounts([modalData._id]);
+
+      if (response) {
+        toast.success("Xóa thành công!");
+
+        // Update the data set by removing the deleted account
+        setData((prevData) => {
+          const updatedData = prevData.filter(
+            (account) => account._id !== modalData._id
+          );
+          return updatedData;
+        });
+
+        if (modal) toggleModal();
+      }
+      setModifyDataLoading(false);
     } catch (err) {
       toast.error(err.message);
       setModifyDataLoading(false);
@@ -1099,16 +1126,28 @@ const UsersManage = () => {
                     >
                       {isEdit ? "Hủy" : "Đóng"}
                     </button>
-                    {!isCreateNew && (
+                    {!isCreateNew && !isEdit && (
                       <button
                         className={cx2("button")}
                         style={{
-                          backgroundColor: "#FD661E",
+                          backgroundColor: "lightblue",
                         }}
                         onClick={handleResetPassword}
                         disabled={modifyDataLoading}
                       >
                         Đặt lại mật khẩu
+                      </button>
+                    )}
+                    {!isCreateNew && !isEdit && (
+                      <button
+                        className={cx2("button")}
+                        style={{
+                          backgroundColor: "#FD661E",
+                        }}
+                        onClick={handleDeleteAccount}
+                        disabled={modifyDataLoading}
+                      >
+                        Xóa
                       </button>
                     )}
                     <button

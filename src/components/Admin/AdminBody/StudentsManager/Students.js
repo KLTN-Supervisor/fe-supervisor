@@ -1579,7 +1579,7 @@ const StudentsManage = () => {
                   >
                     {isEdit ? "Hủy" : "Đóng"}
                   </button>
-                  {!isCreateNew && (
+                  {!isCreateNew && !isEdit && (
                     <button
                       className={cx2("button")}
                       style={{

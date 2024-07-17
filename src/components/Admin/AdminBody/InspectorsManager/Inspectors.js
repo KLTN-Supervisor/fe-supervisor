@@ -41,6 +41,7 @@ const InspectorsManage = () => {
     uploadImagesImportFile,
     createNewInspector,
     updateInspector,
+    deleteSelectedInspectors,
   } = useAdminServices();
 
   const [page, setPage] = useState(1);
@@ -502,6 +503,32 @@ const InspectorsManage = () => {
           });
           return updatedData;
         });
+        if (modal) toggleModal();
+      }
+      setModifyDataLoading(false);
+    } catch (err) {
+      toast.error(err.message);
+      setModifyDataLoading(false);
+    }
+  };
+
+  const handleDeleteInspector = async () => {
+    try {
+      setModifyDataLoading(true);
+
+      const response = await deleteSelectedInspectors([modalData._id]);
+
+      if (response) {
+        toast.success("Xóa thành công!");
+
+        // Update the data set by removing the deleted inspector
+        setData((prevData) => {
+          const updatedData = prevData.filter(
+            (inspector) => inspector._id !== modalData._id
+          );
+          return updatedData;
+        });
+
         if (modal) toggleModal();
       }
       setModifyDataLoading(false);
@@ -1205,6 +1232,18 @@ const InspectorsManage = () => {
                     >
                       {isEdit ? "Hủy" : "Đóng"}
                     </button>
+                    {!isCreateNew && !isEdit && (
+                      <button
+                        className={cx2("button")}
+                        style={{
+                          backgroundColor: "#FD661E",
+                        }}
+                        onClick={handleDeleteInspector}
+                        disabled={modifyDataLoading}
+                      >
+                        Xóa
+                      </button>
+                    )}
                     <button
                       className={cx2("button")}
                       style={{
