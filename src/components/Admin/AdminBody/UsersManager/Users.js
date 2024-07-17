@@ -489,43 +489,60 @@ const UsersManage = () => {
                 /> */}
               </Stack>
               <div>
-                {usersSelected.length > 0 && (
-                  <>
-                    <Button
-                      onClick={handleUnBanUsers}
-                      startIcon={
-                        <SvgIcon fontSize="small">
-                          <RemoveCircleOutlineIcon />
-                        </SvgIcon>
-                      }
-                      variant="contained"
-                      sx={{
-                        background: "green",
-                        marginRight: 5,
-                        ":hover": { background: "green", opacity: 0.7 },
-                      }}
-                    >
-                      UnBan
-                    </Button>
+                {usersSelected.length > 0 &&
+                  (() => {
+                    const selectedUsers = usersSelected.map((id) =>
+                      data.find((user) => user._id === id)
+                    );
+                    const hasBannedUsers = selectedUsers.some(
+                      (user) => user.banned
+                    );
+                    const hasUnbannedUsers = selectedUsers.some(
+                      (user) => !user.banned
+                    );
 
-                    <Button
-                      onClick={handleBanUsers}
-                      startIcon={
-                        <SvgIcon fontSize="small">
-                          <BlockIcon />
-                        </SvgIcon>
-                      }
-                      variant="contained"
-                      sx={{
-                        background: "red",
-                        marginRight: 5,
-                        ":hover": { background: "red", opacity: 0.7 },
-                      }}
-                    >
-                      Ban
-                    </Button>
-                  </>
-                )}
+                    return (
+                      <>
+                        {hasUnbannedUsers && (
+                          <Button
+                            onClick={handleBanUsers}
+                            startIcon={
+                              <SvgIcon fontSize="small">
+                                <BlockIcon />
+                              </SvgIcon>
+                            }
+                            variant="contained"
+                            sx={{
+                              background: "red",
+                              marginRight: 5,
+                              ":hover": { background: "red", opacity: 0.7 },
+                            }}
+                          >
+                            Ban
+                          </Button>
+                        )}
+
+                        {hasBannedUsers && (
+                          <Button
+                            onClick={handleUnBanUsers}
+                            startIcon={
+                              <SvgIcon fontSize="small">
+                                <RemoveCircleOutlineIcon />
+                              </SvgIcon>
+                            }
+                            variant="contained"
+                            sx={{
+                              background: "green",
+                              marginRight: 5,
+                              ":hover": { background: "green", opacity: 0.7 },
+                            }}
+                          >
+                            UnBan
+                          </Button>
+                        )}
+                      </>
+                    );
+                  })()}
                 <Button
                   onClick={() => {
                     clearModalData();

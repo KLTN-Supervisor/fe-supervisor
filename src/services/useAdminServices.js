@@ -384,10 +384,17 @@ const useAdminServices = () => {
     }
   };
 
-  const getReports = async (year, term, page, limit) => {
+  const getReports = async (
+    year,
+    term,
+    page,
+    limit,
+    search = "",
+    type = ""
+  ) => {
     try {
       const response = await privateRequest(
-        `/admin/examSchedules/reports?year=${year}&term=${term}&page=${page}&limit=${limit}`
+        `/admin/examSchedules/reports?year=${year}&term=${term}&page=${page}&limit=${limit}&search=${search}&type=${type}`
       );
 
       return response.data;

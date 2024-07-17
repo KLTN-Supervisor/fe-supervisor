@@ -2,7 +2,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import PropTypes from "prop-types";
 import { Card, InputAdornment, OutlinedInput, SvgIcon } from "@mui/material";
 
-export const UserSearch = ({ setSearch }) => {
+export const StudentsSearch = ({ setSearch }) => {
   const handleSearch = (event) => {
     if (event.key === "Enter") setSearch(event.target.value);
     else if (event.target.value === "") setSearch(event.target.value);
@@ -13,19 +13,16 @@ export const UserSearch = ({ setSearch }) => {
       <OutlinedInput
         defaultValue=""
         fullWidth
-        placeholder="Tên đăng nhập, tên...."
+        placeholder="Phòng..."
+        onKeyUp={handleSearch}
         inputProps={{
           sx: {
             p: 1.5,
           },
         }}
-        onKeyUp={handleSearch}
         startAdornment={
           <InputAdornment position="start">
-            <SvgIcon
-              color="action"
-              // fontSize="small"
-            >
+            <SvgIcon color="action" fontSize="small">
               <SearchIcon />
             </SvgIcon>
           </InputAdornment>
@@ -35,6 +32,6 @@ export const UserSearch = ({ setSearch }) => {
   );
 };
 
-UserSearch.propTypes = {
+StudentsSearch.propTypes = {
   setSearch: PropTypes.func,
 };

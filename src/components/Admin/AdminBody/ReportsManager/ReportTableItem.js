@@ -53,7 +53,13 @@ const ReportTableItem = (props) => {
       }}
     >
       <TableCell>{user.time.room.room_name}</TableCell>
-      <TableCell>{user.report_type}</TableCell>
+      <TableCell>
+        {user.report_type === "PROBLEM"
+          ? "Sự cố"
+          : user.report_type === "REPORT"
+          ? "Biên bản"
+          : ""}
+      </TableCell>
       <TableCell>{user.note}</TableCell>
       <TableCell>{formatHour(user.time.start_time)}</TableCell>
       <TableCell>{formatDate(user.time.start_time)}</TableCell>

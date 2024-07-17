@@ -5,6 +5,7 @@ import { Card, InputAdornment, OutlinedInput, SvgIcon } from "@mui/material";
 export const StudentsSearch = ({ setSearch }) => {
   const handleSearch = (event) => {
     if (event.key === "Enter") setSearch(event.target.value);
+    else if (event.target.value === "") setSearch(event.target.value);
   };
 
   return (
@@ -16,15 +17,12 @@ export const StudentsSearch = ({ setSearch }) => {
         onKeyUp={handleSearch}
         inputProps={{
           sx: {
-            p: 1.5
-          }
+            p: 1.5,
+          },
         }}
         startAdornment={
-          <InputAdornment position="start" >
-            <SvgIcon
-              color="action"
-              fontSize="small"
-            >
+          <InputAdornment position="start">
+            <SvgIcon color="action" fontSize="small">
               <SearchIcon />
             </SvgIcon>
           </InputAdornment>

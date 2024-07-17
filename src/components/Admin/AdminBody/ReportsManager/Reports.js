@@ -29,6 +29,7 @@ import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { getStudentsImageSource } from "../../../../untils/getImageSource";
 import { formatHour, formatDate } from "../../../../untils/format-date";
+import { StudentsSearch } from "./ReportSearch";
 
 const cx = classNames.bind(styles);
 // const now = new Date();
@@ -97,6 +98,8 @@ const UsersManage = () => {
     setRowsPerPage(event.target.value);
   }, []);
 
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState("");
   const [year, setYear] = useState("");
   const [years, setYears] = useState([]);
   const [studentsLoading, setStudentsLoading] = useState(false);
@@ -107,6 +110,9 @@ const UsersManage = () => {
   const [term, setTerm] = useState("");
   const handleTermChange = (event) => {
     setTerm(event.target.value);
+  };
+  const handleTypeChange = (event) => {
+    setTypeFilter(event.target.value);
   };
 
   const getYearExam = async () => {
@@ -142,7 +148,14 @@ const UsersManage = () => {
   const getData = useCallback(async () => {
     try {
       setDataLoading(true);
-      const response = await getReports(year, term, page, rowsPerPage);
+      const response = await getReports(
+        year,
+        term,
+        page,
+        rowsPerPage,
+        search,
+        typeFilter
+      );
       if (response) {
         setData(response.reports);
         setTotalRecords(response.total_records);
@@ -153,11 +166,11 @@ const UsersManage = () => {
       console.log(err);
       setDataLoading(false);
     }
-  }, [year, term, page, rowsPerPage]);
+  }, [year, term, page, rowsPerPage, search, typeFilter]);
 
   useEffect(() => {
     if (year !== "" && term !== "") getData();
-  }, [year, term, page, rowsPerPage]);
+  }, [year, term, page, rowsPerPage, search, typeFilter]);
 
   useEffect(() => {
     document.title = "Xem báo cáo";
@@ -289,6 +302,7 @@ const UsersManage = () => {
                   border: "1px solid rgba(0, 85, 141, 0.5)",
                   padding: "3px 16px",
                   borderRadius: "10px",
+                  marginRight: 2,
                 }}
               >
                 <Select
@@ -310,25 +324,53 @@ const UsersManage = () => {
                     ))}
                 </Select>
               </FormControl>
-            </div>
-            {!privateHttpRequest.isLoading && (
-              <ReportTable
-                isLoading={dataLoading}
-                count={totalRecords}
-                data={data}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-                onRowsPerPageChange={handleRowsPerPageChange}
-                page={page}
-                rowsPerPage={rowsPerPage}
-                setUsersSelected={setUsersSelected}
-                selected={usersSelected}
-                handleOnClick={(item) => {
-                  setModalData(item);
-                  setModal(true);
+              <FormControl
+                variant="standard"
+                className={cx("form__select")}
+                sx={{
+                  width: 0.9,
+                  border: "1px solid rgba(0, 85, 141, 0.5)",
+                  padding: "3px 16px",
+                  borderRadius: "10px",
                 }}
-              />
-            )}
+              >
+                <Select
+                  value={typeFilter}
+                  onChange={handleTypeChange}
+                  displayEmpty
+                  disableUnderline
+                  inputProps={{ "aria-label": "Without label" }}
+                  sx={{ height: "100%", marginRight: 0 }}
+                >
+                  <MenuItem value="">
+                    <em>Loại báo cáo</em>
+                  </MenuItem>
+                  <MenuItem key={"REPORT"} value="REPORT">
+                    Biên bản
+                  </MenuItem>
+                  <MenuItem key={"PROBLEM"} value="PROBLEM">
+                    Sự cố
+                  </MenuItem>
+                </Select>
+              </FormControl>
+            </div>
+            <StudentsSearch setSearch={setSearch} />
+            <ReportTable
+              isLoading={dataLoading}
+              count={totalRecords}
+              data={data}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              setUsersSelected={setUsersSelected}
+              selected={usersSelected}
+              handleOnClick={(item) => {
+                setModalData(item);
+                setModal(true);
+              }}
+            />
           </Stack>
         </Container>
       </Box>
