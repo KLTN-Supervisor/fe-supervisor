@@ -41,6 +41,7 @@ const StudentsManage = () => {
     uploadImagesImportFile,
     updateStudent,
     trainStudentImages,
+    deleteSelectedStudents,
   } = useAdminServices();
 
   const [page, setPage] = useState(1);
@@ -613,6 +614,32 @@ const StudentsManage = () => {
     }
   };
 
+  const handleDeleteStudent = async () => {
+    try {
+      setModifyDataLoading(true);
+
+      const response = await deleteSelectedStudents([modalData._id]);
+
+      if (response) {
+        toast.success("Xóa thành công!");
+
+        // Update the data set by removing the deleted student
+        setData((prevData) => {
+          const updatedData = prevData.filter(
+            (student) => student._id !== modalData._id
+          );
+          return updatedData;
+        });
+
+        if (modal) toggleModal();
+      }
+      setModifyDataLoading(false);
+    } catch (err) {
+      toast.error(err.message);
+      setModifyDataLoading(false);
+    }
+  };
+
   const trainData = async () => {
     try {
       const response = toast.promise(trainStudentImages, {
@@ -620,14 +647,13 @@ const StudentsManage = () => {
         success: "Đã train xong dữ liệu...",
         error: {
           render: ({ data }) => {
-            console.log(data)
+            console.log(data);
             return `${data.message}`;
           },
         },
       });
 
       console.log(response);
-
     } catch (err) {}
   };
 
@@ -1553,6 +1579,18 @@ const StudentsManage = () => {
                   >
                     {isEdit ? "Hủy" : "Đóng"}
                   </button>
+                  {!isCreateNew && (
+                    <button
+                      className={cx2("button")}
+                      style={{
+                        backgroundColor: "#FD661E",
+                      }}
+                      onClick={handleDeleteStudent}
+                      disabled={modifyDataLoading}
+                    >
+                      Xóa
+                    </button>
+                  )}
                   <button
                     className={cx2("button")}
                     style={{

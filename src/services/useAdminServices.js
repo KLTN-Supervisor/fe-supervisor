@@ -111,6 +111,63 @@ const useAdminServices = () => {
     }
   };
 
+  const deleteSelectedInspectors = async (ids = []) => {
+    try {
+      const response = await privateRequest(
+        `/admin/inspectors/delete-inspectors`,
+        "delete",
+        {
+          selectedIds: ids,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const deleteSelectedStudents = async (ids = []) => {
+    try {
+      const response = await privateRequest(
+        `/admin/students/delete-students`,
+        "delete",
+        {
+          selectedIds: ids,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const deleteSelectedAccounts = async (ids = []) => {
+    try {
+      const response = await privateRequest(
+        `/admin/accounts/delete-accounts`,
+        "delete",
+        {
+          selectedIds: ids,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      return response?.data;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   const getTopAuthors = async () => {
     try {
       const response = await privateRequest("/admin/user/mostpost");
@@ -448,6 +505,9 @@ const useAdminServices = () => {
     resetAccountPassword,
     getUploadedFileYears,
     deleteSelectedFiles,
+    deleteSelectedAccounts,
+    deleteSelectedStudents,
+    deleteSelectedInspectors,
   };
 };
 
