@@ -1262,20 +1262,20 @@ function HomePage() {
     }
   };
 
-  useEffect(()=>{
-    Promise.all([
-      // THIS FOR FACE DETECT AND LOAD FROM YOU PUBLIC/MODELS DIRECTORY
-      faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
-      faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-      faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-    ]).then(async () => {
-      // Khởi tạo faceMatcher và lưu vào Redux store
-      const trainingData = await loadTrainingData();
-      const faceMatcher = new faceapi.FaceMatcher(trainingData, 0.4);
-      dispatch({ type: "SET_FACE_MATCHER", payload: faceMatcher });
-    });
-    console.log(faceMatcher);
-  },[])
+  // useEffect(()=>{
+  //   Promise.all([
+  //     // THIS FOR FACE DETECT AND LOAD FROM YOU PUBLIC/MODELS DIRECTORY
+  //     faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+  //     faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+  //     faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+  //   ]).then(async () => {
+  //     // Khởi tạo faceMatcher và lưu vào Redux store
+  //     const trainingData = await loadTrainingData();
+  //     const faceMatcher = new faceapi.FaceMatcher(trainingData, 0.4);
+  //     dispatch({ type: "SET_FACE_MATCHER", payload: faceMatcher });
+  //   });
+  //   console.log(faceMatcher);
+  // },[])
 
   // STOP VIDEO STREAM
   const clear = async () => {
