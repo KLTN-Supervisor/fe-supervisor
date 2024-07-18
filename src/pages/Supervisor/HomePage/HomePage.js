@@ -1245,25 +1245,25 @@ function HomePage() {
   const { faceMatcher } = useContext(StateContext);
   const { dispatch } = useContext(StateContext);
 
+  const loadTrainingData = async () => {
+    try {
+      const response = await privateRequest(`/train/`);
+      const labeledFaceDescriptors = response.data
+        .map((x) => {
+          const descriptors = x.descriptors.map(
+            (descriptor) => new Float32Array(descriptor)
+          );
+          return new faceapi.LabeledFaceDescriptors(x.label, descriptors);
+        })
+        .filter(Boolean);
+      return labeledFaceDescriptors;
+    } catch (err) {
+      throw err;
+    }
+  };
+
   useEffect(()=>{
     if(!faceMatcher){
-      const loadTrainingData = async () => {
-        try {
-          const response = await privateRequest(`/train/`);
-          const labeledFaceDescriptors = response.data
-            .map((x) => {
-              const descriptors = x.descriptors.map(
-                (descriptor) => new Float32Array(descriptor)
-              );
-              return new faceapi.LabeledFaceDescriptors(x.label, descriptors);
-            })
-            .filter(Boolean);
-          return labeledFaceDescriptors;
-        } catch (err) {
-          throw err;
-        }
-      };
-      
       Promise.all([
         // THIS FOR FACE DETECT AND LOAD FROM YOU PUBLIC/MODELS DIRECTORY
         faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
