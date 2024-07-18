@@ -12,6 +12,7 @@ import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import { Alert, Snackbar, CircularProgress } from "@mui/material";
 import { StateContext } from "../../../context/StateContext";
 import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
+import usePrivateHttpClient from "../../../hooks/http-hook/private-http-hook";
 
 
 const cx = classNames.bind(styles);
@@ -21,6 +22,7 @@ function StudentCard({ student, attendance, home, search, updateAttendance, upda
   const [modal, setModal] = useState(false);
   const [currentTitle, setCurrentTitle] = useState(document.title);
   const [isAttendance, setIsAttendance] = useState(attendance);
+  const { privateRequest } = usePrivateHttpClient();
 
   const toggleModal = () => {
     if (document.body.style.overflow !== "hidden") {
@@ -62,6 +64,7 @@ function StudentCard({ student, attendance, home, search, updateAttendance, upda
   const isLoadCanvasRef = useRef(true);
   const intervalRef = useRef(null);
   const { faceMatcher } = useContext(StateContext);
+  const { dispatch } = useContext(StateContext);
 
 
   const [snackBarOpen, setSnackBarOpen] = useState(false);
